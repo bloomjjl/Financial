@@ -82,8 +82,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WebApplication\Controllers\AssetTypeControllerTests.cs" />
+    <Compile Include="Data\Fakes\FakeAssetTypes.cs" />
+    <Compile Include="Data\InMemoryUnitOfWork.cs" />
+    <Compile Include="Data\Repositories\InMemoryAssetTypeSettingTypeRepository.cs" />
+    <Compile Include="Data\Repositories\InMemoryAssetTypeRepository.cs" />
+    <Compile Include="Data\Repositories\InMemorySettingTypeRepository.cs" />
+    <Compile Include="Data\Repositories\InMemoryRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\HomeControllerTest.cs" />
+    <Compile Include="WebApplication\Controllers\HomeControllerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
@@ -92,9 +99,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Financial\Financial.csproj">
-      <Project>{7D728390-A09F-475B-AC9F-92656330D797}</Project>
-      <Name>Financial</Name>
+    <Folder Include="Core\Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Financial.Core\Financial.Core.csproj">
+      <Project>{B454AEF2-D9B8-45C0-AE22-AEAD2DE95567}</Project>
+      <Name>Financial.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Financial.WebApplication\Financial.WebApplication.csproj">
+      <Project>{4079845B-9B5D-454C-9779-F573DDF69DB7}</Project>
+      <Name>Financial.WebApplication</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

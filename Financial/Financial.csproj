@@ -44,6 +44,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.AI.Agent.Intercept, Version=2.0.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.DependencyCollector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.2.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.PerfCounterCollector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.PerfCounterCollector.2.2.0\lib\net45\Microsoft.AI.PerfCounterCollector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.ServerTelemetryChannel, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel.2.2.0\lib\net45\Microsoft.AI.ServerTelemetryChannel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.Web, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.Web.2.2.0\lib\net45\Microsoft.AI.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AI.WindowsServer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.WindowsServer.2.2.0\lib\net45\Microsoft.AI.WindowsServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.2.2.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -162,89 +190,100 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="App_Start\IdentityConfig.cs" />
-    <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\Startup.Auth.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="Global.asax.cs">
+    <Compile Include="WebApplication\App_Start\BundleConfig.cs" />
+    <Compile Include="WebApplication\App_Start\FilterConfig.cs" />
+    <Compile Include="WebApplication\App_Start\IdentityConfig.cs" />
+    <Compile Include="WebApplication\App_Start\RouteConfig.cs" />
+    <Compile Include="WebApplication\App_Start\Startup.Auth.cs" />
+    <Compile Include="WebApplication\Controllers\AccountController.cs" />
+    <Compile Include="WebApplication\Controllers\HomeController.cs" />
+    <Compile Include="WebApplication\Controllers\ManageController.cs" />
+    <Compile Include="WebApplication\Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Core\Models\Account.cs" />
+    <Compile Include="Core\Models\AccountViewModels.cs" />
+    <Compile Include="Core\Models\IdentityModels.cs" />
+    <Compile Include="Core\Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Startup.cs" />
+    <Compile Include="WebApplication\Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
-    <Content Include="favicon.ico" />
-    <Content Include="fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="Scripts\jquery-1.10.2.js" />
-    <Content Include="Scripts\jquery-1.10.2.min.js" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\modernizr-2.6.2.js" />
-    <Content Include="Scripts\respond.js" />
-    <Content Include="Scripts\respond.min.js" />
-    <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
-    <Content Include="Web.Debug.config">
+    <Content Include="WebApplication\Content\bootstrap.css" />
+    <Content Include="WebApplication\Content\bootstrap.min.css" />
+    <Content Include="WebApplication\favicon.ico" />
+    <Content Include="WebApplication\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="WebApplication\Global.asax" />
+    <Content Include="WebApplication\Content\Site.css" />
+    <Content Include="WebApplication\Scripts\bootstrap.js" />
+    <Content Include="WebApplication\Scripts\bootstrap.min.js" />
+    <Content Include="WebApplication\ApplicationInsights.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="web.config" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="WebApplication\Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="WebApplication\Scripts\jquery-1.10.2.js" />
+    <Content Include="WebApplication\Scripts\jquery-1.10.2.min.js" />
+    <None Include="WebApplication\Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="WebApplication\Scripts\jquery.validate.js" />
+    <Content Include="WebApplication\Scripts\jquery.validate.min.js" />
+    <Content Include="WebApplication\Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="WebApplication\Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="WebApplication\Scripts\modernizr-2.6.2.js" />
+    <Content Include="WebApplication\Scripts\respond.js" />
+    <Content Include="WebApplication\Scripts\respond.min.js" />
+    <Content Include="WebApplication\Scripts\_references.js" />
+    <Content Include="WebApplication\Web.config" />
+    <Content Include="WebApplication\Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Web.Release.config">
+    <Content Include="WebApplication\Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Views\Web.config" />
-    <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
-    <Content Include="Views\Account\ConfirmEmail.cshtml" />
-    <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
-    <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
-    <Content Include="Views\Account\ForgotPassword.cshtml" />
-    <Content Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\Login.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
-    <Content Include="Views\Account\ResetPassword.cshtml" />
-    <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\SendCode.cshtml" />
-    <Content Include="Views\Account\VerifyCode.cshtml" />
-    <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <Content Include="Views\Manage\ChangePassword.cshtml" />
-    <Content Include="Views\Manage\Index.cshtml" />
-    <Content Include="Views\Manage\ManageLogins.cshtml" />
-    <Content Include="Views\Manage\SetPassword.cshtml" />
-    <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
-    <Content Include="Views\Shared\Lockout.cshtml" />
-    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="WebApplication\Views\Web.config" />
+    <Content Include="WebApplication\Views\_ViewStart.cshtml" />
+    <Content Include="WebApplication\Views\Shared\Error.cshtml" />
+    <Content Include="WebApplication\Views\Shared\_Layout.cshtml" />
+    <Content Include="WebApplication\Views\Home\About.cshtml" />
+    <Content Include="WebApplication\Views\Home\Contact.cshtml" />
+    <Content Include="WebApplication\Views\Home\Index.cshtml" />
+    <Content Include="WebApplication\Views\Account\_ExternalLoginsListPartial.cshtml" />
+    <Content Include="WebApplication\Views\Account\ConfirmEmail.cshtml" />
+    <Content Include="WebApplication\Views\Account\ExternalLoginConfirmation.cshtml" />
+    <Content Include="WebApplication\Views\Account\ExternalLoginFailure.cshtml" />
+    <Content Include="WebApplication\Views\Account\ForgotPassword.cshtml" />
+    <Content Include="WebApplication\Views\Account\ForgotPasswordConfirmation.cshtml" />
+    <Content Include="WebApplication\Views\Account\Login.cshtml" />
+    <Content Include="WebApplication\Views\Account\Register.cshtml" />
+    <Content Include="WebApplication\Views\Account\ResetPassword.cshtml" />
+    <Content Include="WebApplication\Views\Account\ResetPasswordConfirmation.cshtml" />
+    <Content Include="WebApplication\Views\Account\SendCode.cshtml" />
+    <Content Include="WebApplication\Views\Account\VerifyCode.cshtml" />
+    <Content Include="WebApplication\Views\Manage\AddPhoneNumber.cshtml" />
+    <Content Include="WebApplication\Views\Manage\ChangePassword.cshtml" />
+    <Content Include="WebApplication\Views\Manage\Index.cshtml" />
+    <Content Include="WebApplication\Views\Manage\ManageLogins.cshtml" />
+    <Content Include="WebApplication\Views\Manage\SetPassword.cshtml" />
+    <Content Include="WebApplication\Views\Manage\VerifyPhoneNumber.cshtml" />
+    <Content Include="WebApplication\Views\Shared\Lockout.cshtml" />
+    <Content Include="WebApplication\Views\Shared\_LoginPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <Folder Include="WebApplication\App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="packages.config" />
-    <None Include="Project_Readme.html" />
-    <Content Include="Scripts\jquery-1.10.2.min.map" />
+    <Content Include="WebApplication\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="WebApplication\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="WebApplication\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="WebApplication\packages.config" />
+    <None Include="WebApplication\Project_Readme.html" />
+    <Content Include="WebApplication\Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
