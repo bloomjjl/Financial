@@ -171,6 +171,7 @@
     <Compile Include="Controllers\AssetTypeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\SettingTypeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -236,10 +237,14 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\AssetType\Index.cshtml" />
+    <Content Include="Views\AssetType\Create.cshtml" />
+    <Content Include="Views\AssetType\Edit.cshtml" />
+    <Content Include="Views\AssetType\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\AccountType\" />
+    <Folder Include="Views\SettingType\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

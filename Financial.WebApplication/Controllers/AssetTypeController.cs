@@ -1,5 +1,6 @@
 ﻿using Financial.Core;
 using Financial.Core.Models;
+using Financial.Core.ViewModels.AssetType;
 using Financial.Data;
 using System;
 using System.Collections.Generic;
@@ -26,104 +27,138 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Index()
         {
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"].ToString();
+            }
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"].ToString();
+            }
+
+            var vmIndex = new List<IndexViewModel>();
+
             try
             {
-                if(TempData["ErrorMessage"] != null)
+                // get values from db
+                var dbAssetTypes  = _unitOfWork.AssetTypes.GetAll().OrderBy(r => r.Name).ToList();
+
+                if(dbAssetTypes == null || dbAssetTypes.Count <= 0)
                 {
-                    ModelState.AddModelError("", TempData["ErrorMessage"].ToString());
+                    ViewData["ErrorMessage"] = "Unable to view information. Try again later.";
                 }
 
-                var vmAssetTypes = _unitOfWork.AssetTypes.GetAll().Where(r => r.IsActive).ToList();
-                return View("Index", vmAssetTypes);
+                // transfer dto to vm
+                foreach(var dtoAssetType in dbAssetTypes)
+                {
+                    vmIndex.Add(new IndexViewModel(dtoAssetType));
+                }
+
+                return View("Index", vmIndex);
             }
             catch (Exception e)
             {
-                ModelState.AddModelError("", "Unable to view information at this time. Try again later.");
-                List<AssetType> vmAssetTypes = new List<AssetType>();
-                return View("Index", vmAssetTypes);
+                ViewData["ErrorMessage"] = "Unable to view information at this time. Try again later.";
+                return View("Index", vmIndex);
             }
         }
 
         [HttpGet]
         public ViewResult Create()
         {
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"].ToString();
+            }
+
             return View("Create");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(AssetType vmCreate)
+        public ActionResult Create(CreateViewModel vmCreate)
         {
             if(!ModelState.IsValid)
             {
-                return RedirectToAction("Create", "AssetType");
+                return RedirectToAction("Create", "AssetType", new { id = 1 });
             }
             if(string.IsNullOrEmpty(vmCreate.Name))
             {
-                ModelState.AddModelError("", "Name is required.");
+                ViewData["ErrorMessage"] = "Name is required.";
                 return View("Create", vmCreate);
             }
 
             try
             {
                 // look for existing entity with matching name
-                AssetType dbAssetType = _unitOfWork.AssetTypes.Find(r => r.Name == vmCreate.Name); 
-
-                // Active entity found
-                if(dbAssetType != null && dbAssetType.IsActive)
-                {
-                    // YES. STOP. do not duplicate entry
-                    ModelState.AddModelError("", "Name already exists.");
-                    return View("Create", vmCreate);
-                }
+                AssetType dtoAssetType = _unitOfWork.AssetTypes.Find(r => r.Name == vmCreate.Name);
 
                 // Is this a new entity
-                if (dbAssetType == null)
+                if (dtoAssetType == null)
                 {
                     // YES. create new entity
-                    AssetType dtoAssetType = new AssetType()
+                    AssetType assetType = new AssetType()
                     {
-                        Name = vmCreate.Name
+                        Name = vmCreate.Name,
+                        IsActive = true
                     };
 
-                    _unitOfWork.AssetTypes.Add(dtoAssetType);
+                    _unitOfWork.AssetTypes.Add(assetType);
                     _unitOfWork.CommitTrans();
+                    TempData["SuccessMessage"] = "Record created.";
+                    return RedirectToAction("Index", "AssetType");
+                }
+
+                // Active entity found
+                if (dtoAssetType.IsActive)
+                {
+                    // YES. STOP. do not duplicate entry
+                    ViewData["ErrorMessage"] = "Name already exists.";
+                    return View("Create", vmCreate);
                 }
                 else
                 {
                     // update existing entity to active
-                    AssetType dtoAssetType = new AssetType()
-                    {
-                        Id = dbAssetType.Id,
-                        Name = dbAssetType.Name,
-                        IsActive = true,
-                    };
+                    dtoAssetType.IsActive = true;
 
                     _unitOfWork.AssetTypes.Update(dtoAssetType);
                     _unitOfWork.CommitTrans();
+                    TempData["SuccessMessage"] = "Record is visible.";
+                    return RedirectToAction("Index", "AssetType");
                 }
-
-                return RedirectToAction("Index", "AssetType");
             }
             catch (Exception)
             {
-                ModelState.AddModelError("", "Unable to add record at this time. Try again later.");
+                ViewData["ErrorMessage"] = "Unable to add record at this time. Try again later.";
                 return View("Create", vmCreate);
             }
         }
 
         [HttpGet]
-        public ActionResult Edit(int assetTypeId)
+        public ActionResult Edit(int? id)
         {
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"].ToString();
+            }
+            if(id == null)
+            {
+                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+                return RedirectToAction("Index", "AssetType");
+            }
+
             try
             {
-                var vmEdit = _unitOfWork.AssetTypes.Get(assetTypeId);
-
-                if (vmEdit == null)
+                // get db values
+                var dtoAssetType = _unitOfWork.AssetTypes.Get((int)id);
+                if (dtoAssetType == null)
                 {
-                    TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+                    TempData["ErrorMessage"] = "Unable to edit record. Try again later.";
                     return RedirectToAction("Index", "AssetType");
                 }
+
+                // transfer dto to vm
+                var vmEdit = new EditViewModel(dtoAssetType);
 
                 return View("Edit", vmEdit);
             }
@@ -136,7 +171,7 @@ namespace Financial.WebApplication.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(AssetType vmEdit)
+        public ActionResult Edit(EditViewModel vmEdit)
         {
             if (!ModelState.IsValid)
             {
@@ -145,7 +180,7 @@ namespace Financial.WebApplication.Controllers
             }
             if (string.IsNullOrEmpty(vmEdit.Name))
             {
-                ModelState.AddModelError("", "Asset Type Name is required.");
+                TempData["ErrorMessage"] = "Asset Type Name is required.";
                 return View("Edit", vmEdit);
             }
 
@@ -158,26 +193,83 @@ namespace Financial.WebApplication.Controllers
                     return RedirectToAction("Index", "AssetType");
                 }
 
+                // get record from db
+                var dtoAssetType = _unitOfWork.AssetTypes.Get(vmEdit.Id);
+
                 // look for active entity with matching name
-                AssetType dbAssetTypeDuplicate = _unitOfWork.AssetTypes.Find(r => r.Name == vmEdit.Name && r.Id != vmEdit.Id);
-                if (dbAssetTypeDuplicate != null && dbAssetTypeDuplicate.IsActive)
+                int? count = _unitOfWork.AssetTypes.GetAll()
+                    .Where(r => r.Name == vmEdit.Name)
+                    .Where(r => r.Id != dtoAssetType.Id)
+                    .Count();
+                if (count != null && count > 0)
                 {
                     // STOP. Duplicate entity found
-                    ModelState.AddModelError("", "Name already exists.");
+                    ViewData["ErrorMessage"] = "Name already exists.";
                     return View("Edit", vmEdit);
                 }
 
+                // get message to display
+                if (dtoAssetType.Name == vmEdit.Name &&
+                    dtoAssetType.IsActive == vmEdit.IsActive)
+                {
+                    // nothing changed
+                    TempData["SuccessMessage"] = null;
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "Record updated.";
+                }
+
                 // save changes
-                _unitOfWork.AssetTypes.Update(vmEdit);
+                dtoAssetType.Name = vmEdit.Name;
+                dtoAssetType.IsActive = vmEdit.IsActive;
+
+                _unitOfWork.AssetTypes.Update(dtoAssetType);
                 _unitOfWork.CommitTrans();
 
                 return RedirectToAction("Index", "AssetType");
             }
             catch (Exception)
             {
-                ModelState.AddModelError("", "Unable to edit record at this time. Try again later.");
+                TempData["ErrorMessage"] = "Unable to edit record at this time. Try again later.";
                 return View("Edit", vmEdit);
             }
+        }
+
+        [HttpGet]
+        public ActionResult Details(int? id)
+        {
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"].ToString();
+            }
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "Unable to display record. Try again.";
+                return RedirectToAction("Index", "AssetType");
+            }
+
+            try
+            { 
+                // get db values
+                var dtoAssetType = _unitOfWork.AssetTypes.Get((int)id);
+                if (dtoAssetType == null)
+                {
+                    TempData["ErrorMessage"] = "Unable to display record. Try again.";
+                    return RedirectToAction("Index", "AssetType");
+                }
+
+                // transfer dto to vm
+                var vmDetails = new DetailsViewModel(dtoAssetType);
+
+                return View("Details", vmDetails);
+            }
+            catch(Exception)
+            {
+                TempData["ErrorMessage"] = "Unable to display record. Try again later.";
+                return RedirectToAction("Index", "AssetType");
+            }
+
         }
     }
 }

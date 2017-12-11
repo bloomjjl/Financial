@@ -82,6 +82,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WebApplication\Controllers\SettingTypeControllerTests.cs" />
+    <Compile Include="Data\Fakes\FakeSettingTypes.cs" />
     <Compile Include="WebApplication\Controllers\AssetTypeControllerTests.cs" />
     <Compile Include="Data\Fakes\FakeAssetTypes.cs" />
     <Compile Include="Data\InMemoryUnitOfWork.cs" />

@@ -10,6 +10,7 @@ using Financial.Tests.Data;
 using Financial.Tests.Data.Repositories;
 using Financial.Tests.Data.Fakes;
 using System.Web.Mvc;
+using Financial.Core.ViewModels.AssetType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
@@ -25,147 +26,121 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         protected IList<AssetType> _assetTypes;
-        protected AssetTypeController _controller;
         protected InMemoryAssetTypeRepository _repositoryAssetType;
         protected InMemoryUnitOfWork _unitOfWork;
+        protected AssetTypeController _controller;
     }
 
     public static class AssetTypeObjectMother
     {
-        public static AssetType GetValidAssetTypeViewModelToCreate()
-        {
-            return new AssetType()
-            {
-                //Id = 0,
-                Name = "NewAssetTypeName",
-                //IsActive = true
-            };
-        }
-        public static AssetType GetValidAssetTypeViewModelToCreate(string name)
-        {
-            return new AssetType()
-            {
-                //Id = 0, 
-                Name = name,
-                //IsActive = true 
-            };
-        }
-        public static AssetType GetInvalidAssetTypeViewModelWithInvalidNameToCreate()
-        {
-            return new AssetType()
-            {
-                //Id = 0, 
-                Name = null,
-                //IsActive = true 
-            };
-        }
-        public static AssetType GetValidAssetTypeViewModelToEdit()
-        {
-            return new AssetType()
-            {
-                Id = 2,
-                Name = "NewAssetTypeName",
-                IsActive = true
-            };
-        }
-        public static AssetType GetValidAssetTypeViewModelToEdit(AssetType assetType)
-        {
-            return new AssetType()
-            {
-                Id = assetType.Id,
-                Name = assetType.Name,
-                IsActive = assetType.IsActive
-            };
-        }
-        public static AssetType GetValidAssetTypeViewModelWithSameNameToEdit()
-        {
-            return new AssetType()
-            {
-                Id = 5,
-                Name = "AssetTypeName5",
-                IsActive = true
-            };
-        }
-        public static AssetType GetValidAssetTypeViewModelWithDuplicateNameToEdit()
-        {
-            return new AssetType()
-            {
-                Id = 2,
-                Name = "AssetTypeName5",
-                IsActive = true
-            };
-        }
-        public static AssetType GetInvalidAssetTypeViewModelWithInvalidNameToEdit()
-        {
-            return new AssetType()
-            {
-                Id = 4,
-                Name = null,
-                IsActive = true
-            };
-        }
-        public static AssetType GetInvalidAssetTypeViewModelWithInvalidIdToEdit(int id)
-        {
-            return new AssetType()
-            {
-                Id = id,
-                Name = "NewAssetTypeName",
-                IsActive = true
-            };
-        }
-
     }
 
     [TestClass()]
     public class AssetTypeControllerTests : AssetTypeControllerTestsBase
     {
+        // *** GET - SUCCESS ***
+        // Valid Returned Views 
+        // Valid Returned View Models
+        // Valid Returned Success Messages
+
+        // *** GET - ERROR ***
+        // Invalid Returned Error Messages
+        // Invalid Input Values
+        // Invalid Returned View Models
+        // Invalid Retrieved Database Values 
+        // Invalid Retrieved Database Objects
+
+        // *** POST - SUCCESS ***
+        // Valid Redirected Actions 
+        // Valid Output Values
+        // Valid Updated Database Values
+        // Valid Returned Success Messages
+
+        // *** POST - ERROR ***
+        // Invalid Input Values
+        // Invalid Database Values 
+        // Invalid Database Objects
+        // Invalid Output Values
+        // Invalid Returned Error Messages
+
+
+
+
         [TestMethod()]
-        public void Index_Get_ReturnsIndexViewWhenNoInputValuesTest()
+        public void Index_Get_WhenNoInputVauesProvided_ReturnIndexViewAndSortedViewModelTest()
         {
             // Arrange
-            AssetTypeController controller = _controller;
+            _assetTypes[0].Name = "Zzzz AssetType";
+            _assetTypes[1].Name = "A AssetType";
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
+            AssetTypeController controller = new AssetTypeController(_unitOfWork);
+            List<AssetType> vmExpected = _assetTypes.AsQueryable().ToList();
+            int lastIndex = vmExpected.Count() - 1;
 
             // Act
             var result = controller.Index();
 
-            // Assert
-            Assert.AreEqual("Index", result.ViewName);
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Index", viewResult.ViewName);
+            // Assert - VIEW Model
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexViewModel>));
+            var vmResult = viewResult.ViewData.Model as List<IndexViewModel>;
+            Assert.AreEqual(vmExpected.Count, vmResult.Count, "Number of Records.");
+            Assert.AreEqual("A AssetType", vmResult[0].Name, "Name");
+            Assert.AreEqual("Zzzz AssetType", vmResult[lastIndex].Name, "Name");
+            // Assert - MESSAGE
         }
 
         [TestMethod()]
-        public void Index_Get_ViewModelHasAllActiveAssetTypesTest()
+        public void Index_Get_WhenTempDataSuccessMessageProvidedIsValid_ReturnIndexViewAndViewModelAndSuccessMessageTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            List<AssetType> expectedAssetTypes = _assetTypes.AsQueryable().Where(r => r.IsActive).ToList();
+            List<AssetType> vmExpected = _assetTypes.AsQueryable().ToList();
+            controller.TempData["SuccessMessage"] = "Test Success Message";
 
             // Act
             var result = controller.Index();
-            var viewModel = result.ViewData.Model as List<AssetType>;
 
-            // Assert
-            Assert.AreEqual(expectedAssetTypes.Count, viewModel.Count);
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Index", viewResult.ViewName);
+            // Assert - VIEW Model
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexViewModel>));
+            var vmResult = viewResult.ViewData.Model as List<IndexViewModel>;
+            Assert.AreEqual(vmExpected.Count, vmResult.Count, "Number of Records.");
+            // Assert - MESSAGE
+            Assert.AreEqual("Test Success Message", controller.ViewData["SuccessMessage"]);
         }
 
         [TestMethod()]
-        public void Index_Get_ReturnsErrorMessageFromTempDataTest()
+        public void Index_Get_WhenTempDataErrorMessageProvidedIsValid_ReturnIndexViewAndViewModelAndErrorMessageTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
+            List<AssetType> vmExpected = _assetTypes.AsQueryable().ToList();
             controller.TempData["ErrorMessage"] = "Test Error Message";
 
             // Act
             var result = controller.Index();
-            var modelState = result.ViewData.ModelState[""];
 
-            // Assert
-            Assert.IsNotNull(modelState);
-            Assert.IsTrue(modelState.Errors.Any());
-            Assert.AreEqual("Test Error Message", modelState.Errors[0].ErrorMessage);
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Index", viewResult.ViewName);
+            // Assert - VIEW Model
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexViewModel>));
+            var vmResult = viewResult.ViewData.Model as List<IndexViewModel>;
+            Assert.AreEqual(vmExpected.Count, vmResult.Count, "Number of Records.");
+            // Assert - MESSAGE
+            Assert.AreEqual("Test Error Message", controller.ViewData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Index_Get_ReturnsValidViewModelWhenNoDataFoundTest()
+        public void Index_Get_WhenNoRecordsFoundInDatabase_ReturnIndexViewAndViewModelAndErrorMessageTest()
         {
             // Arrange
             List<AssetType> entities = new List<AssetType>(); // create empty list of entities
@@ -176,14 +151,19 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Act
             var result = controller.Index();
-            var viewModel = result.ViewData.Model;
 
-            // Assert
-            Assert.IsInstanceOfType(viewModel, typeof(List<AssetType>));
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Index", viewResult.ViewName);
+            // Assert - VIEW Model
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<IndexViewModel>));
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to view information. Try again later.", controller.ViewData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Index_Get_ReturnsIndexViewWithErrorMessageWhenEntityNotValidTest()
+        public void Index_Get_WhenEntitiesFromDatabaseNotValid_ReturnIndexViewAndViewModelAndErrorMessageTest()
         {
             // Arrange
             List<AssetType> entities = null; // create invalid list of entities
@@ -194,19 +174,21 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Act
             var result = controller.Index();
-            var modelState = result.ViewData.ModelState[""];
 
-            // Assert
-            Assert.AreEqual("Index", result.ViewName);
-            Assert.IsNotNull(modelState);
-            Assert.IsTrue(modelState.Errors.Any());
-            Assert.AreEqual("Unable to view information at this time. Try again later.", modelState.Errors[0].ErrorMessage);
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Index", viewResult.ViewName);
+            // Assert - VIEW Model
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<IndexViewModel>));
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to view information at this time. Try again later.", controller.ViewData["ErrorMessage"]);
         }
 
 
 
         [TestMethod()]
-        public void Create_Get_ReturnsCreateViewWhenNoInputValuesTest()
+        public void Create_Get_WhenNoInputVauesProvided_ReturnCreateViewTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
@@ -214,130 +196,186 @@ namespace Financial.Tests.WebApplication.Controllers
             // Act
             var result = controller.Create();
 
-            // Assert
-            Assert.AreEqual("Create", result.ViewName);
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsNull(viewResult.ViewData.Model, "View Model Returned.");
+            // Assert - MESSAGE
         }
 
         [TestMethod()]
-        public void Create_Post_ReturnsIndexViewWhenSuccessfulTest()
+        public void Create_Get_WhenTempDataErrorMessageProvidedIsValid_ReturnCreateViewAndErrorMessageTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToCreate();
+            List<AssetType> vmExpected = _assetTypes.AsQueryable().ToList();
+            controller.TempData["ErrorMessage"] = "Test Error Message";
 
             // Act
-            var result = controller.Create(viewModel);
-            var routeResult = result as RedirectToRouteResult;
+            var result = controller.Create();
 
-            // Assert
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsNull(viewResult.ViewData.Model, "View Model Returned.");
+            // Assert - MESSAGE
+            Assert.AreEqual("Test Error Message", controller.ViewData["ErrorMessage"]);
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenValidRecordAddedToDatabase_UpdateDatabaseAndReturnIndexActionAndSuccessMessageTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int newId = _assetTypes.Count + 1;
+            CreateViewModel vmExpected = new CreateViewModel()
+            {
+                //Id = 0,
+                Name = "NewAssetTypeName",
+                //IsActive = true
+            };
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert - ACTION
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"]);
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - DATABASE VALUES
+            var dtoAssetType = _assetTypes.FirstOrDefault(r => r.Id == newId);
+            Assert.AreEqual(vmExpected.Name, dtoAssetType.Name, "Name");
+            Assert.AreEqual(true, dtoAssetType.IsActive, "IsActive");
+            Assert.AreEqual(true, _unitOfWork.Committed, "Committed Transaction");
+            // Assert - MESSAGE
+            Assert.AreEqual("Record created.", controller.TempData["SuccessMessage"]);
         }
 
         [TestMethod()]
-        public void Create_Post_RecordAddedTest()
+        public void Create_Post_WhenDuplicateRecordFoundAndIsActiveEqualsFalse_UpdateDatabaseAndReturnIndexActionAndSuccessMessageTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToCreate();
-            int newId = _assetTypes.Count + 1;
+            AssetType dtoAssetType = _unitOfWork.AssetTypes.Get(3); // record where IsActive equals false
+            bool initialIsActive = dtoAssetType.IsActive;
+            CreateViewModel vmExpected = new CreateViewModel()
+            {
+                //Id = 0, 
+                Name = dtoAssetType.Name,
+                //IsActive = false 
+            };
 
             // Act
-            var result = controller.Create(viewModel);
-            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == newId);
+            var result = controller.Create(vmExpected);
 
-            // Assert
-            Assert.AreEqual(viewModel.Name, dbAssetType.Name);
-            Assert.AreEqual(true, dbAssetType.IsActive);
-            Assert.AreEqual(true, _unitOfWork.Committed);
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - DATABASE VALUES
+            var dbResult = _assetTypes.Where(r => r.Name == vmExpected.Name).ToList();
+            Assert.AreEqual(1, dbResult.Count(), "Number of records with same name in database.");
+            Assert.IsFalse(initialIsActive, "Intial IsActive value for record with matching name.");
+            Assert.AreEqual(true, dbResult[0].IsActive, "Updated IsActive value for record with matching name.");
+            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction committed.");
+            // Assert - MESSAGE
+            Assert.AreEqual("Record is visible.", controller.TempData["SuccessMessage"]);
         }
-
+        
         [TestMethod()]
-        public void Create_Post_UpdateRecordWhenIsActiveEqualsFalseTest()
-        {
-            // Arrange
-            AssetTypeController controller = _controller;
-            int initialCount = _assetTypes.Count();
-            AssetType dbAssetType = _unitOfWork.AssetTypes.Get(3); // record where IsActive equals false
-            bool initialIsActive = dbAssetType.IsActive;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToCreate(dbAssetType.Name);
-
-            // Act
-            var result = controller.Create(viewModel);
-            var dbAssetTypeUpdated = _unitOfWork.AssetTypes.Find(r => r.Name == viewModel.Name);
-
-            // Assert
-            Assert.AreEqual(initialCount, _assetTypes.Count(), "Number of records in database must not change.");
-            Assert.IsFalse(initialIsActive, "Record being duplicated must have IsActive = false.");
-            Assert.AreEqual(viewModel.Name, dbAssetType.Name, "Names must match to create error.");
-            Assert.AreEqual(true, dbAssetTypeUpdated.IsActive, "Record being duplicated must have IsActive = true.");
-            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction must be committed.");
-        }
-
-        [TestMethod()]
-        public void Create_Post_ReturnsCreateViewWhenModelStateNotValidTest()
+        public void Create_Post_WhenModelStateNotValid_ReturnCreateActionTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
             controller.ModelState.AddModelError("", "mock error message");
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToCreate();
+            CreateViewModel vmExpected = new CreateViewModel()
+            {
+                //Id = 0,
+                Name = "NewAssetTypeName",
+                //IsActive = true
+            };
 
             // Act
-            var result = controller.Create(viewModel);
-            var routeResult = result as RedirectToRouteResult;
+            var result = controller.Create(vmExpected);
 
-            // Assert
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Create", routeResult.RouteValues["action"]);
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
         }
 
         [TestMethod()]
-        public void Create_Post_ReturnsCreateViewAndViewModelWithErrorMessageWhenRequiredFieldAssetTypeNameNotValidTest()
+        public void Create_Post_WhenNameProvidedIsNull_ReturnCreateViewAndViewModelAndErrorMessageTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            AssetType viewModel = AssetTypeObjectMother.GetInvalidAssetTypeViewModelWithInvalidNameToCreate();
+            CreateViewModel vmExpected = new CreateViewModel()
+            {
+                //Id = 0, 
+                Name = null,
+                //IsActive = true 
+            };
 
             // Act
-            var result = (ViewResult)controller.Create(viewModel);
-            var viewModelReturned = result.ViewData.Model;
-            var modelState = result.ViewData.ModelState[""];
+            var result = controller.Create(vmExpected);
 
-            // Assert
-            Assert.AreEqual("Create", result.ViewName);
-            Assert.AreEqual(viewModel, viewModelReturned);
-            Assert.AreEqual("Name is required.", modelState.Errors[0].ErrorMessage);
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel));
+            var vmResult = viewResult.ViewData.Model as CreateViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+            // Assert - MESSAGE
+            Assert.AreEqual("Name is required.", controller.ViewData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Create_Post_ReturnsCreateViewAndViewModelWithErrorMessageWhenRequiredFieldAssetTypeNameDuplicatedTest()
+        public void Create_Post_WhenNameProvidedIsADuplicate_ReturnCreateViewAndViewModelAndErrorMessageTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
             int initialCount = _assetTypes.Count();
-            AssetType dbAssetType = _unitOfWork.AssetTypes.Get(4); // record to duplicate
-            bool initialIsActive = dbAssetType.IsActive;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToCreate(dbAssetType.Name);
+            AssetType dtoAssetType = _unitOfWork.AssetTypes.Get(4); // record to duplicate
+            bool initialIsActive = dtoAssetType.IsActive;
+            CreateViewModel vmCreate = new CreateViewModel()
+            {
+                //Id = 0, 
+                Name = dtoAssetType.Name,
+                //IsActive = true 
+            };
 
             // Act
-            var result = controller.Create(viewModel) as ViewResult;
-            var dbAssetTypeUpdated = _unitOfWork.AssetTypes.Find(r => r.Name == viewModel.Name);
-            var modelState = result.ViewData.ModelState[""];
+            var result = controller.Create(vmCreate);
 
-            // Assert
-            Assert.AreEqual("Create", result.ViewName, "Create view must be returned.");
-            Assert.AreEqual(viewModel, result.ViewData.Model, "Correct view model must be returned.");
-            Assert.AreEqual("Name already exists.", modelState.Errors[0].ErrorMessage, "Error message must match.");
-            Assert.AreEqual(initialCount, _assetTypes.Count(), "Number of records in database must not change.");
-            Assert.AreEqual(dbAssetType, dbAssetTypeUpdated, "Record must not be updated.");
-            Assert.IsTrue(initialIsActive, "Record being duplicated must have IsActive = true.");
-            Assert.AreEqual(true, dbAssetTypeUpdated.IsActive, "Record being duplicated must remain IsActive = true.");
-            Assert.AreEqual(false, _unitOfWork.Committed, "Transaction must not be committed.");
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel));
+            var vmResult = viewResult.ViewData.Model as CreateViewModel;
+            Assert.AreEqual(vmCreate.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmCreate.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmCreate.IsActive, vmResult.IsActive, "IsActive");
+            // Assert - MESSAGE
+            Assert.AreEqual("Name already exists.", controller.ViewData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Create_Post_ReturnsCreateViewAndViewModelWithErrorMessageWhenEntityNotValidTest()
+        public void Create_Post_WhenEntitiesFromDatabaseNotValidTest()
         {
             // Arrange
             List<AssetType> entities = null; // List of invalid entities
@@ -345,54 +383,120 @@ namespace Financial.Tests.WebApplication.Controllers
             InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
             unitOfWork.AssetTypes = repository;
             AssetTypeController controller = new AssetTypeController(unitOfWork);
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToCreate();
+            CreateViewModel vmExpected = new CreateViewModel()
+            {
+                //Id = 0, 
+                Name = "NewAssetTypeName",
+                //IsActive = true 
+            };
 
             // Act
-            var result = (ViewResult)controller.Create(viewModel);
-            var modelState = result.ViewData.ModelState[""];
+            var result = controller.Create(vmExpected);
 
-            // Assert
-            Assert.AreEqual("Create", result.ViewName, "Create view must be returned.");
-            Assert.AreEqual(viewModel, result.ViewData.Model, "Correct view model must be returned.");
-            Assert.AreEqual("Unable to add record at this time. Try again later.", modelState.Errors[0].ErrorMessage, "Error message must match.");
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel));
+            var vmResult = viewResult.ViewData.Model as CreateViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to add record at this time. Try again later.", controller.ViewData["ErrorMessage"]);
         }
 
 
+
+        [TestMethod()]
+        public void Edit_Get_WhenIdProvidedIsValidTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int id = 2;
+            AssetType dtoAssetType = _unitOfWork.AssetTypes.Get(id);
+
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(dtoAssetType.Id, vmResult.Id, "Id");
+            Assert.AreEqual(dtoAssetType.Name, vmResult.Name, "Name");
+            Assert.AreEqual(dtoAssetType.IsActive, vmResult.IsActive, "IsActive");
+            // Assert - MESSAGE
+        }
+
+        [TestMethod()]
+        public void Edit_Get_WhenTempDataErrorMessageProvidedIsValidTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int id = 2;
+            controller.TempData["ErrorMessage"] = "Test Error Message";
+
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            // Assert - MESSAGE
+            Assert.AreEqual("Test Error Message", controller.ViewData["ErrorMessage"]);
+        }
         
         [TestMethod()]
-        public void Edit_Get_ReturnsEditViewWhenInputValueAssetTypeIdProvidedTest()
+        public void Edit_Get_WhenIdProvidedIsNullTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            int id = 2;
+            int? id = null;
 
             // Act
-            var result = controller.Edit(id) as ViewResult;
+            var result = controller.Edit(id);
 
-            // Assert
-            Assert.AreEqual("Edit", result.ViewName);
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to edit record. Try again.", controller.TempData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Edit_Get_ReturnsViewModelWhenRecordFoundTest()
+        public void Edit_Get_WhenIdProvidedIsOutOfRangeTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            int id = 2;
-            AssetType dbAssetType = _unitOfWork.AssetTypes.Get(id);
+            int id = _assetTypes.Count + 2; // ID outside of range
 
             // Act
-            var result = controller.Edit(id) as ViewResult;
-            var viewModel = result.ViewData.Model as AssetType;
+            var result = controller.Edit(id);
 
-            // Assert
-            Assert.AreEqual(dbAssetType.Id, viewModel.Id);
-            Assert.AreEqual(dbAssetType.Name, viewModel.Name);
-            Assert.AreEqual(dbAssetType.IsActive, viewModel.IsActive);
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to edit record. Try again later.", controller.TempData["ErrorMessage"]);
         }
-
+        
         [TestMethod()]
-        public void Edit_Get_ReturnsIndexViewWithErrorMessageWhenEntityNotValidTest()
+        public void Edit_Get_WhenEntitiesFromDatabaseNotValidTest()
         {
             // Arrange
             List<AssetType> entities = null; // invalid list of entities
@@ -400,148 +504,271 @@ namespace Financial.Tests.WebApplication.Controllers
             InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
             unitOfWork.AssetTypes = repository;
             AssetTypeController controller = new AssetTypeController(unitOfWork);
-            int assetTypeId = 1;
+            int id = 1;
 
             // Act
-            var result = controller.Edit(assetTypeId);
-            var routeResult = result as RedirectToRouteResult;
+            var result = controller.Edit(id);
 
-            // Assert
+            // Assert - ACTION
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"]);
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
-            Assert.IsTrue(controller.TempData.ContainsKey("ErrorMessage"));
+            // Assert - VALUES
+            // Assert - MESSAGE
             Assert.AreEqual("Unable to edit record at this time. Try again later.", controller.TempData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Edit_Get_ReturnsIndexViewWithErrorMessageWhenEntityNotFoundTest()
+        public void Edit_Post_WhenNameProvidedIsValidTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            int badId = _assetTypes.Count + 2; // ID outside of range
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = "NewAssetTypeName",
+                IsActive = true
+            };
 
             // Act
-            var result = controller.Edit(badId);
-            var routeResult = result as RedirectToRouteResult;
+            var result = controller.Edit(vmExpected);
 
-            // Assert
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"]);
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
-            Assert.AreEqual("Unable to edit record. Try again.", controller.TempData["ErrorMessage"]);
+            // Assert - VALUES
+            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.Id, dbAssetType.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, dbAssetType.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, dbAssetType.IsActive, "IsActive");
+            Assert.AreEqual(true, _unitOfWork.Committed, "Committed Transaction");
+            // Assert - MESSAGE
+            Assert.AreEqual("Record updated.", controller.TempData["SuccessMessage"]);
         }
 
         [TestMethod()]
-        public void Edit_Post_ReturnsIndexViewWhenSuccessfulTest()
+        public void Edit_Post_WhenIsActiveProvidedIsValidTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToEdit();
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = "AssetTypeName2",
+                IsActive = false
+            };
 
             // Act
-            var result = controller.Edit(viewModel);
+            var result = controller.Edit(vmExpected);
+
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
             var routeResult = result as RedirectToRouteResult;
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Method redirects to a differnt action.");
-            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Index action must be returned.");
-            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "AssetType controller must be returned.");
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.Id, dbAssetType.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, dbAssetType.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, dbAssetType.IsActive, "IsActive");
+            Assert.AreEqual(true, _unitOfWork.Committed, "Committed Transaction");
+            // Assert - MESSAGE
+            Assert.AreEqual("Record updated.", controller.TempData["SuccessMessage"]);
         }
 
         [TestMethod()]
-        public void Edit_Post_ReturnsIndexViewWhenNameNotChangedTest()
+        public void Edit_Post_WhenAllValuesProvidedHaveNotChangedTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelWithSameNameToEdit();
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = "AssetTypeName2",
+                IsActive = true
+            };
 
             // Act
-            var result = controller.Edit(viewModel);
+            var result = controller.Edit(vmExpected);
+
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
             var routeResult = result as RedirectToRouteResult;
-
-            // Assert
-            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Index action must be returned.");
-            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "AssetType controller must be returned.");
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.Id, dbAssetType.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, dbAssetType.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, dbAssetType.IsActive, "IsActive");
+            Assert.AreEqual(true, _unitOfWork.Committed, "Committed Transaction");
+            // Assert - MESSAGE
+            Assert.AreEqual(null, controller.TempData["SuccessMessage"]);
         }
-
+        
         [TestMethod()]
-        public void Edit_Post_RecordUpdatedTest()
-        {
-            // Arrange
-            AssetTypeController controller = _controller;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToEdit();
-
-            // Act
-            var result = controller.Edit(viewModel);
-            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == viewModel.Id);
-
-            // Assert
-            Assert.AreEqual(viewModel.Id, dbAssetType.Id);
-            Assert.AreEqual(viewModel.Name, dbAssetType.Name);
-            Assert.AreEqual(viewModel.IsActive, dbAssetType.IsActive);
-            Assert.AreEqual(true, _unitOfWork.Committed);
-        }
-
-        [TestMethod()]
-        public void Edit_Post_UpdateRecordIsActiveWhenIsActiveEqualsFalseTest()
-        {
-            // Arrange
-            AssetTypeController controller = _controller;
-            int initialCount = _assetTypes.Count();
-            AssetType dbAssetType = _unitOfWork.AssetTypes.Get(3); // record where IsActive equals false
-            bool initialIsActive = dbAssetType.IsActive;
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToEdit(dbAssetType);
-
-            // Act
-            var result = controller.Create(viewModel);
-            var dbAssetTypeUpdated = _unitOfWork.AssetTypes.Find(r => r.Id == viewModel.Id);
-
-            // Assert
-            Assert.AreEqual(initialCount, _assetTypes.Count(), "Number of records in database must not change.");
-            Assert.IsFalse(initialIsActive, "Record being updated must have IsActive = false.");
-            Assert.AreEqual(viewModel.Name, dbAssetType.Name, "Names must not change.");
-            Assert.AreEqual(true, dbAssetTypeUpdated.IsActive, "Record updated must have IsActive = true.");
-            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction must be committed.");
-        }
-
-        [TestMethod()]
-        public void Edit_Post_ReturnsIndexViewWithErrorMessageWhenModelStateNotValidTest()
+        public void Edit_Post_WhenModelStateNotValidTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
             controller.ModelState.AddModelError("", "mock error message");
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToEdit();
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = "AssetTypeName2",
+                IsActive = true
+            };
 
             // Act
-            var result = controller.Edit(viewModel);
-            var routeResult = result as RedirectToRouteResult;
+            var result = controller.Edit(vmExpected);
 
-            // Assert
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"]);
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
             Assert.AreEqual("Unable to edit record. Try again.", controller.TempData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Edit_Post_ReturnsEditViewAndViewModelWithErrorMessageWhenRequiredFieldAssetTypeNameNotValidTest()
+        public void Edit_Post_WhenIdProvidedIsNullTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            AssetType viewModel = AssetTypeObjectMother.GetInvalidAssetTypeViewModelWithInvalidNameToEdit();
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                //Id = null,
+                Name = "New Name",
+                IsActive = true
+            };
 
             // Act
-            var result = (ViewResult)controller.Edit(viewModel);
-            var viewModelReturned = result.ViewData.Model;
-            var modelState = result.ViewData.ModelState[""];
+            var result = controller.Edit(vmExpected);
 
-            // Assert
-            Assert.AreEqual("Edit", result.ViewName);
-            Assert.AreEqual(viewModel, viewModelReturned);
-            Assert.AreEqual("Asset Type Name is required.", modelState.Errors[0].ErrorMessage);
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
+        }
+        
+        [TestMethod()]
+        public void Edit_Post_WhenNameProvidedNotValidTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = null,
+                IsActive = true
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+            // Assert - MESSAGE
+            Assert.AreEqual("Asset Type Name is required.", controller.TempData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Edit_Post_ReturnsEditViewAndViewModelWithErrorMessageWhenEntityNotValidTest()
+        public void Edit_Post_WhenNameProvidedIsADuplicateTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int initialCount = _assetTypes.Count();
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 1,
+                Name = "AssetTypeName2", // duplicated name
+                IsActive = true
+            };
+            AssetType dbAssetTypeExisting = _unitOfWork.AssetTypes.Find(r => r.Name == vmExpected.Name);
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+            // Assert - MESSAGE
+            Assert.AreEqual("Name already exists.", controller.ViewData["ErrorMessage"]);
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenIdProvidedIsOutOfRangeTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = _assetTypes.Count + 2, // index outside of range
+                Name = "BadAssetTypeName",
+                IsActive = true
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VIEW MODEL
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to edit record. Try again.", controller.TempData["ErrorMessage"]);
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenNoRecordsFoundInDatabaseTest()
+        {
+            // Arrange
+            List<AssetType> entities = new List<AssetType>(); // create empty list of entities
+            InMemoryAssetTypeRepository repository = new InMemoryAssetTypeRepository(entities);
+            InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
+            unitOfWork.AssetTypes = repository;
+            AssetTypeController controller = new AssetTypeController(unitOfWork);
+            int id = 1;
+
+            // Act
+            var result = controller.Edit(id);
+
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VIEW MODEL
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to edit record. Try again later.", controller.TempData["ErrorMessage"]);
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenEntitiesFromDatabaseNotValidTest()
         {
             // Arrange
             List<AssetType> entities = null; // invalid list of entities
@@ -549,58 +776,166 @@ namespace Financial.Tests.WebApplication.Controllers
             InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
             unitOfWork.AssetTypes = repository;
             AssetTypeController controller = new AssetTypeController(unitOfWork);
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelToEdit();
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = "AssetTypeName2",
+                IsActive = true
+            };
 
             // Act
-            var result = (ViewResult)controller.Edit(viewModel);
-            var modelState = result.ViewData.ModelState[""];
+            var result = controller.Edit(vmExpected);
 
-            // Assert
-            Assert.AreEqual("Edit", result.ViewName);
-            Assert.AreEqual(viewModel, result.ViewData.Model);
-            Assert.AreEqual("Unable to edit record at this time. Try again later.", modelState.Errors[0].ErrorMessage);
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to edit record at this time. Try again later.", controller.TempData["ErrorMessage"]);
         }
 
+
+
         [TestMethod()]
-        public void Edit_Post_ReturnsIndexViewWithErrorMessageWhenEntityNotFoundTest()
+        public void Details_Get_WhenIdProvidedIsValidTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            int badId = _assetTypes.Count + 2; // index outside of range
-            AssetType viewModel = AssetTypeObjectMother.GetInvalidAssetTypeViewModelWithInvalidIdToEdit(badId);
+            int id = 2;
+            AssetType dbExpected = _unitOfWork.AssetTypes.Get(id);
 
             // Act
-            var result = controller.Edit(viewModel);
+            var result = controller.Details(id);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Details", viewResult.ViewName);
+            // Assert
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(DetailsViewModel));
+            var vmResult = viewResult.ViewData.Model as DetailsViewModel;
+            Assert.AreEqual(dbExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(dbExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(dbExpected.IsActive, vmResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Detials_Get_WhenTempDataErrorMessageProvidedIsValidTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int id = 2;
+            controller.TempData["ErrorMessage"] = "Test Error Message";
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert - VIEW
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Details", viewResult.ViewName);
+            // Assert - VIEW MODEL
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(DetailsViewModel));
+            var vmResult = viewResult.ViewData.Model as DetailsViewModel;
+            // Assert - MESSAGE
+            Assert.AreEqual("Test Error Message", controller.ViewData["ErrorMessage"]);
+
+        }
+
+        [TestMethod()]
+        public void Details_Get_WhenIdProvidedNotValidTest()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int? id = null;
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
             var routeResult = result as RedirectToRouteResult;
-
-            // Assert
-            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Index view must be returned.");
-            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "AssetType controller must be returned.");
-            Assert.AreEqual("Unable to edit record. Try again.", controller.TempData["ErrorMessage"], "Error message must match.");
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to display record. Try again.", controller.TempData["ErrorMessage"]);
         }
 
         [TestMethod()]
-        public void Edit_Post_ReturnsEditViewAndViewModelWithErrorMessageWhenRequiredFieldAssetTypeNameDuplicatedTest()
+        public void Details_Get_WhenIdProvidedIsOutsideOfRangeTest()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            int initialCount = _assetTypes.Count();
-            AssetType viewModel = AssetTypeObjectMother.GetValidAssetTypeViewModelWithDuplicateNameToEdit();
-            AssetType dbAssetTypeDuplicated = _unitOfWork.AssetTypes.Find(r => r.Name == viewModel.Name);
+            int id = _assetTypes.Count + 2; // ID outside of range
 
             // Act
-            var result = controller.Edit(viewModel) as ViewResult;
-            var dbAssetTypeUpdated = _unitOfWork.AssetTypes.Find(r => r.Name == viewModel.Name);
-            var modelState = result.ViewData.ModelState[""];
+            var result = controller.Details(id);
 
-            // Assert
-            Assert.AreEqual("Edit", result.ViewName, "Edit view must be returned.");
-            Assert.AreEqual(viewModel, result.ViewData.Model, "Correct view model must be returned.");
-            Assert.AreEqual("Name already exists.", modelState.Errors[0].ErrorMessage, "Error message must match.");
-            Assert.AreEqual(initialCount, _assetTypes.Count(), "Number of records in database must not change.");
-            Assert.AreEqual(dbAssetTypeDuplicated, dbAssetTypeUpdated, "Duplicated record must not be updated.");
-            Assert.AreEqual(false, _unitOfWork.Committed, "Transaction must not be committed.");
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to display record. Try again.", controller.TempData["ErrorMessage"]);
         }
+
+        [TestMethod()]
+        public void Details_Post_WhenNoRecordsFoundInDatabaseTest()
+        {
+            // Arrange
+            List<AssetType> entities = new List<AssetType>(); // create empty list of entities
+            InMemoryAssetTypeRepository repository = new InMemoryAssetTypeRepository(entities);
+            InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
+            unitOfWork.AssetTypes = repository;
+            AssetTypeController controller = new AssetTypeController(unitOfWork);
+            int id = 2;
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to display record. Try again.", controller.TempData["ErrorMessage"]);
+        }
+
+        [TestMethod()]
+        public void Details_Get_WhenEntitiesFromDatabaseNotValidTest()
+        {
+            // Arrange
+            List<AssetType> entities = null; // invalid list of entities
+            InMemoryAssetTypeRepository repository = new InMemoryAssetTypeRepository(entities);
+            InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
+            unitOfWork.AssetTypes = repository;
+            AssetTypeController controller = new AssetTypeController(unitOfWork);
+            int id = 1;
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert - ACTION
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            // Assert - VALUES
+            // Assert - MESSAGE
+            Assert.AreEqual("Unable to display record. Try again later.", controller.TempData["ErrorMessage"]);
+        }
+
 
     }
 }

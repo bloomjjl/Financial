@@ -65,10 +65,13 @@
     <Compile Include="RepositoryInterfaces\IRelationshipTypeRepository.cs" />
     <Compile Include="RepositoryInterfaces\IRepository.cs" />
     <Compile Include="RepositoryInterfaces\ITransactionTypeRepository.cs" />
+    <Compile Include="ViewModels\AssetType\CreateViewModel.cs" />
+    <Compile Include="ViewModels\AssetType\DetailsViewModel.cs" />
+    <Compile Include="ViewModels\AssetType\EditViewModel.cs" />
+    <Compile Include="ViewModels\AssetType\IndexViewModel.cs" />
+    <Compile Include="ViewModels\SettingType\IndexViewModel.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,0 +1,51 @@
+﻿@model Financial.Core.ViewModels.AssetType.DetailsViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Asset Types</h2>
+
+<div>
+
+    <h4>Details</h4>
+    
+    @if (ViewData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-warning">
+            <span class="glyphicon glyphicon-remove"></span>
+            @ViewData["ErrorMessage"].ToString()
+        </div>
+    }
+    else if (ViewData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span>
+            @ViewData["SuccessMessage"].ToString()
+        </div>
+    }
+
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsActive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsActive)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

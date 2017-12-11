@@ -47,7 +47,6 @@ namespace Financial.Tests.Data.Repositories
         {
             // database sets following values
             entity.Id = _entities.Count + 1;
-            entity.IsActive = true;
 
             _entities.Add(entity);
         }
