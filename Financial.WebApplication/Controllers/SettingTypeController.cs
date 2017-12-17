@@ -27,38 +27,38 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Index()
         {
-            if (TempData["ErrorMessage"] != null)
-            {
-                ViewData["ErrorMessage"] = TempData["ErrorMessage"].ToString();
-            }
-            if (TempData["SuccessMessage"] != null)
-            {
-                ViewData["SuccessMessage"] = TempData["SuccessMessage"].ToString();
-            }
+            // transfer db to vm
+            var vmIndex = _unitOfWork.SettingTypes.GetAll()
+                .Select(r => new IndexViewModel(r))
+                .ToList();
 
-            try
-            {
-                var vmIndex = _unitOfWork.SettingTypes.GetAll()
-                    .Select(r => new IndexViewModel(r))
-                    .OrderBy(r => r.Name)
-                    .ToList();
-                /*
-                // get records from db
-                List<SettingType> dbSettingTypes = _unitOfWork.SettingTypes.GetAll().OrderBy(r => r.Name).ToList();
+            // display view
+            return View("Index", vmIndex);
+        }
 
-                // transfer dto to vm
-                foreach (var dtoSettingType in dbSettingTypes)
-                {
-                    vmIndex.Add(new IndexViewModel(dtoSettingType));
-                }
-                */
-                return View("Index", vmIndex);
-            }
-            catch (Exception)
+        [HttpGet]
+        public ViewResult Create()
+        {
+            return View("Create");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(CreateViewModel vmCreate)
+        {
+            // transfer vm to dto
+            var dtoSettingType = new SettingType()
             {
-                //ViewData["ErrorMessage"] = TempData["ErrorMessage"].ToString();
-                return View("Index");
-            }
+                Name = vmCreate.Name,
+                IsActive = vmCreate.IsActive
+            };
+
+            // update db
+            _unitOfWork.SettingTypes.Add(dtoSettingType);
+            _unitOfWork.CommitTrans();
+
+            // display view
+            return RedirectToAction("CreateLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = dtoSettingType.Id });
         }
     }
 }

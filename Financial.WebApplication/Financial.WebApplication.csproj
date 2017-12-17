@@ -244,11 +244,12 @@
     <Content Include="Views\AssetType\Details.cshtml" />
     <Content Include="Views\AssetSetting\Create.cshtml" />
     <Content Include="Views\AssetTypeSettingType\CreateLinkedSettingTypes.cshtml" />
+    <Content Include="Views\SettingType\Create.cshtml" />
+    <Content Include="Views\AssetTypeSettingType\CreateLinkedAssetTypes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\AccountType\" />
-    <Folder Include="Views\SettingType\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

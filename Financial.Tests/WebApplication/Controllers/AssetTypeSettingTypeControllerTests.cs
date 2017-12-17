@@ -50,14 +50,8 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeSettingTypeController controller = _controller;
-            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
-            _assetTypes.Add(new AssetType()
-            {
-                Id = assetTypeId,
-                Name = "New Name",
-                IsActive = true
-            });
-            List<SettingType> dbSettingTypes = _settingTypes.ToList();
+            int assetTypeId = _assetTypes.Count() + 1; 
+            _assetTypes.Add(new AssetType() { Id = assetTypeId });
 
             // Act
             var result = controller.CreateLinkedSettingTypes(assetTypeId);
@@ -67,11 +61,32 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as ViewResult;
             Assert.AreEqual("CreateLinkedSettingTypes", viewResult.ViewName);
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateLinkedSettingTypesViewModel));
+        }
+
+        [TestMethod()]
+        public void CreateLinkedSettingTypes_Get_WhenProvidedAssetTypeIdIsValid_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int expectedCount = _settingTypes.Count();
+            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
+            _assetTypes.Add(new AssetType()
+            {
+                Id = assetTypeId,
+                Name = "New Name",
+                IsActive = true
+            });
+
+            // Act
+            var result = controller.CreateLinkedSettingTypes(assetTypeId);
+
+            // Assert
+            var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as CreateLinkedSettingTypesViewModel;
             var dtoAssetType = _assetTypes.FirstOrDefault(r => r.Id == assetTypeId);
             Assert.AreEqual(dtoAssetType.Id, vmResult.AssetTypeId, "AssetType Id");
             Assert.AreEqual(dtoAssetType.Name, vmResult.AssetTypeName, "AssetType Name");
-            Assert.AreEqual(dbSettingTypes.Count(), vmResult.CreateViewModels.Count(), "CreateViewModel Count");
+            Assert.AreEqual(expectedCount, vmResult.CreateViewModels.Count(), "CreateViewModel Count");
         }
 
         [TestMethod()]
@@ -84,11 +99,11 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 AssetTypeId = assetTypeId,
                 CreateViewModels = _assetTypesSettingTypes
-                .Select(vm => new CreateViewModel()
+                .Select(r => new CreateViewModel()
                 {
                     AssetTypeId = assetTypeId,
-                    SettingTypeId = vm.SettingTypeId,
-                    IsActive = vm.IsActive
+                    SettingTypeId = r.SettingTypeId,
+                    IsActive = r.IsActive
                 })
                 .ToList()
             };
@@ -99,7 +114,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Database Updated");
             var dbResult = _assetTypesSettingTypes
-                .Where(r => r.AssettTypeId == assetTypeId)
+                .Where(r => r.AssetTypeId == assetTypeId)
                 .ToList();
             Assert.AreEqual(vmExpected.CreateViewModels.Count(), dbResult.Count(), "New Records Added Count");
         }
@@ -133,6 +148,113 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
             Assert.AreEqual(assetTypeId, routeResult.RouteValues["assetTypeId"], "AssetType Id");
         }
+
+
+
+        [TestMethod()]
+        public void CreateLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int settingTypeId = _settingTypes.Count() + 1;
+            _settingTypes.Add(new SettingType() { Id = settingTypeId });
+
+            // Act
+            var result = controller.CreateLinkedAssetTypes(settingTypeId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("CreateLinkedAssetTypes", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateLinkedAssetTypesViewModel));
+        }
+
+        [TestMethod()]
+        public void CreateLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int expectedCount = _assetTypes.Count();
+            int settingTypeId = _settingTypes.Count() + 1; // new SettingType Id
+            _settingTypes.Add(new SettingType()
+            {
+                Id = settingTypeId,
+                Name = "New Name",
+                IsActive = true
+            });
+
+            // Act
+            var result = controller.CreateLinkedAssetTypes(settingTypeId);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as CreateLinkedAssetTypesViewModel;
+            var dtoSettingType = _settingTypes.FirstOrDefault(r => r.Id == settingTypeId);
+            Assert.AreEqual(dtoSettingType.Id, vmResult.SettingTypeId, "SettingType Id");
+            Assert.AreEqual(dtoSettingType.Name, vmResult.SettingTypeName, "SettingType Name");
+            Assert.AreEqual(expectedCount, vmResult.CreateViewModels.Count(), "CreateViewModel Count");
+        }
+
+        [TestMethod()]
+        public void CreateLinkedAssetTypes_Post_WhenProvidedViewModelIsValid_DatabaseUpdated_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int settingTypeId = _settingTypes.Count() + 1; // new SettingType Id
+            CreateLinkedAssetTypesViewModel vmExpected = new CreateLinkedAssetTypesViewModel()
+            {
+                SettingTypeId = settingTypeId,
+                CreateViewModels = _assetTypesSettingTypes
+                .Select(r => new CreateViewModel()
+                {
+                    SettingTypeId = settingTypeId,
+                    AssetTypeId = r.AssetTypeId,
+                    IsActive = r.IsActive
+                })
+                .ToList()
+            };
+
+            // Act
+            var result = controller.CreateLinkedAssetTypes(vmExpected);
+
+            // Assert
+            Assert.AreEqual(true, _unitOfWork.Committed, "Database Updated");
+            var dbResult = _assetTypesSettingTypes
+                .Where(r => r.SettingTypeId == settingTypeId)
+                .ToList();
+            Assert.AreEqual(vmExpected.CreateViewModels.Count(), dbResult.Count(), "New Records Added Count");
+        }
+
+        [TestMethod()]
+        public void CreateLinkedAssetTypes_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int settingTypeId = _settingTypes.Count() + 1; // new SettingType Id
+            CreateLinkedAssetTypesViewModel vmExpected = new CreateLinkedAssetTypesViewModel()
+            {
+                SettingTypeId = settingTypeId,
+                CreateViewModels = _assetTypesSettingTypes
+                .Select(vm => new CreateViewModel()
+                {
+                    SettingTypeId = settingTypeId,
+                    AssetTypeId = vm.AssetTypeId,
+                    IsActive = vm.IsActive
+                })
+                .ToList()
+            };
+
+            // Act
+            var result = controller.CreateLinkedAssetTypes(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual(settingTypeId, routeResult.RouteValues["settingTypeId"], "SettingType Id");
+        }
+
 
     }
 }

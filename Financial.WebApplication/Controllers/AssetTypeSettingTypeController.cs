@@ -41,14 +41,11 @@ namespace Financial.WebApplication.Controllers
         {
             // transfer db to vm
             var dtoAssetType = _unitOfWork.AssetTypes.Get((int)assetTypeId);
-            var dbSettingTypes = _unitOfWork.SettingTypes.GetAll();
-            var vmCreate = new List<CreateViewModel>();
-            foreach(var dtoSettingType in dbSettingTypes)
-            {
-                vmCreate.Add(new CreateViewModel((int)assetTypeId, dtoSettingType));
-            }
+            var vmCreate = _unitOfWork.SettingTypes.GetAll()
+                .Select(r => new CreateViewModel((int)assetTypeId, r))
+                .ToList();
             var vmCreateLinkedSettingTypes = new CreateLinkedSettingTypesViewModel(dtoAssetType, vmCreate);
-                
+                            
             // display view
             return View("CreateLinkedSettingTypes", vmCreateLinkedSettingTypes);
         }
@@ -62,7 +59,7 @@ namespace Financial.WebApplication.Controllers
             {
                 _unitOfWork.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
                 {
-                    AssettTypeId = vmCreate.AssetTypeId,
+                    AssetTypeId = vmCreate.AssetTypeId,
                     SettingTypeId = vmCreate.SettingTypeId,
                     IsActive = vmCreate.IsActive
                 });
@@ -75,6 +72,40 @@ namespace Financial.WebApplication.Controllers
             return RedirectToAction("Details", "AssetType", new { assetTypeId = vmCreateLinkedSettingTypes.AssetTypeId });
         }
 
+        [HttpGet]
+        public ViewResult CreateLinkedAssetTypes(int? settingTypeId)
+        {
+            // transfer db to vm
+            var dtoSettingType = _unitOfWork.SettingTypes.Get((int)settingTypeId);
+            var vmCreate = _unitOfWork.AssetTypes.GetAll()
+                .Select(r => new CreateViewModel((int)settingTypeId, r))
+                .ToList();
+            var vmCreateLinkedAssetTypes = new CreateLinkedAssetTypesViewModel(dtoSettingType, vmCreate);
 
+            // display view
+            return View("CreateLinkedAssetTypes", vmCreateLinkedAssetTypes);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateLinkedAssetTypes(CreateLinkedAssetTypesViewModel vmCreateLinkedAssetTypes)
+        {
+            // transfer vm to db
+            foreach (var vmCreate in vmCreateLinkedAssetTypes.CreateViewModels)
+            {
+                _unitOfWork.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
+                {
+                    AssetTypeId = vmCreate.AssetTypeId,
+                    SettingTypeId = vmCreate.SettingTypeId,
+                    IsActive = vmCreate.IsActive
+                });
+            }
+
+            // complete db update
+            _unitOfWork.CommitTrans();
+
+            // display view
+            return RedirectToAction("Details", "SettingType", new { settingTypeId = vmCreateLinkedAssetTypes.SettingTypeId });
+        }
     }
 }

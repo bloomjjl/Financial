@@ -87,7 +87,8 @@ namespace Financial.Tests.WebApplication.Controllers
             int newId = _assetTypes.Count() + 1;
             CreateViewModel vmCreate = new CreateViewModel()
             {
-                Name = "New Name"
+                Name = "New Name",
+                IsActive = true
             };
 
             // Act
@@ -95,8 +96,9 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == newId);
-            Assert.AreEqual(vmCreate.Name, dbAssetType.Name, "AssetType Name");
+            var dbResult = _assetTypes.FirstOrDefault(r => r.Id == newId);
+            Assert.AreEqual(vmCreate.Name, dbResult.Name, "AssetType Name");
+            Assert.AreEqual(vmCreate.IsActive, dbResult.IsActive, "AssetType IsActive");
         }
 
         [TestMethod()]
@@ -342,11 +344,10 @@ namespace Financial.Tests.WebApplication.Controllers
 
 
         [TestMethod()]
-        public void Index_Get_WhenNoInputVauesProvided_ReturnRouteValues_Test()
+        public void Index_Get_WhenProvidedNoInputVaues_ReturnRouteValues_Test()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            int expectedCount = _assetTypes.Count();
 
             // Act
             var result = controller.Index();
@@ -356,8 +357,22 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as ViewResult;
             Assert.AreEqual("Index", viewResult.ViewName);
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexViewModel>));
-            var vmResult = viewResult.ViewData.Model as List<IndexViewModel>;
-            Assert.AreEqual(expectedCount, vmResult.Count(), "Number of records");
+        }
+
+        [TestMethod()]
+        public void Index_Get_WhenProvidedNoInputValues_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int expectedCount = _assetTypes.Count();
+
+            // Act
+            var result = controller.Index();
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmReturned = viewResult.ViewData.Model as List<IndexViewModel>;
+            Assert.AreEqual(expectedCount, vmReturned.Count(), "Number of records");
         }
 
         /*
@@ -488,7 +503,6 @@ namespace Financial.Tests.WebApplication.Controllers
             // Arrange
             AssetTypeController controller = _controller;
             int id = 2;
-            AssetType dtoAssetType = _unitOfWork.AssetTypes.Get(id);
 
             // Act
             var result = controller.Edit(id);
@@ -499,9 +513,32 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Edit", viewResult.ViewName);
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
             var vmResult = viewResult.ViewData.Model as EditViewModel;
-            Assert.AreEqual(dtoAssetType.Id, vmResult.Id, "Id");
-            Assert.AreEqual(dtoAssetType.Name, vmResult.Name, "Name");
-            Assert.AreEqual(dtoAssetType.IsActive, vmResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnCorrectValuesFromDatabase_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int id = 2;
+            EditViewModel vmExpected = _assetTypes
+                .Select(r => new EditViewModel()
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    IsActive = r.IsActive
+                })
+                .FirstOrDefault(r => r.Id == id);
+
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
         }
 
         [TestMethod()]
@@ -950,7 +987,6 @@ namespace Financial.Tests.WebApplication.Controllers
             // Arrange
             AssetTypeController controller = _controller;
             int id = 2;
-            AssetType dbExpected = _unitOfWork.AssetTypes.Get(id);
 
             // Act
             var result = controller.Details(id);
@@ -960,11 +996,34 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as ViewResult;
             Assert.AreEqual("Details", viewResult.ViewName);
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(DetailsViewModel));
-            var vmResult = viewResult.ViewData.Model as DetailsViewModel;
-            Assert.AreEqual(dbExpected.Id, vmResult.Id, "Id");
-            Assert.AreEqual(dbExpected.Name, vmResult.Name, "Name");
-            Assert.AreEqual(dbExpected.IsActive, vmResult.IsActive, "IsActive");
         }
+
+        [TestMethod()]
+        public void Details_Get_WhenProvidedIdIsValid_ReturnCorrectValuesFromDatabase_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int id = 2;
+            DetailsViewModel vmExpected = _assetTypes
+                .Select(r => new DetailsViewModel()
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    IsActive = r.IsActive
+                })
+                .FirstOrDefault(r => r.Id == id);
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as DetailsViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+        }
+
 
         /*
         [TestMethod()]

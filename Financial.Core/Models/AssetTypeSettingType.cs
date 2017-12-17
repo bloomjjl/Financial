@@ -14,7 +14,7 @@ namespace Financial.Core.Models
         [Required]
         [Display(Name = "AssetType ID")]
         [Column("AccountTypeId")]
-        public int AssettTypeId { get; set; }
+        public int AssetTypeId { get; set; }
         [Required]
         [Display(Name = "SettingType ID")]
         [Column("AttributeTypeId")]
