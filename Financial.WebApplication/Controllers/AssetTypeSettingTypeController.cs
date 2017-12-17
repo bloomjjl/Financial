@@ -74,5 +74,7 @@ namespace Financial.WebApplication.Controllers
             // display view
             return RedirectToAction("Details", "AssetType", new { assetTypeId = vmCreateLinkedSettingTypes.AssetTypeId });
         }
+
+
     }
 }

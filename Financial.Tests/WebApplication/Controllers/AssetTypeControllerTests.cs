@@ -73,15 +73,14 @@ namespace Financial.Tests.WebApplication.Controllers
             // Act
             var result = controller.Create();
 
-            // Assert - VIEW
+            // Assert
             Assert.IsInstanceOfType(result, typeof(ViewResult));
             var viewResult = result as ViewResult;
             Assert.AreEqual("Create", viewResult.ViewName);
-            // Assert - RETURNED VALUES
         }
 
         [TestMethod()]
-        public void Create_Post_WhenProvidedViewModelIsValid_ReturnCreateLinkedSettingTypesActionAndAssetTypeSettingTypeControllerAndAssetTypeId_Test()
+        public void Create_Post_WhenProvidedViewModelIsValid_DatabaseUpdated_Test()
         {
             // Arrange
             AssetTypeController controller = _controller;
@@ -94,18 +93,31 @@ namespace Financial.Tests.WebApplication.Controllers
             // Act
             var result = controller.Create(vmCreate);
 
-            // Assert - VIEW
+            // Assert
+            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
+            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == newId);
+            Assert.AreEqual(vmCreate.Name, dbAssetType.Name, "AssetType Name");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int newId = _assetTypes.Count() + 1;
+            CreateViewModel vmCreate = new CreateViewModel() { Id = newId };
+
+            // Act
+            var result = controller.Create(vmCreate);
+
+            // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
             var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("CreateLinkedSettingTypes", routeResult.RouteValues["action"]);
-            Assert.AreEqual("AssetTypeSettingType", routeResult.RouteValues["controller"]);
-            // Assert - DATABASE VALUES
-            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var actualAssetType = _assetTypes.FirstOrDefault(r => r.Id == newId);
-            Assert.AreEqual(vmCreate.Name, actualAssetType.Name, "AssetType Name");
-            // Assert - RETURNED VALUES
+            Assert.AreEqual("CreateLinkedSettingTypes", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("AssetTypeSettingType", routeResult.RouteValues["controller"], "Controller");
             Assert.AreEqual(newId, routeResult.RouteValues["assetTypeId"], "AssetType Id");
         }
+
         /*
         [TestMethod()]
         public void Create_Get_WhenNoInputVauesProvided_ReturnCreateViewTest()
@@ -330,6 +342,26 @@ namespace Financial.Tests.WebApplication.Controllers
 
 
         [TestMethod()]
+        public void Index_Get_WhenNoInputVauesProvided_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int expectedCount = _assetTypes.Count();
+
+            // Act
+            var result = controller.Index();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Index", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexViewModel>));
+            var vmResult = viewResult.ViewData.Model as List<IndexViewModel>;
+            Assert.AreEqual(expectedCount, vmResult.Count(), "Number of records");
+        }
+
+        /*
+        [TestMethod()]
         public void Index_Get_WhenNoInputVauesProvided_ReturnIndexViewAndSortedViewModelTest()
         {
             // Arrange
@@ -447,9 +479,77 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to view information at this time. Try again later.", controller.ViewData["ErrorMessage"]);
         }
+        */
 
 
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int id = 2;
+            AssetType dtoAssetType = _unitOfWork.AssetTypes.Get(id);
 
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(dtoAssetType.Id, vmResult.Id, "Id");
+            Assert.AreEqual(dtoAssetType.Name, vmResult.Name, "Name");
+            Assert.AreEqual(dtoAssetType.IsActive, vmResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedViewModelIsValid_DatabaseUpdated_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = "Updated Name",
+                IsActive = true
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert
+            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
+            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.Id, dbAssetType.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, dbAssetType.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, dbAssetType.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 5,
+                Name = "Updated Name",
+                IsActive = false
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+        }
+
+        /*
         [TestMethod()]
         public void Edit_Get_WhenIdProvidedIsValidTest()
         {
@@ -495,7 +595,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Test Error Message", controller.ViewData["ErrorMessage"]);
         }
-        
+
         [TestMethod()]
         public void Edit_Get_WhenIdProvidedIsNullTest()
         {
@@ -535,7 +635,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to edit record. Try again later.", controller.TempData["ErrorMessage"]);
         }
-        
+
         [TestMethod()]
         public void Edit_Get_WhenEntitiesFromDatabaseNotValidTest()
         {
@@ -840,9 +940,33 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to edit record at this time. Try again later.", controller.TempData["ErrorMessage"]);
         }
+        */
 
 
 
+        [TestMethod()]
+        public void Details_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            int id = 2;
+            AssetType dbExpected = _unitOfWork.AssetTypes.Get(id);
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Details", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(DetailsViewModel));
+            var vmResult = viewResult.ViewData.Model as DetailsViewModel;
+            Assert.AreEqual(dbExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(dbExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(dbExpected.IsActive, vmResult.IsActive, "IsActive");
+        }
+
+        /*
         [TestMethod()]
         public void Details_Get_WhenIdProvidedIsValidTest()
         {
@@ -976,7 +1100,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to display record. Try again later.", controller.TempData["ErrorMessage"]);
         }
-
+        */
 
     }
 }
