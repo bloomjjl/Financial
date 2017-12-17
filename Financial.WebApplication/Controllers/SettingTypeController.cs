@@ -36,10 +36,13 @@ namespace Financial.WebApplication.Controllers
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"].ToString();
             }
 
-            List<IndexViewModel> vmIndex = new List<IndexViewModel>();
-
             try
             {
+                var vmIndex = _unitOfWork.SettingTypes.GetAll()
+                    .Select(r => new IndexViewModel(r))
+                    .OrderBy(r => r.Name)
+                    .ToList();
+                /*
                 // get records from db
                 List<SettingType> dbSettingTypes = _unitOfWork.SettingTypes.GetAll().OrderBy(r => r.Name).ToList();
 
@@ -48,7 +51,7 @@ namespace Financial.WebApplication.Controllers
                 {
                     vmIndex.Add(new IndexViewModel(dtoSettingType));
                 }
-
+                */
                 return View("Index", vmIndex);
             }
             catch (Exception)

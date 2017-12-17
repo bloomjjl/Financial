@@ -1,0 +1,68 @@
+﻿@model Financial.Core.ViewModels.AssetTypeSettingType.CreateLinkedSettingTypesViewModel
+
+@{
+    ViewBag.Title = "CreateLinkedSettingTypes";
+}
+
+<h2>Asset Types</h2>
+
+<h4>Create Linked Setting Types</h4>
+
+<hr />
+
+<div class="form-horizontal">
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.AssetTypeName, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.AssetTypeName, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+        </div>
+    </div>
+
+</div>
+
+<hr />
+<hr />
+
+<h4>Linked Setting Types</h4>
+
+<hr />
+
+@using (Html.BeginForm("CreateLinkedSettingTypes", "AssetTypeSettingType", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @for (int i = 0; i < Model.CreateViewModels.Count(); i++)
+        {
+            @Html.HiddenFor(modelItem => Model.CreateViewModels[i].AssetTypeId)
+            @Html.HiddenFor(modelItem => Model.CreateViewModels[i].SettingTypeId)
+
+            <div class="form-group">
+                <div class="col-md-offset-1 col-md-1 checkbox">
+                    @Html.EditorFor(modelItem => Model.CreateViewModels[i].IsActive)
+                </div>
+                <div class="col-md-10">
+                    @Html.DisplayFor(modelItem => Model.CreateViewModels[i].SettingTypeName, new { @class = "control-label" })
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index", "AssetType")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

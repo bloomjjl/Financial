@@ -168,7 +168,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AssetSettingController.cs" />
     <Compile Include="Controllers\AssetTypeController.cs" />
+    <Compile Include="Controllers\AssetTypeSettingTypeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\SettingTypeController.cs" />
@@ -240,6 +242,9 @@
     <Content Include="Views\AssetType\Create.cshtml" />
     <Content Include="Views\AssetType\Edit.cshtml" />
     <Content Include="Views\AssetType\Details.cshtml" />
+    <Content Include="Views\AssetSetting\Create.cshtml" />
+    <Content Include="Views\AssetTypeSettingType\_Create.cshtml" />
+    <Content Include="Views\AssetTypeSettingType\CreateLinkedSettingTypes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

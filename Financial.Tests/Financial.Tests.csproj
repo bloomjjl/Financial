@@ -82,6 +82,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Fakes\FakeAssetTypesSettingTypes.cs" />
+    <Compile Include="WebApplication\Controllers\AssetTypeSettingTypeControllerTests.cs" />
+    <Compile Include="Data\Repositories\InMemoryAssetSettingRepository.cs" />
+    <Compile Include="WebApplication\Controllers\AssetSettingControllerTests.cs" />
+    <Compile Include="Data\Fakes\FakeAssets.cs" />
+    <Compile Include="Data\Fakes\FakeAssetSettings.cs" />
     <Compile Include="WebApplication\Controllers\SettingTypeControllerTests.cs" />
     <Compile Include="Data\Fakes\FakeSettingTypes.cs" />
     <Compile Include="WebApplication\Controllers\AssetTypeControllerTests.cs" />

@@ -66,11 +66,6 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Create()
         {
-            if (TempData["ErrorMessage"] != null)
-            {
-                ViewData["ErrorMessage"] = TempData["ErrorMessage"].ToString();
-            }
-
             return View("Create");
         }
 
@@ -78,60 +73,19 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
-            if(!ModelState.IsValid)
+            // transfer vm to dto
+            var dtoAssetType = new AssetType()
             {
-                return RedirectToAction("Create", "AssetType", new { id = 1 });
-            }
-            if(string.IsNullOrEmpty(vmCreate.Name))
-            {
-                ViewData["ErrorMessage"] = "Name is required.";
-                return View("Create", vmCreate);
-            }
+                Name = vmCreate.Name,
+                IsActive = true
+            };
 
-            try
-            {
-                // look for existing entity with matching name
-                AssetType dtoAssetType = _unitOfWork.AssetTypes.Find(r => r.Name == vmCreate.Name);
+            // transfer dto to db
+            _unitOfWork.AssetTypes.Add(dtoAssetType);
+            _unitOfWork.CommitTrans();
 
-                // Is this a new entity
-                if (dtoAssetType == null)
-                {
-                    // YES. create new entity
-                    AssetType assetType = new AssetType()
-                    {
-                        Name = vmCreate.Name,
-                        IsActive = true
-                    };
-
-                    _unitOfWork.AssetTypes.Add(assetType);
-                    _unitOfWork.CommitTrans();
-                    TempData["SuccessMessage"] = "Record created.";
-                    return RedirectToAction("Index", "AssetType");
-                }
-
-                // Active entity found
-                if (dtoAssetType.IsActive)
-                {
-                    // YES. STOP. do not duplicate entry
-                    ViewData["ErrorMessage"] = "Name already exists.";
-                    return View("Create", vmCreate);
-                }
-                else
-                {
-                    // update existing entity to active
-                    dtoAssetType.IsActive = true;
-
-                    _unitOfWork.AssetTypes.Update(dtoAssetType);
-                    _unitOfWork.CommitTrans();
-                    TempData["SuccessMessage"] = "Record is visible.";
-                    return RedirectToAction("Index", "AssetType");
-                }
-            }
-            catch (Exception)
-            {
-                ViewData["ErrorMessage"] = "Unable to add record at this time. Try again later.";
-                return View("Create", vmCreate);
-            }
+            // display View
+            return RedirectToAction("CreateLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = dtoAssetType.Id });
         }
 
         [HttpGet]

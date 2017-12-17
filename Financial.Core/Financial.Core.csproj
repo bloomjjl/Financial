@@ -65,6 +65,9 @@
     <Compile Include="RepositoryInterfaces\IRelationshipTypeRepository.cs" />
     <Compile Include="RepositoryInterfaces\IRepository.cs" />
     <Compile Include="RepositoryInterfaces\ITransactionTypeRepository.cs" />
+    <Compile Include="ViewModels\AssetSetting\CreateViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeSettingType\CreateLinkedSettingTypesViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeSettingType\CreateViewModel.cs" />
     <Compile Include="ViewModels\AssetType\CreateViewModel.cs" />
     <Compile Include="ViewModels\AssetType\DetailsViewModel.cs" />
     <Compile Include="ViewModels\AssetType\EditViewModel.cs" />
