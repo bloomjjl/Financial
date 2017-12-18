@@ -87,8 +87,7 @@ namespace Financial.Tests.WebApplication.Controllers
             int newId = _assetTypes.Count() + 1;
             CreateViewModel vmCreate = new CreateViewModel()
             {
-                Name = "New Name",
-                IsActive = true
+                Name = "New Name"
             };
 
             // Act
@@ -98,7 +97,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
             var dbResult = _assetTypes.FirstOrDefault(r => r.Id == newId);
             Assert.AreEqual(vmCreate.Name, dbResult.Name, "AssetType Name");
-            Assert.AreEqual(vmCreate.IsActive, dbResult.IsActive, "AssetType IsActive");
+            Assert.AreEqual(true, dbResult.IsActive, "AssetType IsActive");
         }
 
         [TestMethod()]
@@ -558,10 +557,10 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbAssetType = _assetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
-            Assert.AreEqual(vmExpected.Id, dbAssetType.Id, "Id");
-            Assert.AreEqual(vmExpected.Name, dbAssetType.Name, "Name");
-            Assert.AreEqual(vmExpected.IsActive, dbAssetType.IsActive, "IsActive");
+            var dbResult = _assetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.Id, dbResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, dbResult.IsActive, "IsActive");
         }
 
         [TestMethod()]

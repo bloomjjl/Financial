@@ -1,0 +1,56 @@
+﻿@model Financial.Core.ViewModels.SettingType.DetailsViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Setting Types</h2>
+
+<div>
+
+    <h4>Details</h4>
+
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+
+    <hr />
+
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsActive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsActive)
+        </dd>
+
+    </dl>
+</div>
+
+<div>
+
+    <hr />
+
+    <h4>Linked Setting Types</h4>
+
+    <p>
+        @Html.ActionLink("Edit", "EditLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = Model.Id })
+    </p>
+
+    <hr />
+
+    @{
+        Html.RenderAction("IndexLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = Model.Id });
+    }
+
+</div>

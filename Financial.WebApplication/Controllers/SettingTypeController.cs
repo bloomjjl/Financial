@@ -50,7 +50,7 @@ namespace Financial.WebApplication.Controllers
             var dtoSettingType = new SettingType()
             {
                 Name = vmCreate.Name,
-                IsActive = vmCreate.IsActive
+                IsActive = true
             };
 
             // update db
@@ -59,6 +59,47 @@ namespace Financial.WebApplication.Controllers
 
             // display view
             return RedirectToAction("CreateLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = dtoSettingType.Id });
+        }
+
+        [HttpGet]
+        public ViewResult Edit(int? id)
+        {
+            // transfer db to vm
+            var vmEdit = _unitOfWork.SettingTypes.GetAll()
+                .Select(r => new EditViewModel(r))
+                .FirstOrDefault(r => r.Id == id);
+
+            // display view
+            return View("Edit", vmEdit);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(EditViewModel vmEdit)
+        {
+            // transfer vm to dto
+            var dtoSettingType = _unitOfWork.SettingTypes.Get(vmEdit.Id);
+            dtoSettingType.Name = vmEdit.Name;
+            dtoSettingType.IsActive = vmEdit.IsActive;
+
+            // update db
+            _unitOfWork.SettingTypes.Update(dtoSettingType);
+            _unitOfWork.CommitTrans();
+
+            // display view
+            return RedirectToAction("Index", "SettingType");
+        }
+
+        [HttpGet]
+        public ViewResult Details(int? id)
+        {
+            // transfer dto to vm
+            var vmDetails = _unitOfWork.SettingTypes.GetAll()
+                .Select(r => new DetailsViewModel(r))
+                .FirstOrDefault(r => r.Id == id);
+
+            // display view
+            return View("Details", vmDetails);
         }
     }
 }

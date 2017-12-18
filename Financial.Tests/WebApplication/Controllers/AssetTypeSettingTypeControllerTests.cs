@@ -46,6 +46,76 @@ namespace Financial.Tests.WebApplication.Controllers
     public class AssetTypeSettingTypeControllerTests : AssetTypeSettingTypeControllerTestsBase
     {
         [TestMethod()]
+        public void IndexLinkedSettingTypes_Child_WhenProvidedAssetTypeIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int assetTypeId = 1;
+
+            // Act
+            var result = controller.IndexLinkedSettingTypes(assetTypeId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(PartialViewResult));
+            var viewResult = result as PartialViewResult;
+            Assert.AreEqual("_IndexLinkedSettingTypes", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexLinkedSettingTypesViewModel>));
+        }
+
+        [TestMethod()]
+        public void IndexLinkedSettingTypes_Child_WhenProvidedAssetTypeIdIsValid_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int assetTypeId = 1;
+            int expectedCount = _assetTypesSettingTypes.Count(r => r.AssetTypeId == assetTypeId);
+
+            // Act
+            var result = controller.IndexLinkedSettingTypes(assetTypeId);
+
+            // Assert
+            var viewResult = result as PartialViewResult;
+            var vmResult = viewResult.ViewData.Model as List<IndexLinkedSettingTypesViewModel>;
+            Assert.AreEqual(expectedCount, vmResult.Count(), "ViewModel Count");
+        }
+
+        [TestMethod()]
+        public void IndexLinkedAssetTypes_Child_WhenProvidedSettingTypeIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int settingTypeId = 1;
+
+            // Act
+            var result = controller.IndexLinkedAssetTypes(settingTypeId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(PartialViewResult));
+            var viewResult = result as PartialViewResult;
+            Assert.AreEqual("_IndexLinkedAssetTypes", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexLinkedAssetTypesViewModel>));
+        }
+
+        [TestMethod()]
+        public void IndexLinkedAssetTypes_Child_WhenProvidedSettingTypeIdIsValid_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int settingTypeId = 2;
+            int expectedCount = _assetTypesSettingTypes.Count(r => r.SettingTypeId == settingTypeId);
+
+            // Act
+            var result = controller.IndexLinkedAssetTypes(settingTypeId);
+
+            // Assert
+            var viewResult = result as PartialViewResult;
+            var vmResult = viewResult.ViewData.Model as List<IndexLinkedAssetTypesViewModel>;
+            Assert.AreEqual(expectedCount, vmResult.Count(), "ViewModel Count");
+        }
+
+
+
+        [TestMethod()]
         public void CreateLinkedSettingTypes_Get_WhenProvidedAssetTypeIdIsValid_ReturnRouteValues_Test()
         {
             // Arrange
@@ -146,7 +216,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
-            Assert.AreEqual(assetTypeId, routeResult.RouteValues["assetTypeId"], "AssetType Id");
+            Assert.AreEqual(assetTypeId, routeResult.RouteValues["id"], "AssetType Id");
         }
 
 
@@ -252,7 +322,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
             Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller");
-            Assert.AreEqual(settingTypeId, routeResult.RouteValues["settingTypeId"], "SettingType Id");
+            Assert.AreEqual(settingTypeId, routeResult.RouteValues["id"], "SettingType Id");
         }
 
 

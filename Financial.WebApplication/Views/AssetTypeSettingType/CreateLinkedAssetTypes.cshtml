@@ -37,7 +37,7 @@
 
         @for (int i = 0; i < Model.CreateViewModels.Count(); i++)
         {
-
+            @Html.HiddenFor(modelItem => Model.SettingTypeId)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].AssetTypeId)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].SettingTypeId)
 
@@ -49,7 +49,6 @@
                     @Html.DisplayFor(modelItem => Model.CreateViewModels[i].AssetTypeName, new { @class = "control-label" })
                 </div>
             </div>
-
         }
 
         <div class="form-group">

@@ -1,25 +1,10 @@
-﻿@model IEnumerable<Financial.Core.ViewModels.AssetType.IndexViewModel>
+﻿@model IEnumerable<Financial.Core.ViewModels.SettingType.IndexViewModel>
 
 @{
     ViewBag.Title = "Index";
 }
 
-<h2>Asset Types</h2>
-
-@if (ViewData["ErrorMessage"] != null)
-{
-    <div class="alert alert-warning">
-        <span class="glyphicon glyphicon-remove"></span>
-        @ViewData["ErrorMessage"].ToString()
-    </div>
-}
-else if (ViewData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        <span class="glyphicon glyphicon-ok"></span>
-        @ViewData["SuccessMessage"].ToString()
-    </div>
-}
+<h2>Setting Types</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")

@@ -4,28 +4,34 @@
     ViewBag.Title = "Details";
 }
 
+@if (ViewData["ErrorMessage"] != null)
+{
+    <div class="alert alert-warning">
+        <span class="glyphicon glyphicon-remove"></span>
+        @ViewData["ErrorMessage"].ToString()
+    </div>
+}
+else if (ViewData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        <span class="glyphicon glyphicon-ok"></span>
+        @ViewData["SuccessMessage"].ToString()
+    </div>
+}
+
 <h2>Asset Types</h2>
 
 <div>
 
     <h4>Details</h4>
-    
-    @if (ViewData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-warning">
-            <span class="glyphicon glyphicon-remove"></span>
-            @ViewData["ErrorMessage"].ToString()
-        </div>
-    }
-    else if (ViewData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span>
-            @ViewData["SuccessMessage"].ToString()
-        </div>
-    }
+
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
 
     <hr />
+
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Name)
@@ -45,7 +51,22 @@
 
     </dl>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+
+<div>
+
+    <hr />
+
+    <h4>Linked Setting Types</h4>
+
+    <p>
+        @Html.ActionLink("Edit", "EditLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = Model.Id })
+    </p>
+
+    <hr />
+
+    @{
+        Html.RenderAction("IndexLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = Model.Id });
+    }
+
+</div>
+

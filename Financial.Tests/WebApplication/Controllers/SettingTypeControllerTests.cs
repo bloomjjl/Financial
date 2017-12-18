@@ -88,8 +88,7 @@ namespace Financial.Tests.WebApplication.Controllers
             int newId = _settingTypes.Count() + 1;
             CreateViewModel vmCreate = new CreateViewModel()
             {
-                Name = "New Name",
-                IsActive = true
+                Name = "New Name"
             };
 
             // Act
@@ -99,7 +98,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
             var dbResult = _settingTypes.FirstOrDefault(r => r.Id == newId);
             Assert.AreEqual(vmCreate.Name, dbResult.Name, "SettingType Name");
-            Assert.AreEqual(vmCreate.IsActive, dbResult.IsActive, "SettingType IsActive");
+            Assert.AreEqual(true, dbResult.IsActive, "SettingType IsActive");
         }
 
         [TestMethod()]
@@ -155,128 +154,143 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedCount, vmReturned.Count(), "Number of records");
         }
 
-        /*
-        // *** GET - SUCCESS ***
-        // Valid Returned Views 
+
+
         [TestMethod()]
-        public void Index_Get_ReturnsIndexView_WhenNoInputValuesTest()
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
         {
             // Arrange
             SettingTypeController controller = _controller;
+            int id = 2;
 
             // Act
-            var result = controller.Index();
+            var result = controller.Edit(id);
 
             // Assert
-            Assert.AreEqual("Index", result.ViewName);
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
         }
-        
-        // Valid Returned View Models
+
         [TestMethod()]
-        public void Index_Get_ReturnsViewModel_WhenNoImputVauesTest()
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnCorrectValuesFromDatabase_Test()
         {
             // Arrange
             SettingTypeController controller = _controller;
-            List<SettingType> expectedSettingTypes = _settingTypes.AsQueryable().ToList();
+            int id = 2;
+            EditViewModel vmExpected = _settingTypes
+                .Select(r => new EditViewModel()
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    IsActive = r.IsActive
+                })
+                .FirstOrDefault(r => r.Id == id);
 
             // Act
-            var result = controller.Index();
+            var result = controller.Edit(id);
 
             // Assert
-            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<IndexViewModel>));
-            var vmResult = result.ViewData.Model as List<IndexViewModel>;
-            Assert.AreEqual(expectedSettingTypes.Count, vmResult.Count, "Number of records found in database");
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
         }
-        
-        // Valid Returned View Models (Continued)
-        [TestMethod()]
-        public void Index_Get_ReturnsSortedViewModel_WhenNoImputVauesTest()
-        {
-            // Arrange
-            _settingTypes[0].Name = "Zzzz Name";
-            _settingTypes[1].Name = "A Name";
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
-            List<SettingType> vmIndex = _settingTypes.AsQueryable().ToList();
-            int lastIndex = vmIndex.Count() - 1;
 
-            // Act
-            var result = controller.Index();
-
-            // Assert
-            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<IndexViewModel>));
-            var vmResult = result.ViewData.Model as List<IndexViewModel>;
-            Assert.AreEqual("A Name", vmResult[0].Name, "Name");
-            Assert.AreEqual("Zzzz Name", vmResult[lastIndex].Name, "Name");
-        }
-        
-        // Valid Returned Success Messages
         [TestMethod()]
-        public void Index_Get_ReturnsSuccessMessage_WhenTempDataIsValidTest()
+        public void Edit_Post_WhenProvidedViewModelIsValid_DatabaseUpdated_Test()
         {
             // Arrange
             SettingTypeController controller = _controller;
-            controller.TempData["SuccessMessage"] = "Test Success Message";
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 2,
+                Name = "Updated Name",
+                IsActive = true
+            };
 
             // Act
-            var result = controller.Index();
+            var result = controller.Edit(vmExpected);
 
             // Assert
-            Assert.AreEqual("Test Success Message", controller.ViewData["SuccessMessage"]);
+            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
+            var dbResult = _settingTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.Id, dbResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, dbResult.IsActive, "IsActive");
         }
-        
-        // *** GET - ERROR ***
-        // Valid Returned Error Messages
+
         [TestMethod()]
-        public void Index_Get_ReturnsErrorMessage_WhenTempDataIsValidTest()
+        public void Edit_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
             SettingTypeController controller = _controller;
-            controller.TempData["ErrorMessage"] = "Test Error Message";
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 5,
+                Name = "Updated Name",
+                IsActive = false
+            };
 
             // Act
-            var result = controller.Index();
+            var result = controller.Edit(vmExpected);
 
             // Assert
-            Assert.AreEqual("Test Error Message", controller.ViewData["ErrorMessage"]);
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"]);
+            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"]);
         }
-        
-        // Invalid Retrieved Database Values 
+
+
+
         [TestMethod()]
-        public void Index_Get_ReturnsValidViewModel_WhenNoDataFoundTest()
+        public void Details_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            List<SettingType> entities = new List<SettingType>(); // create empty list of entities
-            InMemorySettingTypeRepository repository = new InMemorySettingTypeRepository(entities);
-            InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
-            unitOfWork.SettingTypes = repository;
-            SettingTypeController controller = new SettingTypeController(unitOfWork);
+            SettingTypeController controller = _controller;
+            int id = 2;
 
             // Act
-            var result = controller.Index();
+            var result = controller.Details(id);
 
             // Assert
-            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<IndexViewModel>));
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Details", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(DetailsViewModel));
         }
 
-        // Invalid Retrieved Database Objects
         [TestMethod()]
-        public void Index_Get_ReturnsValidViewModel_WhenEntityNotValidTest()
+        public void Details_Get_WhenProvidedIdIsValid_ReturnCorrectValuesFromDatabase_Test()
         {
             // Arrange
-            List<SettingType> entities = null; // create invalid list of entities
-            InMemorySettingTypeRepository repository = new InMemorySettingTypeRepository(entities);
-            InMemoryUnitOfWork unitOfWork = new InMemoryUnitOfWork();
-            unitOfWork.SettingTypes = repository;
-            SettingTypeController controller = new SettingTypeController(unitOfWork);
+            SettingTypeController controller = _controller;
+            int id = 2;
+            DetailsViewModel vmExpected = _settingTypes
+                .Select(r => new DetailsViewModel()
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    IsActive = r.IsActive
+                })
+                .FirstOrDefault(r => r.Id == id);
 
             // Act
-            var result = controller.Index();
+            var result = controller.Details(id);
 
             // Assert
-            Assert.IsInstanceOfType(result.ViewData.Model, typeof(List<IndexViewModel>));
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as DetailsViewModel;
+            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
+            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
+            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
         }
-        */
+
+
 
     }
 }

@@ -23,17 +23,32 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpGet]
-        public ActionResult Index()
+        [ChildActionOnly]
+        public ActionResult IndexLinkedSettingTypes(int assetTypeId)
         {
-            return View();
+            // transfer db to vm
+            var vmIndexlinkedSettingTypes = _unitOfWork.AssetTypesSettingTypes.GetAll()
+                .Join(_unitOfWork.SettingTypes.GetAll().ToList(), atst => atst.SettingTypeId, st => st.Id, (atst, st) => new { atst, st })
+                .Where(ratst => ratst.atst.AssetTypeId == assetTypeId)
+                .Select(m => new IndexLinkedSettingTypesViewModel(m.st, m.atst))
+                .ToList();
+
+            // display view
+            return PartialView("_IndexLinkedSettingTypes", vmIndexlinkedSettingTypes);
         }
 
-        [HttpGet]
-        public ActionResult Create()
+        [ChildActionOnly]
+        public ActionResult IndexLinkedAssetTypes(int settingTypeId)
         {
+            // transfer db to vm
+            var vmIndexlinkedAssetTypes = _unitOfWork.AssetTypesSettingTypes.GetAll()
+                .Join(_unitOfWork.AssetTypes.GetAll().ToList(), atst => atst.SettingTypeId, at => at.Id, (atst, at) => new { atst, at })
+                .Where(ratst => ratst.atst.SettingTypeId == settingTypeId)
+                .Select(m => new IndexLinkedAssetTypesViewModel(m.at, m.atst))
+                .ToList();
+
             // display view
-            return View();
+            return PartialView("_IndexLinkedAssetTypes", vmIndexlinkedAssetTypes);
         }
 
         [HttpGet]
@@ -69,7 +84,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            return RedirectToAction("Details", "AssetType", new { assetTypeId = vmCreateLinkedSettingTypes.AssetTypeId });
+            return RedirectToAction("Details", "AssetType", new { id = vmCreateLinkedSettingTypes.AssetTypeId });
         }
 
         [HttpGet]
@@ -105,7 +120,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            return RedirectToAction("Details", "SettingType", new { settingTypeId = vmCreateLinkedAssetTypes.SettingTypeId });
+            return RedirectToAction("Details", "SettingType", new { id = vmCreateLinkedAssetTypes.SettingTypeId });
         }
     }
 }

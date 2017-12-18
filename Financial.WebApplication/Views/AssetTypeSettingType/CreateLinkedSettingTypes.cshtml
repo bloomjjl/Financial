@@ -38,6 +38,7 @@
 
         @for (int i = 0; i < Model.CreateViewModels.Count(); i++)
         {
+            @Html.HiddenFor(modelItem => Model.AssetTypeId)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].AssetTypeId)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].SettingTypeId)
 
