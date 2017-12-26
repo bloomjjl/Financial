@@ -79,6 +79,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedCount, vmResult.Count(), "ViewModel Count");
         }
 
+
+
         [TestMethod()]
         public void IndexLinkedAssetTypes_Child_WhenProvidedSettingTypeIdIsValid_ReturnRouteValues_Test()
         {
@@ -323,6 +325,108 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
             Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller");
             Assert.AreEqual(settingTypeId, routeResult.RouteValues["id"], "SettingType Id");
+        }
+
+
+
+        [TestMethod()]
+        public void EditLinkedSettingTypes_Get_WhenProvidedAssetTypeIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int assetTypeId = 1;
+
+            // Act
+            var result = controller.EditLinkedSettingTypes(assetTypeId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("EditLinkedSettingTypes", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditLinkedSettingTypesViewModel));
+        }
+
+        [TestMethod()]
+        public void EditLinkedSettingTypes_Get_WhenProvidedAssetTypeIdIsValid_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            int assetTypeId = 1;
+            _assetTypes.Add(new AssetType()
+            {
+                Id = assetTypeId,
+                Name = "New Name",
+                IsActive = true
+            });
+            AssetTypeSettingTypeController controller = _controller;
+            int expectedCount = _settingTypes.Count(r => r.IsActive);
+
+            // Act
+            var result = controller.EditLinkedSettingTypes(assetTypeId);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditLinkedSettingTypesViewModel;
+            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "EditViewModel Count");
+        }
+
+        [TestMethod()]
+        public void EditLinkedSettingTypes_Post_WhenProvidedViewModelIsValid_DatabaseUpdated_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
+            EditLinkedSettingTypesViewModel vmExpected = new EditLinkedSettingTypesViewModel()
+            {
+                AssetTypeId = assetTypeId,
+                EditViewModels = _assetTypesSettingTypes
+                .Select(r => new EditViewModel()
+                {
+                    AssetTypeId = assetTypeId,
+                    SettingTypeId = r.SettingTypeId,
+                    IsActive = r.IsActive
+                })
+                .ToList()
+            };
+
+            // Act
+            var result = controller.EditLinkedSettingTypes(vmExpected);
+
+            // Assert
+            Assert.AreEqual(true, _unitOfWork.Committed, "Database Updated");
+            var dbResult = _assetTypesSettingTypes
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .ToList();
+            Assert.AreEqual(vmExpected.EditViewModels.Count(), dbResult.Count(), "New Records Added Count");
+        }
+
+        [TestMethod()]
+        public void EditLinkedSettingTypes_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeSettingTypeController controller = _controller;
+            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
+            EditLinkedSettingTypesViewModel vmExpected = new EditLinkedSettingTypesViewModel()
+            {
+                AssetTypeId = assetTypeId,
+                EditViewModels = _assetTypesSettingTypes
+                .Select(vm => new EditViewModel()
+                {
+                    AssetTypeId = assetTypeId,
+                    SettingTypeId = vm.SettingTypeId,
+                    IsActive = vm.IsActive
+                })
+                .ToList()
+            };
+
+            // Act
+            var result = controller.EditLinkedSettingTypes(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual(assetTypeId, routeResult.RouteValues["id"], "AssetType Id");
         }
 
 

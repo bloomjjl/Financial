@@ -43,10 +43,8 @@
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].SettingTypeId)
 
             <div class="form-group">
-                <div class="col-md-offset-1 col-md-1 checkbox">
-                    @Html.EditorFor(modelItem => Model.CreateViewModels[i].IsActive)
-                </div>
-                <div class="col-md-10">
+                <div class="col-md-offset-2 col-md-10">
+                    @Html.EditorFor(modelItem => Model.CreateViewModels[i].IsActive, new { @class = "checkbox" })
                     @Html.DisplayFor(modelItem => Model.CreateViewModels[i].SettingTypeName, new { @class = "control-label" })
                 </div>
             </div>

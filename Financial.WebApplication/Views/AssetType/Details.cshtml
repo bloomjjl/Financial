@@ -26,7 +26,7 @@ else if (ViewData["SuccessMessage"] != null)
     <h4>Details</h4>
 
     <p>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Edit", "Edit", "AssetType", new { id = Model.Id }) |
         @Html.ActionLink("Back to List", "Index")
     </p>
 
@@ -59,7 +59,7 @@ else if (ViewData["SuccessMessage"] != null)
     <h4>Linked Setting Types</h4>
 
     <p>
-        @Html.ActionLink("Edit", "EditLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = Model.Id })
+        @Html.ActionLink("Edit", "EditLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = Model.Id }, null)
     </p>
 
     <hr />

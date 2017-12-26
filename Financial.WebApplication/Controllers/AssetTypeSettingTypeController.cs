@@ -122,5 +122,49 @@ namespace Financial.WebApplication.Controllers
             // display view
             return RedirectToAction("Details", "SettingType", new { id = vmCreateLinkedAssetTypes.SettingTypeId });
         }
+
+        [HttpGet]
+        public ViewResult EditLinkedSettingTypes(int? assetTypeId)
+        {
+            // transfer db to vm
+            var vmEditList = _unitOfWork.SettingTypes.GetAll()
+                .Where(r => r.IsActive)
+                .ToList()
+                .Join(_unitOfWork.AssetTypesSettingTypes.GetAll().Where(r => r.IsActive).ToList(), 
+                    st => st.Id, atst => atst.SettingTypeId, 
+                    (st, atst) => new { st, atst })
+                .Select(m => new EditViewModel(m.st, m.atst))
+                .ToList();
+
+            // display view
+            return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel((int)assetTypeId, vmEditList));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditLinkedSettingTypes(EditLinkedSettingTypesViewModel vmEditLinkedSettingTypes)
+        {
+            // get all the active SettingTypes linked to AssetType
+            var dbAssetTypesSettingTypes = _unitOfWork.AssetTypesSettingTypes.GetAll()
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetTypeId == vmEditLinkedSettingTypes.AssetTypeId)
+                .ToList();
+            var vmEditList = vmEditLinkedSettingTypes.EditViewModels;
+
+            // transfer vm to db
+            foreach(var dtoAssetTypesSettingTypes in dbAssetTypesSettingTypes)
+            {
+                if(_unitOfWork.SettingTypes.Get(dtoAssetTypesSettingTypes.SettingTypeId).IsActive)
+                {
+                    dtoAssetTypesSettingTypes.IsActive = vmEditLinkedSettingTypes.
+                }
+            }
+
+            // complete db update
+
+            // display view
+            return RedirectToAction("Details", "AssetType", new { id = vmEditLinkedSettingTypes.AssetTypeId });
+        }
+
     }
 }

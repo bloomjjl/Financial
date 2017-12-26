@@ -69,6 +69,9 @@
     <Compile Include="ViewModels\AssetTypeSettingType\CreateLinkedAssetTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeSettingType\CreateLinkedSettingTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeSettingType\CreateViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeSettingType\EditLinkedAssetTypesViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeSettingType\EditLinkedSettingTypesViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeSettingType\EditViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeSettingType\IndexLinkedAssetTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeSettingType\IndexLinkedSettingTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetType\CreateViewModel.cs" />
