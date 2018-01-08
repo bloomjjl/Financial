@@ -17,6 +17,7 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
         public IndexLinkedAssetTypesViewModel(Models.AssetType dtoAssetType, Models.AssetTypeSettingType dtoAssetTypeSettingType)
         {
             Id = dtoAssetTypeSettingType.Id;
+            SettingTypeId = dtoAssetTypeSettingType.SettingTypeId;
             IsActive = dtoAssetTypeSettingType.IsActive;
             AssetTypeId = dtoAssetType.Id;
             AssetTypeName = dtoAssetType.Name;
@@ -24,6 +25,8 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
         }
 
         public int Id { get; set; }
+
+        public int SettingTypeId { get; set; }
 
         public int AssetTypeId { get; set; }
 

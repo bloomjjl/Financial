@@ -12,11 +12,17 @@ namespace Financial.Core.Models
     public class AssetTypeRelationshipType : BaseEntity
     {
         [Required]
-        [Display(Name = "AssetType ID")]
-        [Column("AccountTypeId")]
-        public int AssetTypeId { get; set; }
+        [Display(Name = "ParentAssetType ID")]
+        [Column("ParentAccountTypeId")]
+        public int ParentAssetTypeId { get; set; }
+        [Display(Name = "ChildAssetType ID")]
+        [Column("ChildAccountTypeId")]
+        public int ChildAssetTypeId { get; set; }
         [Required]
-        [Display(Name = "RelationshipType ID")]
-        public int RelationshipTypeId { get; set; }
+        [Display(Name = "ParentChildRelationshipType ID")]
+        public int ParentChildRelationshipTypeId { get; set; }
+        [Required]
+        [Display(Name = "ChildParentRelationshipType ID")]
+        public int ChildParentRelationshipTypeId { get; set; }
     }
 }

@@ -2,8 +2,9 @@
 
 @{
     ViewBag.Title = "CreateLinkedAssetTypes";
+    TempData["SuccessMessage"] = Model.Message.ToString(); // store message if canceled
 }
-<h2>Setting Types</h2>
+<h2>Setting Type</h2>
 
 <h4>Create Linked Asset Types</h4>
 
@@ -23,7 +24,7 @@
 <hr />
 <hr />
 
-<h4>Linked Asset Types</h4>
+<h4>Asset Types</h4>
 
 <hr />
 
@@ -38,6 +39,7 @@
         @for (int i = 0; i < Model.CreateViewModels.Count(); i++)
         {
             @Html.HiddenFor(modelItem => Model.SettingTypeId)
+            @Html.HiddenFor(modelItem => Model.Message)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].AssetTypeId)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].SettingTypeId)
 
@@ -54,15 +56,13 @@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Index", "SettingType", null, new { @class = "btn btn-default" })
             </div>
         </div>
 
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index", "SettingType")
-</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

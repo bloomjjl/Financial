@@ -66,63 +66,6 @@ namespace Financial.Tests.WebApplication.Controllers
 
 
         [TestMethod()]
-        public void Create_Get_WhenProvidedNoInputVaues_ReturnCreateView_Test()
-        {
-            // Arrange
-            SettingTypeController controller = _controller;
-
-            // Act
-            var result = controller.Create();
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(ViewResult));
-            var viewResult = result as ViewResult;
-            Assert.AreEqual("Create", viewResult.ViewName);
-        }
-
-        [TestMethod()]
-        public void Create_Post_WhenProvidedViewModelIsValid_DatabaseUpdated_Test()
-        {
-            // Arrange
-            SettingTypeController controller = _controller;
-            int newId = _settingTypes.Count() + 1;
-            CreateViewModel vmCreate = new CreateViewModel()
-            {
-                Name = "New Name"
-            };
-
-            // Act
-            var result = controller.Create(vmCreate);
-
-            // Assert
-            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _settingTypes.FirstOrDefault(r => r.Id == newId);
-            Assert.AreEqual(vmCreate.Name, dbResult.Name, "SettingType Name");
-            Assert.AreEqual(true, dbResult.IsActive, "SettingType IsActive");
-        }
-
-        [TestMethod()]
-        public void Create_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
-        {
-            // Arrange
-            SettingTypeController controller = _controller;
-            int newId = _settingTypes.Count() + 1;
-            CreateViewModel vmCreate = new CreateViewModel() { Id = newId };
-
-            // Act
-            var result = controller.Create(vmCreate);
-
-            // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
-            var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("CreateLinkedAssetTypes", routeResult.RouteValues["action"], "Action");
-            Assert.AreEqual("AssetTypeSettingType", routeResult.RouteValues["controller"], "Controller");
-            Assert.AreEqual(newId, routeResult.RouteValues["settingTypeId"], "AssetType Id");
-        }
-
-
-
-        [TestMethod()]
         public void Index_Get_WhenProvidedNoInputValues_ReturnRouteValues_Test()
         {
             // Arrange
@@ -139,11 +82,46 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         [TestMethod()]
-        public void Index_Get_WhenProvidedNoInputValues_ReturnAllValuesFromDatabase_Test()
+        public void Index_Get_WhenProvidedSuccessMessage_ReturnViewData_Test()
         {
             // Arrange
             SettingTypeController controller = _controller;
-            int expectedCount = _settingTypes.Count();
+            controller.TempData["SuccessMessage"] = "Test Message";
+
+            // Act
+            var result = controller.Index();
+
+            // Assert
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Test Message", viewResult.ViewData["SuccessMessage"].ToString(), "Message");
+        }
+
+        [TestMethod()]
+        public void Index_Get_WhenProvidedErrorMessage_ReturnViewData_Test()
+        {
+            // Arrange
+            SettingTypeController controller = _controller;
+            controller.TempData["ErrorMessage"] = "Test Message";
+
+            // Act
+            var result = controller.Index();
+
+            // Assert
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Test Message", viewResult.ViewData["ErrorMessage"].ToString(), "Message");
+        }
+
+        [TestMethod()]
+        public void Index_Get_WhenProvidedNoInputValues_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            IList<SettingType> _settingTypes = new List<SettingType>();
+            _settingTypes.Add(new SettingType() { Id = 1, Name = "Name 1", IsActive = true }); // count
+            _settingTypes.Add(new SettingType() { Id = 2, Name = "Name 2", IsActive = false }); // count
+            _settingTypes.Add(new SettingType() { Id = 3, Name = "Name 3", IsActive = true }); // count
+            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
+            SettingTypeController controller = new SettingTypeController(_unitOfWork);
+            int expectedCount = 3;
 
             // Act
             var result = controller.Index();
@@ -152,6 +130,83 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as ViewResult;
             var vmReturned = viewResult.ViewData.Model as List<IndexViewModel>;
             Assert.AreEqual(expectedCount, vmReturned.Count(), "Number of records");
+        }
+
+
+
+        [TestMethod()]
+        public void Create_Get_WhenProvidedNoInputVaues_ReturnRouteValues_Test()
+        {
+            // Arrange
+            SettingTypeController controller = _controller;
+
+            // Act
+            var result = controller.Create();
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName);
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
+        {
+            // Arrange
+            SettingTypeController controller = _controller;
+            CreateViewModel vmexpected = new CreateViewModel()
+            {
+                Name = "New Name"
+            };
+            int newId = _settingTypes.Count() + 1;
+
+            // Act
+            var result = controller.Create(vmexpected);
+
+            // Assert
+            Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
+            var dbResult = _settingTypes.FirstOrDefault(r => r.Id == newId);
+            Assert.AreEqual(vmexpected.Name, dbResult.Name, "SettingType Name");
+            Assert.AreEqual(true, dbResult.IsActive, "SettingType IsActive");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            SettingTypeController controller = _controller;
+            CreateViewModel vmCreate = new CreateViewModel()
+            {
+                Name = "New Name"
+            };
+            int newId = _settingTypes.Count() + 1;
+
+            // Act
+            var result = controller.Create(vmCreate);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("CreateLinkedAssetTypes", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("AssetTypeSettingType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual(newId, routeResult.RouteValues["settingTypeId"], "settingTypeId");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedViewModelIsValid_ReturnSuccessMessage_Test()
+        {
+            // Arrange
+            SettingTypeController controller = _controller;
+            CreateViewModel vmExpected = new CreateViewModel()
+            {
+                Name = "New Name"
+            };
+
+            // Act
+            controller.Create(vmExpected);
+
+            // Assert
+            Assert.AreEqual("Setting Type Created", controller.TempData["SuccessMessage"].ToString(), "Success Message");
         }
 
 
@@ -171,23 +226,19 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as ViewResult;
             Assert.AreEqual("Edit", viewResult.ViewName);
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
-            var vmResult = viewResult.ViewData.Model as EditViewModel;
         }
 
         [TestMethod()]
-        public void Edit_Get_WhenProvidedIdIsValid_ReturnCorrectValuesFromDatabase_Test()
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnRecordFromDatabase_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            IList<SettingType> _settingTypes = new List<SettingType>();
+            _settingTypes.Add(new SettingType() { Id = 1, Name = "Name 1", IsActive = true });
+            _settingTypes.Add(new SettingType() { Id = 2, Name = "Name 2", IsActive = true }); // return values
+            _settingTypes.Add(new SettingType() { Id = 3, Name = "Name 3", IsActive = true });
+            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
+            SettingTypeController controller = new SettingTypeController(_unitOfWork);
             int id = 2;
-            EditViewModel vmExpected = _settingTypes
-                .Select(r => new EditViewModel()
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    IsActive = r.IsActive
-                })
-                .FirstOrDefault(r => r.Id == id);
 
             // Act
             var result = controller.Edit(id);
@@ -195,13 +246,13 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as EditViewModel;
-            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
-            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
-            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+            Assert.AreEqual(id, vmResult.Id, "Id");
+            Assert.AreEqual("Name 2", vmResult.Name, "Name");
+            Assert.AreEqual(true, vmResult.IsActive, "IsActive");
         }
 
         [TestMethod()]
-        public void Edit_Post_WhenProvidedViewModelIsValid_DatabaseUpdated_Test()
+        public void Edit_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
             SettingTypeController controller = _controller;
@@ -230,7 +281,7 @@ namespace Financial.Tests.WebApplication.Controllers
             SettingTypeController controller = _controller;
             EditViewModel vmExpected = new EditViewModel()
             {
-                Id = 5,
+                Id = 1,
                 Name = "Updated Name",
                 IsActive = false
             };
@@ -243,6 +294,25 @@ namespace Financial.Tests.WebApplication.Controllers
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"]);
             Assert.AreEqual("SettingType", routeResult.RouteValues["controller"]);
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedViewModelIsValid_ReturnSuccessMessage_Test()
+        {
+            // Arrange
+            SettingTypeController controller = _controller;
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 1,
+                Name = "Updated Name",
+                IsActive = true
+            };
+
+            // Act
+            controller.Edit(vmExpected);
+
+            // Assert
+            Assert.AreEqual("Record updated.", controller.TempData["SuccessMessage"].ToString(), "Success Message");
         }
 
 
@@ -265,19 +335,16 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         [TestMethod()]
-        public void Details_Get_WhenProvidedIdIsValid_ReturnCorrectValuesFromDatabase_Test()
+        public void Details_Get_WhenProvidedIdIsValid_ReturnRecordFromDatabase_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            IList<SettingType> _settingTypes = new List<SettingType>();
+            _settingTypes.Add(new SettingType() { Id = 1, Name = "Name 1", IsActive = true });
+            _settingTypes.Add(new SettingType() { Id = 2, Name = "Name 2", IsActive = true }); // return values
+            _settingTypes.Add(new SettingType() { Id = 3, Name = "Name 3", IsActive = true });
+            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
+            SettingTypeController controller = new SettingTypeController(_unitOfWork);
             int id = 2;
-            DetailsViewModel vmExpected = _settingTypes
-                .Select(r => new DetailsViewModel()
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                    IsActive = r.IsActive
-                })
-                .FirstOrDefault(r => r.Id == id);
 
             // Act
             var result = controller.Details(id);
@@ -285,12 +352,10 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as DetailsViewModel;
-            Assert.AreEqual(vmExpected.Id, vmResult.Id, "Id");
-            Assert.AreEqual(vmExpected.Name, vmResult.Name, "Name");
-            Assert.AreEqual(vmExpected.IsActive, vmResult.IsActive, "IsActive");
+            Assert.AreEqual(id, vmResult.Id, "Id");
+            Assert.AreEqual("Name 2", vmResult.Name, "Name");
+            Assert.AreEqual(true, vmResult.IsActive, "IsActive");
         }
-
-
 
     }
 }

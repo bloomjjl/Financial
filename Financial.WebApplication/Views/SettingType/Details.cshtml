@@ -10,11 +10,6 @@
 
     <h4>Details</h4>
 
-    <p>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-        @Html.ActionLink("Back to List", "Index")
-    </p>
-
     <hr />
 
     <dl class="dl-horizontal">
@@ -35,22 +30,25 @@
         </dd>
 
     </dl>
+
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+
 </div>
 
 <div>
 
     <hr />
-
-    <h4>Linked Setting Types</h4>
-
-    <p>
-        @Html.ActionLink("Edit", "EditLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = Model.Id })
-    </p>
-
+    <h4>Linked Asset Types</h4>
     <hr />
 
     @{
         Html.RenderAction("IndexLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = Model.Id });
     }
 
+    <p>
+        @Html.ActionLink("Edit", "EditLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = Model.Id }, null)
+    </p>
 </div>

@@ -28,9 +28,11 @@ namespace Financial.WebApplication.Controllers
         {
             // transfer db to vm
             var vmIndexlinkedSettingTypes = _unitOfWork.AssetTypesSettingTypes.GetAll()
-                .Join(_unitOfWork.SettingTypes.GetAll().ToList(), atst => atst.SettingTypeId, st => st.Id, (atst, st) => new { atst, st })
-                .Where(ratst => ratst.atst.AssetTypeId == assetTypeId)
-                .Select(m => new IndexLinkedSettingTypesViewModel(m.st, m.atst))
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .ToList()
+                .Join(_unitOfWork.SettingTypes.GetAll().Where(r => r.IsActive).ToList(), 
+                    atst => atst.SettingTypeId, st => st.Id, 
+                    (atst, st) => new IndexLinkedSettingTypesViewModel(st, atst))
                 .ToList();
 
             // display view
@@ -42,9 +44,11 @@ namespace Financial.WebApplication.Controllers
         {
             // transfer db to vm
             var vmIndexlinkedAssetTypes = _unitOfWork.AssetTypesSettingTypes.GetAll()
-                .Join(_unitOfWork.AssetTypes.GetAll().ToList(), atst => atst.SettingTypeId, at => at.Id, (atst, at) => new { atst, at })
-                .Where(ratst => ratst.atst.SettingTypeId == settingTypeId)
-                .Select(m => new IndexLinkedAssetTypesViewModel(m.at, m.atst))
+                .Where(r => r.SettingTypeId == settingTypeId)
+                .ToList()
+                .Join(_unitOfWork.AssetTypes.GetAll().Where(r => r.IsActive).ToList(), 
+                    atst => atst.AssetTypeId, at => at.Id, 
+                    (atst, at) => new IndexLinkedAssetTypesViewModel(at, atst))
                 .ToList();
 
             // display view
@@ -52,17 +56,23 @@ namespace Financial.WebApplication.Controllers
         }
 
         [HttpGet]
-        public ViewResult CreateLinkedSettingTypes(int? assetTypeId)
+        public ViewResult CreateLinkedSettingTypes(int assetTypeId)
         {
+            // transfer td
+            var previousSuccessMessage = string.Empty;
+            if (TempData["SuccessMessage"] != null)
+            {
+                previousSuccessMessage = TempData["SuccessMessage"].ToString();
+            }
+
             // transfer db to vm
-            var dtoAssetType = _unitOfWork.AssetTypes.Get((int)assetTypeId);
+            var dtoAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
             var vmCreate = _unitOfWork.SettingTypes.GetAll()
-                .Select(r => new CreateViewModel((int)assetTypeId, r))
+                .Select(r => new CreateViewModel(assetTypeId, r))
                 .ToList();
-            var vmCreateLinkedSettingTypes = new CreateLinkedSettingTypesViewModel(dtoAssetType, vmCreate);
                             
             // display view
-            return View("CreateLinkedSettingTypes", vmCreateLinkedSettingTypes);
+            return View("CreateLinkedSettingTypes", new CreateLinkedSettingTypesViewModel(dtoAssetType, previousSuccessMessage, vmCreate));
         }
 
         [HttpPost]
@@ -84,18 +94,26 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            return RedirectToAction("Details", "AssetType", new { id = vmCreateLinkedSettingTypes.AssetTypeId });
+            TempData["SuccessMessage"] = string.Format("{0}, {1}", vmCreateLinkedSettingTypes.Message, "Linked Setting Types Created");
+            return RedirectToAction("Index", "AssetType", new { id = vmCreateLinkedSettingTypes.AssetTypeId });
         }
 
         [HttpGet]
         public ViewResult CreateLinkedAssetTypes(int? settingTypeId)
         {
+            // transfer td
+            var previousSuccessMessage = string.Empty;
+            if (TempData["SuccessMessage"] != null)
+            {
+                previousSuccessMessage = TempData["SuccessMessage"].ToString();
+            }
+
             // transfer db to vm
             var dtoSettingType = _unitOfWork.SettingTypes.Get((int)settingTypeId);
             var vmCreate = _unitOfWork.AssetTypes.GetAll()
                 .Select(r => new CreateViewModel((int)settingTypeId, r))
                 .ToList();
-            var vmCreateLinkedAssetTypes = new CreateLinkedAssetTypesViewModel(dtoSettingType, vmCreate);
+            var vmCreateLinkedAssetTypes = new CreateLinkedAssetTypesViewModel(dtoSettingType, previousSuccessMessage, vmCreate);
 
             // display view
             return View("CreateLinkedAssetTypes", vmCreateLinkedAssetTypes);
@@ -120,51 +138,82 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            return RedirectToAction("Details", "SettingType", new { id = vmCreateLinkedAssetTypes.SettingTypeId });
+            TempData["SuccessMessage"] = string.Format("{0}, {1}", vmCreateLinkedAssetTypes.Message, "Linked Asset Types Created");
+            return RedirectToAction("Index", "SettingType", new { id = vmCreateLinkedAssetTypes.SettingTypeId });
         }
 
         [HttpGet]
-        public ViewResult EditLinkedSettingTypes(int? assetTypeId)
+        public ViewResult EditLinkedSettingTypes(int assetTypeId)
         {
+            // transfer dto for Id
+            var dtoAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
+
             // transfer db to vm
-            var vmEditList = _unitOfWork.SettingTypes.GetAll()
-                .Where(r => r.IsActive)
+            var vmEditList = _unitOfWork.AssetTypesSettingTypes.GetAll()
+                .Where(r => r.AssetTypeId == assetTypeId)
                 .ToList()
-                .Join(_unitOfWork.AssetTypesSettingTypes.GetAll().Where(r => r.IsActive).ToList(), 
-                    st => st.Id, atst => atst.SettingTypeId, 
-                    (st, atst) => new { st, atst })
-                .Select(m => new EditViewModel(m.st, m.atst))
+                .Join(_unitOfWork.SettingTypes.GetAll().Where(r => r.IsActive).ToList(), 
+                    atst => atst.SettingTypeId, st => st.Id, 
+                    (atst, st) =>  new EditViewModel(st, atst))
                 .ToList();
 
             // display view
-            return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel((int)assetTypeId, vmEditList));
+            return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel(dtoAssetType, vmEditList));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult EditLinkedSettingTypes(EditLinkedSettingTypesViewModel vmEditLinkedSettingTypes)
         {
-            // get all the active SettingTypes linked to AssetType
-            var dbAssetTypesSettingTypes = _unitOfWork.AssetTypesSettingTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.AssetTypeId == vmEditLinkedSettingTypes.AssetTypeId)
-                .ToList();
-            var vmEditList = vmEditLinkedSettingTypes.EditViewModels;
-
-            // transfer vm to db
-            foreach(var dtoAssetTypesSettingTypes in dbAssetTypesSettingTypes)
+            // transfer vm to dto
+            foreach(var vmEdit in vmEditLinkedSettingTypes.EditViewModels)
             {
-                if(_unitOfWork.SettingTypes.Get(dtoAssetTypesSettingTypes.SettingTypeId).IsActive)
-                {
-                    dtoAssetTypesSettingTypes.IsActive = vmEditLinkedSettingTypes.
-                }
+                var dtoAssetTypeSettingType = _unitOfWork.AssetTypesSettingTypes.Get(vmEdit.Id);
+                dtoAssetTypeSettingType.IsActive = vmEdit.IsActive;
             }
 
             // complete db update
+            _unitOfWork.CommitTrans();
 
             // display view
             return RedirectToAction("Details", "AssetType", new { id = vmEditLinkedSettingTypes.AssetTypeId });
         }
 
+        [HttpGet]
+        public ViewResult EditLinkedAssetTypes(int settingTypeId)
+        {
+            // transfer dto for id
+            var dtoSettingType = _unitOfWork.SettingTypes.Get(settingTypeId);
+
+            // transfer db to vm
+            var vmEditList = _unitOfWork.AssetTypesSettingTypes.GetAll()
+                .Where(r => r.SettingTypeId == settingTypeId)
+                .ToList()
+                .Join(_unitOfWork.AssetTypes.GetAll().Where(r => r.IsActive).ToList(),
+                atst => atst.AssetTypeId, at => at.Id,
+                (atst, at) => new EditViewModel(at, atst))
+                .ToList();
+
+            // display view
+            return View("EditLinkedAssetTypes", new EditLinkedAssetTypesViewModel(dtoSettingType, vmEditList));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditLinkedAssetTypes(EditLinkedAssetTypesViewModel vmEditLinkedAssetTypes)
+        {
+            // transfer vm to dto
+            foreach(var vmEditList in vmEditLinkedAssetTypes.EditViewModels)
+            {
+                var dtoAssetTypeSettingType = _unitOfWork.AssetTypesSettingTypes.Get(vmEditList.Id);
+                dtoAssetTypeSettingType.IsActive = vmEditList.IsActive;
+            }
+
+            // update db
+            _unitOfWork.CommitTrans();
+
+            // display view
+            return RedirectToAction("Details", "SettingType", new { id = vmEditLinkedAssetTypes.SettingTypeId });
+        }
     }
 }

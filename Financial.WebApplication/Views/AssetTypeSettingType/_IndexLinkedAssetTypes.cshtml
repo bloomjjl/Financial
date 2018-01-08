@@ -1,36 +1,13 @@
 ﻿@model IEnumerable<Financial.Core.ViewModels.AssetTypeSettingType.IndexLinkedAssetTypesViewModel>
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.AssetTypeId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AssetTypeName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AssetTypeIsActive)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.IsActive)
-        </th>
-    </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.AssetTypeId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AssetTypeName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AssetTypeIsActive)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IsActive)
-        </td>
-    </tr>
+@foreach (var item in Model)
+{
+    <div class="form-group">
+        <div class="col-md-offset-1 col-md-11">
+            @Html.CheckBoxFor(modelItem => item.IsActive, htmlAttributes: new { @class = "control-checkbox", @disabled = "disabled" })
+            @Html.Label(item.AssetTypeName, new { htmlAttributes = new { @class = "control-label" } })
+        </div>
+    </div>
 }
 
-</table>
+

@@ -27,6 +27,16 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Index()
         {
+            // get TempData
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+            }
+
             // transfer db to vm
             var vmIndex = _unitOfWork.AssetTypes.GetAll()
                 .Select(r => new IndexViewModel(r))
@@ -59,14 +69,15 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display View
+            TempData["SuccessMessage"] = "Asset Type Created";
             return RedirectToAction("CreateLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = dtoAssetType.Id });
         }
 
         [HttpGet]
-        public ActionResult Edit(int? id)
+        public ActionResult Edit(int id)
         {
             // transfer db to vm
-            var vmEdit = new EditViewModel(_unitOfWork.AssetTypes.Get((int)id));
+            var vmEdit = new EditViewModel(_unitOfWork.AssetTypes.Get(id));
 
             // display view
             return View("Edit", vmEdit);
@@ -85,6 +96,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
+            TempData["SuccessMessage"] = "Record updated.";
             return RedirectToAction("Index", "AssetType");
         }
 

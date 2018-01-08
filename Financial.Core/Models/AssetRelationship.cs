@@ -12,15 +12,15 @@ namespace Financial.Core.Models
     public class AssetRelationship : BaseEntity
     {
         [Required]
-        [Display(Name = "First Asset ID")]
-        [Column("FirstAccountId")]
-        public int FirstAssetId { get; set; }
+        [Display(Name = "Parent Asset ID")]
+        [Column("ParentAccountId")]
+        public int ParentAssetId { get; set; }
         [Required]
-        [Display(Name = "RelationshipType ID")]
-        public int RelationshipTypeId { get; set; }
+        [Display(Name = "Child Asset ID")]
+        [Column("ChildAccountId")]
+        public int ChildAssetId { get; set; }
         [Required]
-        [Display(Name = "Second Asset ID")]
-        [Column("SecondAccountId")]
-        public int SecondAssetId { get; set; }
+        [Display(Name = "AccountTypeRelationshipType ID")]
+        public int AssetTypeRelationshipTypeId { get; set; }
     }
 }

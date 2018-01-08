@@ -251,6 +251,8 @@
     <Content Include="Views\SettingType\Details.cshtml" />
     <Content Include="Views\AssetTypeSettingType\_IndexLinkedSettingTypes.cshtml" />
     <Content Include="Views\AssetTypeSettingType\_IndexLinkedAssetTypes.cshtml" />
+    <Content Include="Views\AssetTypeSettingType\EditLinkedSettingTypes.cshtml" />
+    <Content Include="Views\AssetTypeSettingType\EditLinkedAssetTypes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

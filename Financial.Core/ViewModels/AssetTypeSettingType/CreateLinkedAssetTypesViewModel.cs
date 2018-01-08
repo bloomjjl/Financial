@@ -14,19 +14,23 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
 
         }
 
-        public CreateLinkedAssetTypesViewModel(Models.SettingType dtoSettingType, List<CreateViewModel> vmCreate)
+        public CreateLinkedAssetTypesViewModel(Models.SettingType dtoSettingType, string message, List<CreateViewModel> vmCreate)
         {
             SettingTypeId = dtoSettingType.Id;
             SettingTypeName = dtoSettingType.Name;
             CreateViewModels = vmCreate;
+            Message = message;
         }
 
 
         public int SettingTypeId { get; set; }
+
         [Display(Name = "Setting Type")]
         public string SettingTypeName { get; set; }
 
         public List<CreateViewModel> CreateViewModels { get; set; }
+
+        public string Message { get; set; }
 
     }
 }

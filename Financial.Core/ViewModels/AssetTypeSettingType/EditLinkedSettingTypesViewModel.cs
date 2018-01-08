@@ -9,18 +9,22 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
 {
     public class EditLinkedSettingTypesViewModel
     {
-        public EditLinkedSettingTypesViewModel() { }
-        public EditLinkedSettingTypesViewModel(int assetTypeId, List<EditViewModel> vmEditList)
+        public EditLinkedSettingTypesViewModel()
         {
-            AssetTypeId = assetTypeId;
+        }
+
+        public EditLinkedSettingTypesViewModel(Models.AssetType dtoAssetType, List<EditViewModel> vmEditList)
+        {
+            AssetTypeId = dtoAssetType.Id;
+            AssetTypeName = dtoAssetType.Name;
             EditViewModels = vmEditList;
         }
 
         public int AssetTypeId { get; set; }
+
         [Display(Name = "Asset Type")]
         public string AssetTypeName { get; set; }
 
         public List<EditViewModel> EditViewModels { get; set; }
-
     }
 }

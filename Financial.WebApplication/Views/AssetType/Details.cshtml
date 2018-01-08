@@ -19,16 +19,11 @@ else if (ViewData["SuccessMessage"] != null)
     </div>
 }
 
-<h2>Asset Types</h2>
+<h2>Asset Type</h2>
 
 <div>
 
     <h4>Details</h4>
-
-    <p>
-        @Html.ActionLink("Edit", "Edit", "AssetType", new { id = Model.Id }) |
-        @Html.ActionLink("Back to List", "Index")
-    </p>
 
     <hr />
 
@@ -50,23 +45,27 @@ else if (ViewData["SuccessMessage"] != null)
         </dd>
 
     </dl>
+
+    <p>
+        @Html.ActionLink("Edit", "Edit", "AssetType", new { id = Model.Id }, null) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
 </div>
 
 <div>
 
     <hr />
-
     <h4>Linked Setting Types</h4>
-
-    <p>
-        @Html.ActionLink("Edit", "EditLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = Model.Id }, null)
-    </p>
-
     <hr />
 
-    @{
-        Html.RenderAction("IndexLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = Model.Id });
-    }
+    <div>
+        @{
+            Html.RenderAction("IndexLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = Model.Id });
+        }
+    </div>
 
+    <p>
+        @Html.ActionLink("Edit", "EditLinkedSettingTypes", "AssetTypeSettingType", new { AssetTypeId = Model.Id }, null)
+    </p>
 </div>
 
