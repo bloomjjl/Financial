@@ -5,71 +5,48 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financial.Tests.Data.Fakes;
-using Financial.Tests.Data.Repositories;
-using Financial.Tests.Data;
 using Financial.Core.Models;
-using Financial.Core.ViewModels.SettingType;
+using Financial.Tests.Data.Repositories;
+using Financial.Tests.Data.Fakes;
+using Financial.Tests.Data;
 using System.Web.Mvc;
+using Financial.Core.ViewModels.RelationshipType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class SettingTypeControllerTestsBase
+    public class RelationshipTypeControllerTestsBase
     {
-        public SettingTypeControllerTestsBase()
+        public RelationshipTypeControllerTestsBase()
         {
-            _settingTypes = FakeSettingTypes.InitialFakeSettingTypes().ToList();
-            _repositorySettingType = new InMemorySettingTypeRepository(_settingTypes);
-            _unitOfWork = new InMemoryUnitOfWork();
-            _unitOfWork.SettingTypes = _repositorySettingType;
-            _controller = new SettingTypeController(_unitOfWork);
+            // Fake Data
+            _relationshipTypes = FakeRelationshipTypes.InitialFakeRelationshipTypes().ToList();
+            _assetTypesRelationshipTypes = FakeAssetTypesRelationshipTypes.InitialFakeAssetTypesRelationshipTypes().ToList();
+            // Fake Repositories
+            _repositoryRelationshipType = new InMemoryRelationshipTypeRepository(_relationshipTypes);
+            _repositoryAssetTypeRelationshipType = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
+            // Fake Unit of Work
+            _unitOfWork.RelationshipTypes = _repositoryRelationshipType;
+            _unitOfWork.AssetTypesRelationshipTypes = _repositoryAssetTypeRelationshipType;
+            // Controller
+            _controller = new RelationshipTypeController(_unitOfWork);
         }
 
-        protected IList<SettingType> _settingTypes;
-        protected InMemorySettingTypeRepository _repositorySettingType;
-        protected InMemoryUnitOfWork _unitOfWork;
-        protected SettingTypeController _controller;
-    }
-
-    public static class SettingTypeObjectMother
-    {
+        protected IList<RelationshipType> _relationshipTypes;
+        protected IList<AssetTypeRelationshipType> _assetTypesRelationshipTypes;
+        protected InMemoryRelationshipTypeRepository _repositoryRelationshipType;
+        protected InMemoryAssetTypeRelationshipTypeRepository _repositoryAssetTypeRelationshipType;
+        protected InMemoryUnitOfWork _unitOfWork = new InMemoryUnitOfWork();
+        protected RelationshipTypeController _controller;
     }
 
     [TestClass()]
-    public class SettingTypeControllerTests : SettingTypeControllerTestsBase
+    public class RelationshipTypeControllerTests : RelationshipTypeControllerTestsBase
     {
-        // *** GET - SUCCESS ***
-        // Valid Returned Views 
-        // Valid Returned View Models
-        // Valid Returned Success Messages
-
-        // *** GET - ERROR ***
-        // Invalid Returned Error Messages
-        // Invalid Input Values
-        // Invalid Returned View Models
-        // Invalid Retrieved Database Values 
-        // Invalid Retrieved Database Objects
-
-        // *** POST - SUCCESS ***
-        // Valid Redirected Actions 
-        // Valid Output Values
-        // Valid Updated Database Values
-        // Valid Returned Success Messages
-
-        // *** POST - ERROR ***
-        // Invalid Input Values
-        // Invalid Database Values 
-        // Invalid Database Objects
-        // Invalid Output Values
-        // Invalid Returned Error Messages
-
-
-
         [TestMethod()]
         public void Index_Get_WhenProvidedNoInputValues_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
 
             // Act
             var result = controller.Index();
@@ -85,13 +62,12 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Index_Get_WhenProvidedNoInputValues_ReturnAllValuesFromDatabase_Test()
         {
             // Arrange
-            IList<SettingType> _settingTypes = new List<SettingType>();
-            _settingTypes.Add(new SettingType() { Id = 1, Name = "Name 1", IsActive = true }); // count
-            _settingTypes.Add(new SettingType() { Id = 2, Name = "Name 2", IsActive = false }); // count
-            _settingTypes.Add(new SettingType() { Id = 3, Name = "Name 3", IsActive = true }); // count
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
-            int expectedCount = 3;
+            IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
+            _relationshipTypes.Add(new RelationshipType() { Id = 1, Name = "Name 1", IsActive = true }); // count
+            _relationshipTypes.Add(new RelationshipType() { Id = 2, Name = "Name 2", IsActive = false }); // count
+            _unitOfWork.RelationshipTypes = new InMemoryRelationshipTypeRepository(_relationshipTypes);
+            RelationshipTypeController controller = new RelationshipTypeController(_unitOfWork);
+            int expectedCount = 2;
 
             // Act
             var result = controller.Index();
@@ -106,7 +82,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Index_Get_WhenProvidedSuccessMessage_ReturnViewData_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             controller.TempData["SuccessMessage"] = "Test Message";
 
             // Act
@@ -121,7 +97,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Index_Get_WhenProvidedErrorMessage_ReturnViewData_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             controller.TempData["ErrorMessage"] = "Test Message";
 
             // Act
@@ -138,7 +114,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Create_Get_WhenProvidedNoInputVaues_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
 
             // Act
             var result = controller.Create();
@@ -153,43 +129,41 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Create_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             CreateViewModel vmexpected = new CreateViewModel()
             {
                 Name = "New Name"
             };
-            int newId = _settingTypes.Count() + 1;
+            int newId = _relationshipTypes.Count() + 1;
 
             // Act
             var result = controller.Create(vmexpected);
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _settingTypes.FirstOrDefault(r => r.Id == newId);
-            Assert.AreEqual(vmexpected.Name, dbResult.Name, "SettingType Name");
-            Assert.AreEqual(true, dbResult.IsActive, "SettingType IsActive");
+            var dbResult = _relationshipTypes.FirstOrDefault(r => r.Id == newId);
+            Assert.AreEqual(vmexpected.Name, dbResult.Name, "Name");
+            Assert.AreEqual(true, dbResult.IsActive, "IsActive");
         }
 
         [TestMethod()]
         public void Create_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
-            CreateViewModel vmCreate = new CreateViewModel()
+            RelationshipTypeController controller = _controller;
+            var vmCreate = new CreateViewModel()
             {
                 Name = "New Name"
             };
-            int newId = _settingTypes.Count() + 1;
 
             // Act
             var result = controller.Create(vmCreate);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
             var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("CreateLinkedAssetTypes", routeResult.RouteValues["action"], "Action");
-            Assert.AreEqual("AssetTypeSettingType", routeResult.RouteValues["controller"], "Controller");
-            Assert.AreEqual(newId, routeResult.RouteValues["settingTypeId"], "settingTypeId");
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("RelationshipType", routeResult.RouteValues["controller"], "Controller");
             Assert.AreEqual("Record created", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
 
@@ -197,7 +171,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Create_Post_WhenModelStateNotValid_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             controller.ModelState.AddModelError("", "mock error message");
             var vmExpected = new CreateViewModel()
             {
@@ -211,7 +185,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action");
-            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual("RelationshipType", routeResult.RouteValues["controller"], "Controller");
             Assert.AreEqual("Encountered a problem. Try again.", controller.TempData["ErrorMessage"].ToString(), "Message");
         }
 
@@ -219,10 +193,10 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Create_Post_WhenProvidedNameIsDuplicated_ReturnRouteValues_Test()
         {
             // Arrange
-            IList<SettingType> _settingTypes = new List<SettingType>();
-            _settingTypes.Add(new SettingType() { Id = 1, Name = "Existing Name", IsActive = true }); // duplicated name
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
+            IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
+            _relationshipTypes.Add(new RelationshipType() { Id = 1, Name = "Existing Name", IsActive = true }); // duplicated name
+            _unitOfWork.RelationshipTypes = new InMemoryRelationshipTypeRepository(_relationshipTypes);
+            RelationshipTypeController controller = new RelationshipTypeController(_unitOfWork);
             var vmExpected = new CreateViewModel()
             {
                 Name = "Existing Name"
@@ -232,7 +206,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.Create(vmExpected);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
             var viewResult = result as ViewResult;
             Assert.AreEqual("Create", viewResult.ViewName, "View Name");
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel), "View Model");
@@ -245,7 +219,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             int id = 2;
 
             // Act
@@ -254,21 +228,19 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsInstanceOfType(result, typeof(ViewResult));
             var viewResult = result as ViewResult;
-            Assert.AreEqual("Edit", viewResult.ViewName);
-            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+            Assert.AreEqual("Edit", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel), "View Model");
         }
 
         [TestMethod()]
         public void Edit_Get_WhenProvidedIdIsValid_ReturnRecordFromDatabase_Test()
         {
             // Arrange
-            IList<SettingType> _settingTypes = new List<SettingType>();
-            _settingTypes.Add(new SettingType() { Id = 1, Name = "Name 1", IsActive = true });
-            _settingTypes.Add(new SettingType() { Id = 2, Name = "Name 2", IsActive = true }); // return values
-            _settingTypes.Add(new SettingType() { Id = 3, Name = "Name 3", IsActive = true });
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
-            int id = 2;
+            IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
+            _relationshipTypes.Add(new RelationshipType() { Id = 1, Name = "Name", IsActive = true }); // return values
+            _unitOfWork.RelationshipTypes = new InMemoryRelationshipTypeRepository(_relationshipTypes);
+            RelationshipTypeController controller = new RelationshipTypeController(_unitOfWork);
+            int id = 1;
 
             // Act
             var result = controller.Edit(id);
@@ -277,7 +249,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as EditViewModel;
             Assert.AreEqual(id, vmResult.Id, "Id");
-            Assert.AreEqual("Name 2", vmResult.Name, "Name");
+            Assert.AreEqual("Name", vmResult.Name, "Name");
             Assert.AreEqual(true, vmResult.IsActive, "IsActive");
         }
 
@@ -285,7 +257,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             EditViewModel vmExpected = new EditViewModel()
             {
                 Id = 2,
@@ -298,7 +270,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _settingTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            var dbResult = _relationshipTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
             Assert.AreEqual(vmExpected.Id, dbResult.Id, "Id");
             Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
             Assert.AreEqual(vmExpected.IsActive, dbResult.IsActive, "IsActive");
@@ -308,7 +280,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             EditViewModel vmExpected = new EditViewModel()
             {
                 Id = 1,
@@ -323,7 +295,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"]);
-            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"]);
+            Assert.AreEqual("RelationshipType", routeResult.RouteValues["controller"]);
             Assert.AreEqual("Record updated", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
 
@@ -331,7 +303,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Post_WhenModelStateNotValid_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             controller.ModelState.AddModelError("", "mock error message");
             EditViewModel vmExpected = new EditViewModel()
             {
@@ -347,7 +319,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action");
-            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual("RelationshipType", routeResult.RouteValues["controller"], "Controller");
             Assert.AreEqual("Encountered a problem. Try again.", controller.TempData["ErrorMessage"].ToString(), "Message");
         }
 
@@ -355,12 +327,12 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Post_WhenProvidedNameIsDuplicated_ReturnRouteValues_Test()
         {
             // Arrange
-            IList<SettingType> _settingTypes = new List<SettingType>();
-            _settingTypes.Add(new SettingType() { Id = 1, Name = "Name", IsActive = true });
-            _settingTypes.Add(new SettingType() { Id = 2, Name = "Existing Name", IsActive = true }); // duplicated name
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
-            EditViewModel vmExpected = new EditViewModel()
+            IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
+            _relationshipTypes.Add(new RelationshipType() { Id = 1, Name = "Name", IsActive = true });
+            _relationshipTypes.Add(new RelationshipType() { Id = 2, Name = "Existing Name", IsActive = true }); // duplicated name
+            _unitOfWork.RelationshipTypes = new InMemoryRelationshipTypeRepository(_relationshipTypes);
+            RelationshipTypeController controller = new RelationshipTypeController(_unitOfWork);
+            var vmExpected = new EditViewModel()
             {
                 Id = 1,
                 Name = "Existing Name",
@@ -384,7 +356,7 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Details_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            SettingTypeController controller = _controller;
+            RelationshipTypeController controller = _controller;
             int id = 2;
 
             // Act
@@ -401,13 +373,11 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Details_Get_WhenProvidedIdIsValid_ReturnRecordFromDatabase_Test()
         {
             // Arrange
-            IList<SettingType> _settingTypes = new List<SettingType>();
-            _settingTypes.Add(new SettingType() { Id = 1, Name = "Name 1", IsActive = true });
-            _settingTypes.Add(new SettingType() { Id = 2, Name = "Name 2", IsActive = true }); // return values
-            _settingTypes.Add(new SettingType() { Id = 3, Name = "Name 3", IsActive = true });
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
-            int id = 2;
+            IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
+            _relationshipTypes.Add(new RelationshipType() { Id = 1, Name = "Name", IsActive = true });
+            _unitOfWork.RelationshipTypes = new InMemoryRelationshipTypeRepository(_relationshipTypes);
+            RelationshipTypeController controller = new RelationshipTypeController(_unitOfWork);
+            int id = 1;
 
             // Act
             var result = controller.Details(id);
@@ -416,9 +386,10 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as DetailsViewModel;
             Assert.AreEqual(id, vmResult.Id, "Id");
-            Assert.AreEqual("Name 2", vmResult.Name, "Name");
+            Assert.AreEqual("Name", vmResult.Name, "Name");
             Assert.AreEqual(true, vmResult.IsActive, "IsActive");
         }
+
 
     }
 }

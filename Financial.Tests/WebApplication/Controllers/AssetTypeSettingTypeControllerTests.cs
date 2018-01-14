@@ -63,12 +63,12 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         [TestMethod()]
-        public void IndexLinkedSettingTypes_Child_WhenProvidedAssetTypeIdIsValid_ReturnAllValuesFromDatabase_Test()
+        public void IndexLinkedSettingTypes_Child_WhenProvidedAssetTypeIdIsValid_ReturnActiveValuesFromDatabase_Test()
         {
             // Arrange
             IList<AssetTypeSettingType> _assetTypesSettingTypes = new List<AssetTypeSettingType>();
             _assetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 1, AssetTypeId = 4, SettingTypeId = 5, IsActive = true }); // count
-            _assetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 2, AssetTypeId = 4, SettingTypeId = 6, IsActive = true }); // count
+            _assetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 2, AssetTypeId = 4, SettingTypeId = 6, IsActive = false }); // NOT active
             _assetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 3, AssetTypeId = 4, SettingTypeId = 7, IsActive = true }); // count
             IList<AssetType> _assetTypes = new List<AssetType>();
             _assetTypes.Add(new AssetType() { Id = 4, Name = "AssetType Name 4", IsActive = true });
@@ -81,7 +81,7 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
             AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
             int assetTypeId = 4;
-            int expectedCount = 3;
+            int expectedCount = 2;
 
             // Act
             var result = controller.IndexLinkedSettingTypes(assetTypeId);
@@ -228,7 +228,7 @@ namespace Financial.Tests.WebApplication.Controllers
             AssetTypeSettingTypeController controller = _controller;
             int assetTypeId = _assetTypes.Count() + 1;
             _assetTypes.Add(new AssetType() { Id = assetTypeId, Name = "Name", IsActive = true });
-            controller.TempData["SuccessMessage"] = "Test Message";
+            controller.TempData["SuccessMessage"] = "Test Success Message";
 
             // Act
             var result = controller.CreateLinkedSettingTypes(assetTypeId);
@@ -236,7 +236,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.Model as CreateLinkedSettingTypesViewModel;
-            Assert.AreEqual("Test Message", vmResult.Message, "Message");
+            Assert.AreEqual("Test Success Message", vmResult.SuccessMessage, "Success Message");
         }
 
         [TestMethod()]
@@ -350,16 +350,16 @@ namespace Financial.Tests.WebApplication.Controllers
             CreateLinkedSettingTypesViewModel vmExpected = new CreateLinkedSettingTypesViewModel()
             {
                 AssetTypeId = _assetTypes.Count() + 1, // new AssetType Id
-                Message = "Previous Message",
+                SuccessMessage = "Previous Success Message",
                 CreateViewModels = new List<CreateViewModel>()
             };
-            controller.TempData["SuccessMessage"] = "Previous Message";
+            controller.TempData["SuccessMessage"] = vmExpected.SuccessMessage;
 
             // Act
             controller.CreateLinkedSettingTypes(vmExpected);
 
             // Assert
-            Assert.AreEqual("Previous Message, Linked Setting Types Created", controller.TempData["SuccessMessage"].ToString(), "Success Message");
+            Assert.AreEqual("Previous Success Message, Linked Setting Types Created", controller.TempData["SuccessMessage"].ToString(), "Success Message");
         }
 
 
@@ -389,7 +389,7 @@ namespace Financial.Tests.WebApplication.Controllers
             AssetTypeSettingTypeController controller = _controller;
             int settingTypeId = _settingTypes.Count() + 1;
             _settingTypes.Add(new SettingType() { Id = settingTypeId, Name = "new Name", IsActive = true });
-            controller.TempData["SuccessMessage"] = "Test Message";
+            controller.TempData["SuccessMessage"] = "Test Success Message";
 
             // Act
             var result = controller.CreateLinkedAssetTypes(settingTypeId);
@@ -397,7 +397,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.Model as CreateLinkedAssetTypesViewModel;
-            Assert.AreEqual("Test Message", vmResult.Message, "Message");
+            Assert.AreEqual("Test Success Message", vmResult.SuccessMessage, "Success Message");
         }
 
         [TestMethod()]
@@ -512,7 +512,7 @@ namespace Financial.Tests.WebApplication.Controllers
             CreateLinkedAssetTypesViewModel vmExpected = new CreateLinkedAssetTypesViewModel()
             {
                 SettingTypeId = _settingTypes.Count() + 1, // new SettingType Id
-                Message = "Previous Message",
+                SuccessMessage = "Previous Success Message",
                 CreateViewModels = new List<CreateViewModel>()
             };
 
@@ -520,7 +520,7 @@ namespace Financial.Tests.WebApplication.Controllers
             controller.CreateLinkedAssetTypes(vmExpected);
 
             // Assert
-            Assert.AreEqual("Previous Message, Linked Asset Types Created", controller.TempData["SuccessMessage"].ToString(), "Success Message");
+            Assert.AreEqual("Previous Success Message, Linked Asset Types Created", controller.TempData["SuccessMessage"].ToString(), "Success Message");
         }
 
 

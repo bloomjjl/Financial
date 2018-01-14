@@ -28,6 +28,7 @@ namespace Financial.WebApplication.Controllers
         {
             // transfer db to vm
             var vmIndexlinkedSettingTypes = _unitOfWork.AssetTypesSettingTypes.GetAll()
+                .Where(r => r.IsActive)
                 .Where(r => r.AssetTypeId == assetTypeId)
                 .ToList()
                 .Join(_unitOfWork.SettingTypes.GetAll().Where(r => r.IsActive).ToList(), 
@@ -94,7 +95,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            TempData["SuccessMessage"] = string.Format("{0}, {1}", vmCreateLinkedSettingTypes.Message, "Linked Setting Types Created");
+            TempData["SuccessMessage"] = string.Format("{0}, {1}", vmCreateLinkedSettingTypes.SuccessMessage, "Linked Setting Types Created");
             return RedirectToAction("Index", "AssetType", new { id = vmCreateLinkedSettingTypes.AssetTypeId });
         }
 
@@ -138,7 +139,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            TempData["SuccessMessage"] = string.Format("{0}, {1}", vmCreateLinkedAssetTypes.Message, "Linked Asset Types Created");
+            TempData["SuccessMessage"] = string.Format("{0}, {1}", vmCreateLinkedAssetTypes.SuccessMessage, "Linked Asset Types Created");
             return RedirectToAction("Index", "SettingType", new { id = vmCreateLinkedAssetTypes.SettingTypeId });
         }
 

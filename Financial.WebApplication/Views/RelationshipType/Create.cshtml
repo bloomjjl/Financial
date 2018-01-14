@@ -1,10 +1,10 @@
-﻿@model Financial.Core.ViewModels.SettingType.CreateViewModel
+﻿@model Financial.Core.ViewModels.RelationshipType.CreateViewModel
 
 @{
     ViewBag.Title = "Create";
 }
 
-<h2>Setting Type</h2>
+<h2>Relationship Type</h2>
 
 @if (ViewData["ErrorMessage"] != null)
 {
@@ -14,10 +14,10 @@
     </div>
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm()) 
 {
     @Html.AntiForgeryToken()
-
+    
     <div class="form-horizontal">
 
         <h4>Create</h4>
@@ -35,12 +35,11 @@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />
-                @Html.ActionLink("Cancel", "Index", "SettingType", null, new { @class = "btn btn-default" })
+                @Html.ActionLink("Cancel", "Index", "RelationshipType", null, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>
 }
-
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

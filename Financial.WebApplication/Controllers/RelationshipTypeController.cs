@@ -1,6 +1,6 @@
 ﻿using Financial.Core;
 using Financial.Core.Models;
-using Financial.Core.ViewModels.AssetType;
+using Financial.Core.ViewModels.RelationshipType;
 using Financial.Data;
 using System;
 using System.Collections.Generic;
@@ -10,16 +10,16 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class AssetTypeController : Controller
+    public class RelationshipTypeController : Controller
     {
         private IUnitOfWork _unitOfWork;
 
-        public AssetTypeController()
+        public RelationshipTypeController()
         {
             _unitOfWork = new UnitOfWork();
         }
 
-        public AssetTypeController(IUnitOfWork unitOfWork)
+        public RelationshipTypeController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -27,8 +27,8 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Index()
         {
-            // get TempData
-            if (TempData["SuccessMessage"] != null)
+            // Transfer TempData messages to ViewData
+            if(TempData["SuccessMessage"] != null)
             {
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
             }
@@ -38,7 +38,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer db to vm
-            var vmIndex = _unitOfWork.AssetTypes.GetAll()
+            var vmIndex = _unitOfWork.RelationshipTypes.GetAll()
                 .Select(r => new IndexViewModel(r))
                 .ToList();
 
@@ -54,17 +54,16 @@ namespace Financial.WebApplication.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
             if(!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "AssetType");
+                return RedirectToAction("Index", "RelationshipType");
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.AssetTypes.GetAll()
+            var existingCount = _unitOfWork.RelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Count(r => r.Name == vmCreate.Name);
             if (existingCount > 0)
@@ -75,47 +74,45 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            var dtoAssetType = new AssetType()
+            _unitOfWork.RelationshipTypes.Add(new RelationshipType()
             {
                 Name = vmCreate.Name,
                 IsActive = true
-            };
+            });
 
-            // transfer dto to db
-            _unitOfWork.AssetTypes.Add(dtoAssetType);
+            // update db
             _unitOfWork.CommitTrans();
 
-            // display View
-            TempData["SuccessMessage"] = "Asset Type Created";
-            return RedirectToAction("CreateLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = dtoAssetType.Id });
+            // display view
+            TempData["SuccessMessage"] = "Record created";
+            return RedirectToAction("Index", "RelationshipType");
         }
 
         [HttpGet]
-        public ActionResult Edit(int id)
+        public ViewResult Edit(int id)
         {
-            // transfer db to vm
-            var vmEdit = new EditViewModel(_unitOfWork.AssetTypes.Get(id));
+            // transfer dto to vm
+            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(id);
 
             // display view
-            return View("Edit", vmEdit);
+            return View("Edit", new EditViewModel(dtoRelationshipType));
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Edit(EditViewModel vmEdit)
         {
-            if (!ModelState.IsValid)
+            if(!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "AssetType");
+                return RedirectToAction("Index", "RelationshipType");
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.AssetTypes.GetAll()
+            var existingCount = _unitOfWork.RelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.Name == vmEdit.Name)
                 .Count(r => r.Id != vmEdit.Id);
-            if (existingCount > 0)
+            if(existingCount > 0)
             {
                 // display view
                 ViewData["ErrorMessage"] = "Record already exists";
@@ -123,27 +120,26 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            var dtoAssetType = _unitOfWork.AssetTypes.Get(vmEdit.Id);
-            dtoAssetType.Name = vmEdit.Name;
-            dtoAssetType.IsActive = vmEdit.IsActive;
+            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(vmEdit.Id);
+            dtoRelationshipType.Name = vmEdit.Name;
+            dtoRelationshipType.IsActive = vmEdit.IsActive;
 
             // update db
             _unitOfWork.CommitTrans();
 
             // display view
-            TempData["SuccessMessage"] = "Record updated.";
-            return RedirectToAction("Index", "AssetType");
+            TempData["SuccessMessage"] = "Record updated";
+            return RedirectToAction("Index", "RelationshipType");
         }
 
         [HttpGet]
-        public ActionResult Details(int? id)
+        public ViewResult Details(int id)
         {
-            // transfer dto to vm
-            var dtoAssetType = _unitOfWork.AssetTypes.Get((int)id);
-            var vmDetails = new DetailsViewModel(dtoAssetType);
+            // get dto for id
+            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(id);
 
             // display view
-            return View("Details", vmDetails);
+            return View("Details", new DetailsViewModel(dtoRelationshipType));
         }
     }
 }

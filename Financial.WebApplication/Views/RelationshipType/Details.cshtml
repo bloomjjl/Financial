@@ -1,16 +1,14 @@
-﻿@model Financial.Core.ViewModels.SettingType.DetailsViewModel
+﻿@model Financial.Core.ViewModels.RelationshipType.DetailsViewModel
 
 @{
     ViewBag.Title = "Details";
 }
 
-<h2>Setting Type</h2>
+<h2>Relationship Type</h2>
 
 <div>
-
     <h4>Details</h4>
     <hr />
-
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Name)
@@ -34,20 +32,15 @@
         @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
         @Html.ActionLink("Back to List", "Index")
     </p>
-
 </div>
 
 <div>
 
     <hr />
     <h4>Linked Asset Types</h4>
-    <hr />
+    <p>&nbsp;</p>
 
     @{
-        Html.RenderAction("IndexLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = Model.Id });
+        Html.RenderAction("IndexLinkedAssetTypes", "AssetTypeRelationshipType", new { relationshipTypeId = Model.Id });
     }
-
-    <p>
-        @Html.ActionLink("Edit", "EditLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = Model.Id }, null)
-    </p>
 </div>

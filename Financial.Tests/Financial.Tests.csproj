@@ -82,6 +82,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WebApplication\Controllers\AssetTypeRelationshipTypeControllerTests.cs" />
+    <Compile Include="Data\Fakes\FakeAssetTypesRelationshipTypes.cs" />
+    <Compile Include="Data\Fakes\FakeRelationshipTypes.cs" />
+    <Compile Include="Data\Repositories\InMemoryAssetTypeRelationshipTypeRepository.cs" />
+    <Compile Include="Data\Repositories\InMemoryRelationshipTypeRepository.cs" />
+    <Compile Include="WebApplication\Controllers\RelationshipTypeControllerTests.cs" />
+    <Compile Include="Data\Repositories\InMemoryAssetRepository.cs" />
+    <Compile Include="WebApplication\Controllers\AssetControllerTests.cs" />
     <Compile Include="Data\Fakes\FakeAssetTypesSettingTypes.cs" />
     <Compile Include="WebApplication\Controllers\AssetTypeSettingTypeControllerTests.cs" />
     <Compile Include="Data\Repositories\InMemoryAssetSettingRepository.cs" />
@@ -107,7 +115,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\Models\" />
+    <Folder Include="WebApplication\Controllers\Core\Models\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Financial.Core\Financial.Core.csproj">

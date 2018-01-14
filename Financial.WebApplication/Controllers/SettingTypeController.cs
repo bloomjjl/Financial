@@ -56,6 +56,23 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
+            if(!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
+                return RedirectToAction("Index", "SettingType");
+            }
+
+            // check for duplicate
+            var existingCount = _unitOfWork.SettingTypes.GetAll()
+                .Where(r => r.IsActive)
+                .Count(r => r.Name == vmCreate.Name);
+            if (existingCount > 0)
+            {
+                // display view
+                ViewData["ErrorMessage"] = "Record already exists";
+                return View("Create", vmCreate);
+            }
+
             // transfer vm to dto
             var dtoSettingType = new SettingType()
             {
@@ -68,7 +85,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            TempData["SuccessMessage"] = "Setting Type Created";
+            TempData["SuccessMessage"] = "Record created";
             return RedirectToAction("CreateLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = dtoSettingType.Id });
         }
 
@@ -88,6 +105,24 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EditViewModel vmEdit)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
+                return RedirectToAction("Index", "SettingType");
+            }
+
+            // check for duplicate
+            var existingCount = _unitOfWork.SettingTypes.GetAll()
+                .Where(r => r.IsActive)
+                .Where(r => r.Name == vmEdit.Name)
+                .Count(r => r.Id != vmEdit.Id);
+            if (existingCount > 0)
+            {
+                // display view
+                ViewData["ErrorMessage"] = "Record already exists";
+                return View("Edit", vmEdit);
+            }
+
             // transfer vm to dto
             var dtoSettingType = _unitOfWork.SettingTypes.Get(vmEdit.Id);
             dtoSettingType.Name = vmEdit.Name;
@@ -98,7 +133,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            TempData["SuccessMessage"] = "Record updated.";
+            TempData["SuccessMessage"] = "Record updated";
             return RedirectToAction("Index", "SettingType");
         }
 

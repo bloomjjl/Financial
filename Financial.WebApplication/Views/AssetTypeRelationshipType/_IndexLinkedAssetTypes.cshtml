@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Financial.Core.ViewModels.AssetTypeRelationshipType.IndexLinkedAssetTypesViewModel>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ParentAssetType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ChildAssetType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ParentChildRelationshipType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ChildParentRelationshipType)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ParentAssetType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ChildAssetType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ParentChildRelationshipType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ChildParentRelationshipType)
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

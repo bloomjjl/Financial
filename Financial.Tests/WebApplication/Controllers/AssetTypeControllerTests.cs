@@ -84,6 +84,27 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         [TestMethod()]
+        public void Index_Get_WhenProvidedNoInputValues_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            IList<AssetType> _assetTypes = new List<AssetType>();
+            _assetTypes.Add(new AssetType() { Id = 1, Name = "Name 1", IsActive = true }); // count
+            _assetTypes.Add(new AssetType() { Id = 2, Name = "Name 2", IsActive = false }); // count
+            _assetTypes.Add(new AssetType() { Id = 3, Name = "Name 3", IsActive = true }); // count
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
+            AssetTypeController controller = new AssetTypeController(_unitOfWork);
+            int expectedCount = 3;
+
+            // Act
+            var result = controller.Index();
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmReturned = viewResult.ViewData.Model as List<IndexViewModel>;
+            Assert.AreEqual(expectedCount, vmReturned.Count(), "Number of records");
+        }
+
+        [TestMethod()]
         public void Index_Get_WhenProvidedSuccessMessage_ReturnViewData_Test()
         {
             // Arrange
@@ -111,27 +132,6 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             Assert.AreEqual("Test Message", viewResult.ViewData["ErrorMessage"].ToString(), "Message");
-        }
-
-        [TestMethod()]
-        public void Index_Get_WhenProvidedNoInputValues_ReturnAllValuesFromDatabase_Test()
-        {
-            // Arrange
-            IList<AssetType> _assetTypes = new List<AssetType>();
-            _assetTypes.Add(new AssetType() { Id = 1, Name = "Name 1", IsActive = true }); // count
-            _assetTypes.Add(new AssetType() { Id = 2, Name = "Name 2", IsActive = false }); // count
-            _assetTypes.Add(new AssetType() { Id = 3, Name = "Name 3", IsActive = true }); // count
-            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
-            AssetTypeController controller = new AssetTypeController(_unitOfWork);
-            int expectedCount = 3;
-
-            // Act
-            var result = controller.Index();
-
-            // Assert
-            var viewResult = result as ViewResult;
-            var vmReturned = viewResult.ViewData.Model as List<IndexViewModel>;
-            Assert.AreEqual(expectedCount, vmReturned.Count(), "Number of records");
         }
 
         /*
@@ -313,25 +313,54 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("CreateLinkedSettingTypes", routeResult.RouteValues["action"], "Action");
             Assert.AreEqual("AssetTypeSettingType", routeResult.RouteValues["controller"], "Controller");
             Assert.AreEqual(newId, routeResult.RouteValues["assetTypeId"], "assetTypeId");
-        }
-
-        [TestMethod()]
-        public void Create_Post_WhenProvidedViewModelIsValid_ReturnSuccessMessage_Test()
-        {
-            // Arrange
-            AssetTypeController controller = _controller;
-            CreateViewModel vmExpected = new CreateViewModel()
-            {
-                Name = "New Name"
-            };
-
-            // Act
-            controller.Create(vmExpected);
-
-            // Assert
             Assert.AreEqual("Asset Type Created", controller.TempData["SuccessMessage"].ToString(), "Success Message");
         }
 
+        [TestMethod()]
+        public void Create_Post_WhenModelStateNotValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            AssetTypeController controller = _controller;
+            controller.ModelState.AddModelError("", "mock error message");
+            var vmExpected = new CreateViewModel()
+            {
+                Name = "Existing Name"
+            };
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual("Encountered a problem. Try again.", controller.TempData["ErrorMessage"].ToString(), "Message");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedNameIsDuplicated_ReturnRouteValues_Test()
+        {
+            // Arrange
+            IList<AssetType> _assetTypes = new List<AssetType>();
+            _assetTypes.Add(new AssetType() { Id = 1, Name = "Existing Name", IsActive = true }); // duplicated name
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
+            AssetTypeController controller = new AssetTypeController(_unitOfWork);
+            var vmExpected = new CreateViewModel()
+            {
+                Name = "Existing Name"
+            };
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel), "View Model");
+            Assert.AreEqual("Record already exists", controller.ViewData["ErrorMessage"].ToString(), "Message");
+        }
         /*
         [TestMethod()]
         public void Create_Get_WhenNoInputVauesProvided_ReturnCreateViewTest()
@@ -624,7 +653,7 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeController controller = _controller;
-            EditViewModel vmExpected = new EditViewModel()
+            var vmExpected = new EditViewModel()
             {
                 Id = 1,
                 Name = "Updated Name",
@@ -639,26 +668,60 @@ namespace Financial.Tests.WebApplication.Controllers
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Index", routeResult.RouteValues["action"]);
             Assert.AreEqual("AssetType", routeResult.RouteValues["controller"]);
+            Assert.AreEqual("Record updated.", controller.TempData["SuccessMessage"].ToString(), "Success Message");
         }
 
         [TestMethod()]
-        public void Edit_Post_WhenProvidedViewModelIsValid_ReturnSuccessMessage_Test()
+        public void Edit_Post_WhenModelStateNotValid_ReturnRouteValues_Test()
         {
             // Arrange
             AssetTypeController controller = _controller;
-            EditViewModel vmExpected = new EditViewModel()
+            controller.ModelState.AddModelError("", "mock error message");
+            var vmExpected = new EditViewModel()
             {
                 Id = 1,
-                Name = "Updated Name",
+                Name = "Existing Name",
                 IsActive = true
             };
 
             // Act
-            controller.Edit(vmExpected);
+            var result = controller.Edit(vmExpected);
 
             // Assert
-            Assert.AreEqual("Record updated.", controller.TempData["SuccessMessage"].ToString(), "Success Message");
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual("Encountered a problem. Try again.", controller.TempData["ErrorMessage"].ToString(), "Message");
         }
+
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedNameIsDuplicated_ReturnRouteValues_Test()
+        {
+            // Arrange
+            IList<AssetType> _assetTypes = new List<AssetType>();
+            _assetTypes.Add(new AssetType() { Id = 1, Name = "Name", IsActive = true });
+            _assetTypes.Add(new AssetType() { Id = 2, Name = "Existing Name", IsActive = true }); // duplicated name
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
+            AssetTypeController controller = new AssetTypeController(_unitOfWork);
+            EditViewModel vmExpected = new EditViewModel()
+            {
+                Id = 1,
+                Name = "Existing Name",
+                IsActive = true
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel), "View Model");
+            Assert.AreEqual("Record already exists", controller.ViewData["ErrorMessage"].ToString(), "Message");
+        }
+
 
         /*
         [TestMethod()]
@@ -1073,7 +1136,7 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         [TestMethod()]
-        public void Details_Get_WhenProvidedIdIsValid_ReturnCorrectValuesFromDatabase_Test()
+        public void Details_Get_WhenProvidedIdIsValid_ReturnValuesFromDatabase_Test()
         {
             // Arrange
             IList<AssetType> _assetTypes = new List<AssetType>();

@@ -168,11 +168,14 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AssetController.cs" />
     <Compile Include="Controllers\AssetSettingController.cs" />
     <Compile Include="Controllers\AssetTypeController.cs" />
+    <Compile Include="Controllers\AssetTypeRelationshipTypeController.cs" />
     <Compile Include="Controllers\AssetTypeSettingTypeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\RelationshipTypeController.cs" />
     <Compile Include="Controllers\SettingTypeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -253,10 +256,16 @@
     <Content Include="Views\AssetTypeSettingType\_IndexLinkedAssetTypes.cshtml" />
     <Content Include="Views\AssetTypeSettingType\EditLinkedSettingTypes.cshtml" />
     <Content Include="Views\AssetTypeSettingType\EditLinkedAssetTypes.cshtml" />
+    <Content Include="Views\RelationshipType\Create.cshtml" />
+    <Content Include="Views\RelationshipType\Index.cshtml" />
+    <Content Include="Views\RelationshipType\Edit.cshtml" />
+    <Content Include="Views\RelationshipType\Details.cshtml" />
+    <Content Include="Views\AssetTypeRelationshipType\_IndexLinkedAssetTypes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\AccountType\" />
+    <Folder Include="Views\Asset\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
