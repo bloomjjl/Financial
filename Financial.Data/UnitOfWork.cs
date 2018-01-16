@@ -24,8 +24,9 @@ namespace Financial.Data
             AssetTypesSettingTypes = new AssetTypeSettingTypeRepository(_context);
             AssetTypesRelationshipTypes = new AssetTypeRelationshipTypeRepository(_context);
             AssetTypes = new AssetTypeRepository(_context);
-            SettingTypes = new SettingTypeRepository(_context);
+            ParentChildRelationshipTypes = new ParentChildRelationshipTypeRepository(_context);
             RelationshipTypes = new RelationshipTypeRepository(_context);
+            SettingTypes = new SettingTypeRepository(_context);
             TransactionTypes = new TransactionTypeRepository(_context);
         }
 
@@ -39,8 +40,9 @@ namespace Financial.Data
             AssetTypesSettingTypes = new AssetTypeSettingTypeRepository(_context);
             AssetTypesRelationshipTypes = new AssetTypeRelationshipTypeRepository(_context);
             AssetTypes = new AssetTypeRepository(_context);
-            SettingTypes = new SettingTypeRepository(_context);
+            ParentChildRelationshipTypes = new ParentChildRelationshipTypeRepository(_context);
             RelationshipTypes = new RelationshipTypeRepository(_context);
+            SettingTypes = new SettingTypeRepository(_context);
             TransactionTypes = new TransactionTypeRepository(_context);
         }
 
@@ -51,8 +53,9 @@ namespace Financial.Data
         public IAssetTypeSettingTypeRepository AssetTypesSettingTypes { get; private set; }
         public IAssetTypeRelationshipTypeRepository AssetTypesRelationshipTypes { get; private set; }
         public IAssetTypeRepository AssetTypes { get; private set; }
-        public ISettingTypeRepository SettingTypes { get; private set; }
+        public IParentChildRelationshipTypeRepository ParentChildRelationshipTypes { get; set; }
         public IRelationshipTypeRepository RelationshipTypes { get; private set; }
+        public ISettingTypeRepository SettingTypes { get; private set; }
         public ITransactionTypeRepository TransactionTypes { get; private set; }
 
         public void BeginTrans()

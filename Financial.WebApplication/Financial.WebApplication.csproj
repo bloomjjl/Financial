@@ -175,6 +175,7 @@
     <Compile Include="Controllers\AssetTypeSettingTypeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\ParentChildRelationshipTypeController.cs" />
     <Compile Include="Controllers\RelationshipTypeController.cs" />
     <Compile Include="Controllers\SettingTypeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -261,6 +262,13 @@
     <Content Include="Views\RelationshipType\Edit.cshtml" />
     <Content Include="Views\RelationshipType\Details.cshtml" />
     <Content Include="Views\AssetTypeRelationshipType\_IndexLinkedAssetTypes.cshtml" />
+    <Content Include="Views\AssetTypeRelationshipType\_IndexLinkedRelationshipTypes.cshtml" />
+    <Content Include="Views\AssetTypeRelationshipType\Create.cshtml" />
+    <Content Include="Views\ParentChildRelationshipType\_Index.cshtml" />
+    <Content Include="Views\ParentChildRelationshipType\Create.cshtml" />
+    <Content Include="Views\ParentChildRelationshipType\Edit.cshtml" />
+    <Content Include="Views\ParentChildRelationshipType\Delete.cshtml" />
+    <Content Include="Views\AssetTypeRelationshipType\_CreateLinkedRelationshipTypes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

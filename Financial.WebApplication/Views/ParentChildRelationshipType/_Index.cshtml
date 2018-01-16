@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Financial.Core.ViewModels.ParentChildRelationshipType.IndexViewModel>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ParentRelationshipTypeName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ChildRelationshipTypeName)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ParentRelationshipTypeName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ChildRelationshipTypeName)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id, relationshipTypeId = item.RelationshipTypeId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id, relationshipTypeId = item.RelationshipTypeId })
+        </td>
+    </tr>
+}
+
+</table>

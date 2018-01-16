@@ -1,0 +1,10 @@
+﻿@model Financial.Core.ViewModels.AssetTypeRelationshipType.CreateLinkedRelationshipTypesViewModel
+
+
+<div class="form-group">
+    @Html.LabelFor(model => model.SelectedRelationshipType, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(x => x.SelectedRelationshipType, Model.RelationshipTypes, "-- Select a Relationship Type --", new { @id = "relationship_type", @class = "form-control", onchange = "updateRelationshipType()" })
+        @Html.ValidationMessageFor(model => model.SelectedRelationshipType, "", new { @class = "text-danger" })
+    </div>
+</div>

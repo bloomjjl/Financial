@@ -82,6 +82,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ParentChildRelationshipTypeControllerTests.cs" />
+    <Compile Include="Data\Fakes\FakeParentChildRelationshipTypes.cs" />
+    <Compile Include="Data\Repositories\InMemoryParentChildRelationshipTypeRepository.cs" />
     <Compile Include="WebApplication\Controllers\AssetTypeRelationshipTypeControllerTests.cs" />
     <Compile Include="Data\Fakes\FakeAssetTypesRelationshipTypes.cs" />
     <Compile Include="Data\Fakes\FakeRelationshipTypes.cs" />

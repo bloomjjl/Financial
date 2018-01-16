@@ -20,8 +20,9 @@ namespace Financial.Data
         public DbSet<AssetType> AssetTypes { get; set; }
         public DbSet<AssetTypeSettingType> AssetTypesSettingTypes { get; set; }
         public DbSet<AssetTypeRelationshipType> AssetTypesRelationshipTypes { get; set; }
-        public DbSet<SettingType> SettingTypes { get; set; }
+        public DbSet<ParentChildRelationshipType> ParentChildRelationshipTypes { get; set; }
         public DbSet<RelationshipType> RelationshipTypes { get; set; }
+        public DbSet<SettingType> SettingTypes { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
     }
 }

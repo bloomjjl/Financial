@@ -87,6 +87,7 @@
     <Compile Include="Repositories\AssetTypeSettingTypeRepository.cs" />
     <Compile Include="Repositories\AssetTypeRelationshipTypeRepository.cs" />
     <Compile Include="Repositories\AssetTypeRepository.cs" />
+    <Compile Include="Repositories\ParentChildRelationshipTypeRepository.cs" />
     <Compile Include="Repositories\SettingTypeRepository.cs" />
     <Compile Include="Repositories\RelationshipTypeRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />

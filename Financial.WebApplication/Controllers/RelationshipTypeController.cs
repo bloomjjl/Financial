@@ -135,6 +135,12 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Details(int id)
         {
+            // Transfer TempData messages to ViewData
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+            }
+
             // get dto for id
             var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(id);
 

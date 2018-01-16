@@ -130,19 +130,19 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             RelationshipTypeController controller = _controller;
-            CreateViewModel vmexpected = new CreateViewModel()
+            var vmExpected = new CreateViewModel()
             {
                 Name = "New Name"
             };
             int newId = _relationshipTypes.Count() + 1;
 
             // Act
-            var result = controller.Create(vmexpected);
+            var result = controller.Create(vmExpected);
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
             var dbResult = _relationshipTypes.FirstOrDefault(r => r.Id == newId);
-            Assert.AreEqual(vmexpected.Name, dbResult.Name, "Name");
+            Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
             Assert.AreEqual(true, dbResult.IsActive, "IsActive");
         }
 
@@ -151,13 +151,13 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             RelationshipTypeController controller = _controller;
-            var vmCreate = new CreateViewModel()
+            var vmExpected = new CreateViewModel()
             {
                 Name = "New Name"
             };
 
             // Act
-            var result = controller.Create(vmCreate);
+            var result = controller.Create(vmExpected);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
@@ -258,7 +258,7 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             RelationshipTypeController controller = _controller;
-            EditViewModel vmExpected = new EditViewModel()
+            var vmExpected = new EditViewModel()
             {
                 Id = 2,
                 Name = "Updated Name",
@@ -281,7 +281,7 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             RelationshipTypeController controller = _controller;
-            EditViewModel vmExpected = new EditViewModel()
+            var vmExpected = new EditViewModel()
             {
                 Id = 1,
                 Name = "Updated Name",
@@ -305,7 +305,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Arrange
             RelationshipTypeController controller = _controller;
             controller.ModelState.AddModelError("", "mock error message");
-            EditViewModel vmExpected = new EditViewModel()
+            var vmExpected = new EditViewModel()
             {
                 Id = 1,
                 Name = "Existing Name",
@@ -388,6 +388,22 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(id, vmResult.Id, "Id");
             Assert.AreEqual("Name", vmResult.Name, "Name");
             Assert.AreEqual(true, vmResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Details_Get_WhenProvidedErrorMessage_ReturnViewData_Test()
+        {
+            // Arrange
+            RelationshipTypeController controller = _controller;
+            controller.TempData["ErrorMessage"] = "Test Message";
+            int id = 1;
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Test Message", viewResult.ViewData["ErrorMessage"].ToString(), "Message");
         }
 
 

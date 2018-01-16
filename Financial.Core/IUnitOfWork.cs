@@ -16,8 +16,9 @@ namespace Financial.Core
         IAssetTypeSettingTypeRepository AssetTypesSettingTypes { get; }
         IAssetTypeRelationshipTypeRepository AssetTypesRelationshipTypes { get; }
         IAssetTypeRepository AssetTypes { get; }
-        ISettingTypeRepository SettingTypes { get; }
+        IParentChildRelationshipTypeRepository ParentChildRelationshipTypes { get; set; }
         IRelationshipTypeRepository RelationshipTypes { get; }
+        ISettingTypeRepository SettingTypes { get; }
         ITransactionTypeRepository TransactionTypes { get; }
 
         void BeginTrans();

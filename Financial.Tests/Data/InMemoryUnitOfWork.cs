@@ -25,8 +25,9 @@ namespace Financial.Tests.Data
         public IAssetTypeSettingTypeRepository AssetTypesSettingTypes { get; set; }
         public IAssetTypeRelationshipTypeRepository AssetTypesRelationshipTypes { get; set; }
         public IAssetTypeRepository AssetTypes { get; set; }
-        public ISettingTypeRepository SettingTypes { get; set; }
+        public IParentChildRelationshipTypeRepository ParentChildRelationshipTypes { get; set; }
         public IRelationshipTypeRepository RelationshipTypes { get; set; }
+        public ISettingTypeRepository SettingTypes { get; set; }
         public ITransactionTypeRepository TransactionTypes { get; set; }
 
         public void BeginTrans()

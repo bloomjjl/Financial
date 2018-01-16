@@ -1,0 +1,99 @@
+﻿@model Financial.Core.ViewModels.AssetTypeRelationshipType.CreateViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Linked Asset Types</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Create Link</h4>
+        <hr />
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.SuppliedAssetTypeId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SuppliedAssetTypeName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SuppliedAssetTypeName, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+                @Html.ValidationMessageFor(model => model.SuppliedAssetTypeName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SelectedRelationshipLevel, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(x => x.SelectedRelationshipLevel, Model.RelationshipLevels, "-- Select a Relationship Level --", new { @id = "relationship_level", @class = "form-control", onload = "updateRelationshipLevel()", onchange = "updateRelationshipLevel()" })
+                @Html.ValidationMessageFor(model => model.SelectedRelationshipLevel, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div id="relationship_types">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedRelationshipType, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div id="parent_relationship_types" class="col-md-10">
+                    @Html.DropDownListFor(x => x.SelectedRelationshipType, Model.ParentRelationshipTypes, "-- Select a Relationship Type --", new { @id = "parent_relationship_type", @class = "form-control", onchange = "updateParentRelationshipType()" })
+                    @Html.ValidationMessageFor(model => model.SelectedRelationshipType, "", new { @class = "text-danger" })
+                </div>
+                <div  id="child_relationship_types" class="col-md-10" style="display:none">
+                    @Html.DropDownListFor(x => x.SelectedRelationshipType, Model.ChildRelationshipTypes, "-- Select a Relationship Type --", new { @id = "child_relationship_type", @class = "form-control", onchange = "updateChildRelationshipType()" })
+                    @Html.ValidationMessageFor(model => model.SelectedRelationshipType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div id="link_asset_types">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedLinkAssetType, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(x => x.SelectedLinkAssetType, Model.LinkAssetTypes, "-- Select an Asset Type --", new { @id = "link_asset_type", @class = "form-control", onchange = "updateLinkAssetType()" })
+                    @Html.ValidationMessageFor(model => model.SelectedLinkAssetType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div id="linked_asset_types" style="display:none">
+            <h4>Linked Asset Types</h4>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script>
+
+    function updateRelationshipLevel() {
+
+        var selectedRelationshipLevel = $('#relationship_level').val();
+
+        if (selectedRelationshipLevel == 'Parent')
+        {
+            @*Show Parent Relationship Types*@
+            $('#linked_asset_types').hide('fast');
+            $('#child_relationship_types').hide('fast');
+            $('#parent_relationship_types').show('fast');
+        }
+        else if(selectedRelationshipLevel == 'Child')
+        {
+            @*Show Child Relationship Types*@
+            $('#linked_asset_types').hide('fast');
+            $('#parent_relationship_types').hide('fast');
+            $('#child_relationship_types').show('fast');
+        }
+    }
+
+</script>

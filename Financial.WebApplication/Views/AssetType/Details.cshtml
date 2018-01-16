@@ -53,7 +53,6 @@ else if (ViewData["SuccessMessage"] != null)
 </div>
 
 <div>
-
     <hr />
     <h4>Linked Setting Types</h4>
     <hr />
@@ -69,3 +68,18 @@ else if (ViewData["SuccessMessage"] != null)
     </p>
 </div>
 
+<div>
+    <hr />
+    <h4>Linked Relationship Types</h4>
+    <hr />
+
+    <div>
+        <p>
+            @Html.ActionLink("Create New", "Create", "AssetTypeRelationshipType", new { assetTypeId = Model.Id }, null)
+        </p>
+
+        @{
+            Html.RenderAction("IndexLinkedRelationshipTypes", "AssetTypeRelationshipType", new { assetTypeId = Model.Id });
+        }
+    </div>
+</div>

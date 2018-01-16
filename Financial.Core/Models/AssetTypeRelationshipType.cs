@@ -21,8 +21,5 @@ namespace Financial.Core.Models
         [Required]
         [Display(Name = "ParentChildRelationshipType ID")]
         public int ParentChildRelationshipTypeId { get; set; }
-        [Required]
-        [Display(Name = "ChildParentRelationshipType ID")]
-        public int ChildParentRelationshipTypeId { get; set; }
     }
 }
