@@ -90,15 +90,15 @@ namespace Financial.WebApplication.Controllers
 
             // link duplicated?
             var countExistingParentLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                .Where(r => r.ParentRelationshipTypeId == vmCreate.Id && r.ChildRelationshipTypeId == int.Parse(vmCreate.SelectedRelationshipType))
+                .Where(r => r.ParentRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId && r.ChildRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
             var countExistingChildLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                .Where(r => r.ChildRelationshipTypeId == vmCreate.Id && r.ParentRelationshipTypeId == int.Parse(vmCreate.SelectedRelationshipType))
+                .Where(r => r.ChildRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId && r.ParentRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
             if (countExistingParentLinks > 0 || countExistingChildLinks > 0)
             {
                 // update Drop Down Lists for vm
-                vmCreate.RelationshipTypes = GetDropDownListForRelationshipTypes(vmCreate.Id, null);
+                vmCreate.LinkedRelationshipTypes = GetDropDownListForRelationshipTypes(vmCreate.SuppliedRelationshipTypeId, null);
                 vmCreate.RelationshipLevels = GetDropDownListForRelationshipLevels(null);
 
                 // redisplay view
@@ -111,13 +111,13 @@ namespace Financial.WebApplication.Controllers
             int childRelationshipType = 0;
             if(vmCreate.SelectedRelationshipLevel == "Parent-Child")
             {
-                parentRelationshipType = vmCreate.Id;
-                childRelationshipType = int.Parse(vmCreate.SelectedRelationshipType);
+                parentRelationshipType = vmCreate.SuppliedRelationshipTypeId;
+                childRelationshipType = int.Parse(vmCreate.SelectedLinkedRelationshipType);
             }
             else // Child-Parent
             { 
-                parentRelationshipType = int.Parse(vmCreate.SelectedRelationshipType);
-                childRelationshipType = vmCreate.Id;
+                parentRelationshipType = int.Parse(vmCreate.SelectedLinkedRelationshipType);
+                childRelationshipType = vmCreate.SuppliedRelationshipTypeId;
             }
 
             // transfer vm to dto
@@ -132,7 +132,7 @@ namespace Financial.WebApplication.Controllers
             _unitOfWork.CommitTrans();
 
             // display view
-            return RedirectToAction("Details", "RelationshipType");
+            return RedirectToAction("Details", "RelationshipType", new { id = vmCreate.SuppliedRelationshipTypeId });
         }
 
         [HttpGet]

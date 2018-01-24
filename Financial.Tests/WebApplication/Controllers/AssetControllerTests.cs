@@ -14,38 +14,13 @@ using Financial.Core.ViewModels.Asset;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class AssetControllerTestsBase
+    public class AssetControllerTestsBase : ControllerTestsBase
     {
         public AssetControllerTestsBase()
         {
-            // Fake Data
-            _assets = FakeAssets.InitialFakeAssets().ToList();
-            _assetTypes = FakeAssetTypes.InitialFakeAssetTypes().ToList();
-            _assetTypesSettingTypes = FakeAssetTypesSettingTypes.InitialFakeAssetTypesSettingTypes().ToList();
-            _settingTypes = FakeSettingTypes.InitialFakeSettingTypes().ToList();
-            // Fake Repositories
-            _repositoryAsset = new InMemoryAssetRepository(_assets);
-            _repositoryAssetType = new InMemoryAssetTypeRepository(_assetTypes);
-            _repositoryAssetTypeSettingType = new InMemoryAssetTypeSettingTypeRepository(_assetTypesSettingTypes);
-            _repositorySettingType = new InMemorySettingTypeRepository(_settingTypes);
-            // fake unit of work
-            _unitOfWork.Assets = _repositoryAsset;
-            _unitOfWork.AssetTypes = _repositoryAssetType;
-            _unitOfWork.AssetTypesSettingTypes = _repositoryAssetTypeSettingType;
-            _unitOfWork.SettingTypes = _repositorySettingType;
-            // fake controller
             _controller = new AssetController(_unitOfWork);
         }
 
-        protected IList<Asset> _assets;
-        protected IList<AssetType> _assetTypes;
-        protected IList<AssetTypeSettingType> _assetTypesSettingTypes;
-        protected IList<SettingType> _settingTypes;
-        protected InMemoryAssetRepository _repositoryAsset;
-        protected InMemoryAssetTypeRepository _repositoryAssetType;
-        protected InMemoryAssetTypeSettingTypeRepository _repositoryAssetTypeSettingType;
-        protected InMemorySettingTypeRepository _repositorySettingType;
-        protected InMemoryUnitOfWork _unitOfWork = new InMemoryUnitOfWork();
         protected AssetController _controller;
     }
 
@@ -99,14 +74,14 @@ namespace Financial.Tests.WebApplication.Controllers
                 SelectedAssetTypeId = "1",
                 AssetName = "New Name"
             };
-            int newId = _assets.Count() + 1;
+            int newId = _dataAssets.Count() + 1;
 
             // Act
             var result = controller.Create(vmExpected);
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _assets.FirstOrDefault(r => r.Id == newId);
+            var dbResult = _dataAssets.FirstOrDefault(r => r.Id == newId);
             Assert.AreEqual(vmExpected.AssetName, dbResult.Name, "Asset Name");
             Assert.AreEqual(vmExpected.SelectedAssetTypeId, dbResult.AssetTypeId.ToString(), "AssetType Id");
             Assert.AreEqual(true, dbResult.IsActive, "Asset IsActive");
@@ -122,7 +97,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SelectedAssetTypeId = "1",
                 AssetName = "New Name"
             };
-            int newId = _assets.Count() + 1;
+            int newId = _dataAssets.Count() + 1;
 
             // Act
             var result = controller.Create(vmExpected);

@@ -1,4 +1,5 @@
 ﻿using Financial.Core;
+using Financial.Core.Models;
 using Financial.Core.ViewModels.AssetTypeRelationshipType;
 using Financial.Data;
 using System;
@@ -117,13 +118,104 @@ namespace Financial.WebApplication.Controllers
             var dtoSuppliedAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
 
             // get drop down lists
-            List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels();
+            List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels(null);
             List<SelectListItem> sliParentRelationshipTypes = GetParentRelationshipTypes();
             List<SelectListItem> sliChildRelationshipTypes = GetChildRelationshipTypes();
             List<SelectListItem> sliLinkAssetTypes = GetLinkAssetTypes(assetTypeId);
 
             // display view
             return View("Create", new CreateViewModel(dtoSuppliedAssetType, sliRelationshipLevels, sliParentRelationshipTypes, sliChildRelationshipTypes, sliLinkAssetTypes));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(CreateViewModel vmCreate)
+        {
+            if(!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
+                return RedirectToAction("Index", "AssetType");
+            }
+
+            // check for existing link
+            var countParent = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
+                .Count(r => r.ParentAssetTypeId == vmCreate.SuppliedAssetTypeId &&
+                            r.ChildAssetTypeId == GetIntegerForString(vmCreate.SelectedLinkAssetType) &&
+                            r.ParentChildRelationshipTypeId == GetIntegerForString(vmCreate.SelectedRelationshipType) &&
+                            r.IsActive);
+            var countChild = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
+                .Count(r => r.ParentAssetTypeId == GetIntegerForString(vmCreate.SelectedLinkAssetType) &&
+                            r.ChildAssetTypeId == vmCreate.SuppliedAssetTypeId &&
+                            r.ParentChildRelationshipTypeId == GetIntegerForString(vmCreate.SelectedRelationshipType) &&
+                            r.IsActive);
+            if(countParent > 0 || countChild > 0)
+            {
+                // get drop down lists
+                vmCreate.RelationshipLevels = GetRelationshipLevels(null);
+                vmCreate.ParentRelationshipTypes = GetParentRelationshipTypes();
+                vmCreate.ChildRelationshipTypes = GetChildRelationshipTypes();
+                vmCreate.LinkAssetTypes = GetLinkAssetTypes(vmCreate.SuppliedAssetTypeId);
+
+                // redisplay view
+                ViewData["ErrorMessage"] = "Record already exists";
+                return View("Create", vmCreate);
+            }
+
+            // transfer vm to dto
+            if (vmCreate.SelectedRelationshipLevel == "Parent")
+            {
+                _unitOfWork.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
+                {
+                    ParentAssetTypeId = vmCreate.SuppliedAssetTypeId,
+                    ChildAssetTypeId = GetIntegerForString(vmCreate.SelectedLinkAssetType),
+                    ParentChildRelationshipTypeId = GetIntegerForString(vmCreate.SelectedRelationshipType),
+                    IsActive = true
+                });
+            }
+            else // supplied AssetType == Child
+            {
+                _unitOfWork.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
+                {
+                    ParentAssetTypeId = GetIntegerForString(vmCreate.SelectedLinkAssetType),
+                    ChildAssetTypeId = vmCreate.SuppliedAssetTypeId,
+                    ParentChildRelationshipTypeId = GetIntegerForString(vmCreate.SelectedRelationshipType),
+                    IsActive = true
+                });
+            }
+
+            // update db
+            _unitOfWork.CommitTrans();
+
+            // return view
+            return RedirectToAction("Details", "AssetType", new { id = vmCreate.SuppliedAssetTypeId });
+        }
+
+        [ChildActionOnly]
+        public ActionResult CreateLinkedRelationshipTypes(int assetTypeId, string relationshipLevel)
+        {
+            /*
+            List<SelectListItem> sliRelationshipTypes = NewMethod(relationshipLevel);
+            */
+            // display view
+            return PartialView("_CreateLinkedRelationshipTypes", new CreateLinkedRelationshipTypesViewModel());
+        }
+
+        [HttpGet]
+        public ViewResult Edit(int id, int assetTypeId)
+        {
+            // get dto for supplied id
+            var dtoSuppliedAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
+            var dtoAssetTypeRelationshipType = _unitOfWork.AssetTypesRelationshipTypes.Get(id);
+
+            // Selected values
+            var selectedRelationshipLevel = dtoAssetTypeRelationshipType.ParentAssetTypeId == dtoSuppliedAssetType.Id ?
+                "Parent" : "Child";
+
+            // get drop down lists
+            List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels(selectedRelationshipLevel);
+
+            // display view
+            return View("Edit", new EditViewModel(dtoSuppliedAssetType, sliRelationshipLevels, selectedRelationshipLevel));
         }
 
         private List<SelectListItem> GetLinkAssetTypes(int assetTypeId)
@@ -153,16 +245,6 @@ namespace Financial.WebApplication.Controllers
             return sliLinkAssetTypes;
         }
 
-        [ChildActionOnly]
-        public ActionResult CreateLinkedRelationshipTypes(int assetTypeId, string relationshipLevel)
-        {
-            /*
-            List<SelectListItem> sliRelationshipTypes = NewMethod(relationshipLevel);
-            */
-            // display view
-            return PartialView("_CreateLinkedRelationshipTypes", new CreateLinkedRelationshipTypesViewModel());
-        }
-
         private List<SelectListItem> GetParentRelationshipTypes()
         {
             return _unitOfWork.ParentChildRelationshipTypes.GetAll()
@@ -189,21 +271,29 @@ namespace Financial.WebApplication.Controllers
                 .ToList();
         }
 
-        private static List<SelectListItem> GetRelationshipLevels()
+        private static List<SelectListItem> GetRelationshipLevels(string selectedValue)
         {
             List<SelectListItem> sliRelationshipLevel = new List<SelectListItem>();
             sliRelationshipLevel.Add(new SelectListItem()
             {
                 Value = "Parent",
+                Selected = "Parent" == selectedValue,
                 Text = "Parent"
             });
             sliRelationshipLevel.Add(new SelectListItem()
             {
                 Value = "Child",
+                Selected = "Child" == selectedValue,
                 Text = "Child"
             });
             return sliRelationshipLevel;
         }
 
+        private int GetIntegerForString(string stringValue)
+        {
+            int integerValue = 0;
+            int.TryParse(stringValue, out integerValue);
+            return integerValue;
+        }
     }
 }

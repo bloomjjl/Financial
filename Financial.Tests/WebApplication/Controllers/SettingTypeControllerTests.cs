@@ -14,20 +14,13 @@ using System.Web.Mvc;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class SettingTypeControllerTestsBase
+    public class SettingTypeControllerTestsBase : ControllerTestsBase
     {
         public SettingTypeControllerTestsBase()
         {
-            _settingTypes = FakeSettingTypes.InitialFakeSettingTypes().ToList();
-            _repositorySettingType = new InMemorySettingTypeRepository(_settingTypes);
-            _unitOfWork = new InMemoryUnitOfWork();
-            _unitOfWork.SettingTypes = _repositorySettingType;
             _controller = new SettingTypeController(_unitOfWork);
         }
 
-        protected IList<SettingType> _settingTypes;
-        protected InMemorySettingTypeRepository _repositorySettingType;
-        protected InMemoryUnitOfWork _unitOfWork;
         protected SettingTypeController _controller;
     }
 
@@ -158,14 +151,14 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 Name = "New Name"
             };
-            int newId = _settingTypes.Count() + 1;
+            int newId = _dataSettingTypes.Count() + 1;
 
             // Act
             var result = controller.Create(vmexpected);
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _settingTypes.FirstOrDefault(r => r.Id == newId);
+            var dbResult = _dataSettingTypes.FirstOrDefault(r => r.Id == newId);
             Assert.AreEqual(vmexpected.Name, dbResult.Name, "SettingType Name");
             Assert.AreEqual(true, dbResult.IsActive, "SettingType IsActive");
         }
@@ -179,7 +172,7 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 Name = "New Name"
             };
-            int newId = _settingTypes.Count() + 1;
+            int newId = _dataSettingTypes.Count() + 1;
 
             // Act
             var result = controller.Create(vmCreate);
@@ -298,7 +291,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _settingTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            var dbResult = _dataSettingTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
             Assert.AreEqual(vmExpected.Id, dbResult.Id, "Id");
             Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
             Assert.AreEqual(vmExpected.IsActive, dbResult.IsActive, "IsActive");

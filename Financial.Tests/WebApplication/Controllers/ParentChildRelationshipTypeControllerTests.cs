@@ -14,28 +14,13 @@ using Financial.Core.ViewModels.ParentChildRelationshipType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class ParentChildRelationshipTypeControllerTestsBase
+    public class ParentChildRelationshipTypeControllerTestsBase : ControllerTestsBase
     {
         public ParentChildRelationshipTypeControllerTestsBase()
         {
-            // Fake Data
-            _relationshipTypes = FakeRelationshipTypes.InitialFakeRelationshipTypes().ToList();
-            _parentChildRelationshipTypes = FakeParentChildRelationshipTypes.InitialFakeParentChildRelationshipTypes().ToList();
-            // Fake Repositories
-            _repositoryRelationshipType = new InMemoryRelationshipTypeRepository(_relationshipTypes);
-            _repositoryParentChildRelationshipType = new InMemoryParentChildRelationshipTypeRepository(_parentChildRelationshipTypes);
-            // Fake Unit of Work
-            _unitOfWork.RelationshipTypes = _repositoryRelationshipType;
-            _unitOfWork.ParentChildRelationshipTypes = _repositoryParentChildRelationshipType;
-            // Controller
             _controller = new ParentChildRelationshipTypeController(_unitOfWork);
         }
 
-        protected IList<RelationshipType> _relationshipTypes;
-        protected IList<ParentChildRelationshipType> _parentChildRelationshipTypes;
-        protected InMemoryRelationshipTypeRepository _repositoryRelationshipType;
-        protected InMemoryParentChildRelationshipTypeRepository _repositoryParentChildRelationshipType;
-        protected InMemoryUnitOfWork _unitOfWork = new InMemoryUnitOfWork();
         protected ParentChildRelationshipTypeController _controller;
     }
 
@@ -157,10 +142,10 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as CreateViewModel;
-            Assert.AreEqual(1, vmResult.Id, "Id");
-            Assert.AreEqual("Relationship Type 1", vmResult.RelationshipTypeName, "Name");
+            Assert.AreEqual(1, vmResult.SuppliedRelationshipTypeId, "Id");
+            Assert.AreEqual("Relationship Type 1", vmResult.SuppliedRelationshipTypeName, "Name");
             Assert.AreEqual(2, vmResult.RelationshipLevels.Count(), "RelationshipLevel List"); // Parent-Child, Child-Parent
-            Assert.AreEqual(expectedCount, vmResult.RelationshipTypes.Count(), "RelationshipType List count");
+            Assert.AreEqual(expectedCount, vmResult.LinkedRelationshipTypes.Count(), "RelationshipType List count");
         }
 
         [TestMethod()]
@@ -188,7 +173,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as CreateViewModel;
-            Assert.AreEqual(expectedCount, vmResult.RelationshipTypes.Count(), "RelationshipType List count");
+            Assert.AreEqual(expectedCount, vmResult.LinkedRelationshipTypes.Count(), "RelationshipType List count");
         }
 
         [TestMethod()]
@@ -216,15 +201,14 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as CreateViewModel;
-            Assert.AreEqual(expectedCount, vmResult.RelationshipTypes.Count(), "RelationshipType List count");
+            Assert.AreEqual(expectedCount, vmResult.LinkedRelationshipTypes.Count(), "RelationshipType List count");
         }
 
         [TestMethod()]
         public void Create_Post_WhenProvidedParentChildRelationshipViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
-            // Arrange
-            IList<ParentChildRelationshipType> _parentChildRelationshipTypes = new List<ParentChildRelationshipType>(); 
+            IList<ParentChildRelationshipType> _parentChildRelationshipTypes = new List<ParentChildRelationshipType>(); // clear records
             IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
             _relationshipTypes.Add(new RelationshipType() { Id = 2, Name = "Parent Relationship Type", IsActive = true });
             _relationshipTypes.Add(new RelationshipType() { Id = 3, Name = "Child Relationship Type", IsActive = true }); 
@@ -233,9 +217,9 @@ namespace Financial.Tests.WebApplication.Controllers
             ParentChildRelationshipTypeController controller = new ParentChildRelationshipTypeController(_unitOfWork);
             var vmExpected = new CreateViewModel()
             {
-                Id = 2,
+                SuppliedRelationshipTypeId = 2,
                 SelectedRelationshipLevel = "Parent-Child",
-                SelectedRelationshipType = "3"
+                SelectedLinkedRelationshipType = "3"
             };
             int expectedNewId = 1;
 
@@ -263,9 +247,9 @@ namespace Financial.Tests.WebApplication.Controllers
             ParentChildRelationshipTypeController controller = new ParentChildRelationshipTypeController(_unitOfWork);
             var vmExpected = new CreateViewModel()
             {
-                Id = 3,
+                SuppliedRelationshipTypeId = 3,
                 SelectedRelationshipLevel = "Child-Parent",
-                SelectedRelationshipType = "2"
+                SelectedLinkedRelationshipType = "2"
             };
             int expectedNewId = 1;
 
@@ -284,12 +268,14 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Create_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            ParentChildRelationshipTypeController controller = _controller;
+            var _parentChildRelationshipTypes = new List<ParentChildRelationshipType>(); // clear records
+            _unitOfWork.ParentChildRelationshipTypes = new InMemoryParentChildRelationshipTypeRepository(_parentChildRelationshipTypes);
+            var controller = new ParentChildRelationshipTypeController(_unitOfWork);
             var vmExpected = new CreateViewModel()
             {
-                Id = 3,
+                SuppliedRelationshipTypeId = 3,
                 SelectedRelationshipLevel = "Child-Parent",
-                SelectedRelationshipType = "2"
+                SelectedLinkedRelationshipType = "2"
             };
 
             // Act
@@ -300,6 +286,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
             Assert.AreEqual("RelationshipType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual(vmExpected.SuppliedRelationshipTypeId, routeResult.RouteValues["id"], "Id");
         }
 
         [TestMethod()]
@@ -310,9 +297,9 @@ namespace Financial.Tests.WebApplication.Controllers
             controller.ModelState.AddModelError("", "mock error message");
             var vmExpected = new CreateViewModel()
             {
-                Id = 3,
+                SuppliedRelationshipTypeId = 3,
                 SelectedRelationshipLevel = "Child-Parent",
-                SelectedRelationshipType = "2"
+                SelectedLinkedRelationshipType = "2"
             };
 
             // Act
@@ -340,9 +327,9 @@ namespace Financial.Tests.WebApplication.Controllers
             ParentChildRelationshipTypeController controller = new ParentChildRelationshipTypeController(_unitOfWork);
             var vmExpected = new CreateViewModel()
             {
-                Id = 2,
+                SuppliedRelationshipTypeId = 2,
                 SelectedRelationshipLevel = "Parent-Child",
-                SelectedRelationshipType = "3"
+                SelectedLinkedRelationshipType = "3"
             };
 
             // Act
@@ -355,7 +342,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel), "View Model");
             var vmResult = viewResult.ViewData.Model as CreateViewModel;
             Assert.IsNotNull(vmResult.RelationshipLevels, "RelationshipLevel DropDownList");
-            Assert.IsNotNull(vmResult.RelationshipTypes, "RelationshipTypes DropDownList");
+            Assert.IsNotNull(vmResult.LinkedRelationshipTypes, "RelationshipTypes DropDownList");
             Assert.AreEqual("Record already exists", controller.ViewData["ErrorMessage"].ToString(), "Message");
         }
 
@@ -373,9 +360,9 @@ namespace Financial.Tests.WebApplication.Controllers
             ParentChildRelationshipTypeController controller = new ParentChildRelationshipTypeController(_unitOfWork);
             var vmExpected = new CreateViewModel()
             {
-                Id = 3,
+                SuppliedRelationshipTypeId = 3,
                 SelectedRelationshipLevel = "Child-Parent",
-                SelectedRelationshipType = "2"
+                SelectedLinkedRelationshipType = "2"
             };
 
             // Act
@@ -388,7 +375,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel), "View Model");
             var vmResult = viewResult.ViewData.Model as CreateViewModel;
             Assert.IsNotNull(vmResult.RelationshipLevels, "RelationshipLevel DropDownList");
-            Assert.IsNotNull(vmResult.RelationshipTypes, "RelationshipTypes DropDownList");
+            Assert.IsNotNull(vmResult.LinkedRelationshipTypes, "RelationshipTypes DropDownList");
             Assert.AreEqual("Record already exists", controller.ViewData["ErrorMessage"].ToString(), "Message");
         }
 

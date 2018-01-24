@@ -14,38 +14,14 @@ using Financial.Core.ViewModels.AssetTypeRelationshipType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class AssetTypeRelationshipTypeControllerTestsBase
+    public class AssetTypeRelationshipTypeControllerTestsBase : ControllerTestsBase
     {
         public AssetTypeRelationshipTypeControllerTestsBase()
         {
-            // Fake Data
-            _assetTypes = FakeAssetTypes.InitialFakeAssetTypes().ToList();
-            _assetTypesRelationshipTypes = FakeAssetTypesRelationshipTypes.InitialFakeAssetTypesRelationshipTypes().ToList();
-            _parentChildRelationshipTypes = FakeParentChildRelationshipTypes.InitialFakeParentChildRelationshipTypes().ToList();
-            _relationshipTypes = FakeRelationshipTypes.InitialFakeRelationshipTypes().ToList();
-            // Fake Repositories
-            _repositoryAssetType = new InMemoryAssetTypeRepository(_assetTypes);
-            _repositoryAssetTypeRelationshipType = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
-            _repositoryParentChildRelationshipType = new InMemoryParentChildRelationshipTypeRepository(_parentChildRelationshipTypes);
-            _repositoryRelationshipType = new InMemoryRelationshipTypeRepository(_relationshipTypes);
-            // Fake Unit of Work
-            _unitOfWork.AssetTypes = _repositoryAssetType;
-            _unitOfWork.AssetTypesRelationshipTypes = _repositoryAssetTypeRelationshipType;
-            _unitOfWork.ParentChildRelationshipTypes = _repositoryParentChildRelationshipType;
-            _unitOfWork.RelationshipTypes = _repositoryRelationshipType;
             // Controller
             _controller = new AssetTypeRelationshipTypeController(_unitOfWork);
         }
 
-        protected IList<AssetType> _assetTypes;
-        protected IList<AssetTypeRelationshipType> _assetTypesRelationshipTypes;
-        protected IList<ParentChildRelationshipType> _parentChildRelationshipTypes;
-        protected IList<RelationshipType> _relationshipTypes;
-        protected InMemoryAssetTypeRepository _repositoryAssetType;
-        protected InMemoryAssetTypeRelationshipTypeRepository _repositoryAssetTypeRelationshipType;
-        protected InMemoryParentChildRelationshipTypeRepository _repositoryParentChildRelationshipType;
-        protected InMemoryRelationshipTypeRepository _repositoryRelationshipType;
-        protected InMemoryUnitOfWork _unitOfWork = new InMemoryUnitOfWork();
         protected AssetTypeRelationshipTypeController _controller;
     }
 
@@ -373,88 +349,203 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedCount, vmResult.LinkAssetTypes.Count(), "Link AssetTypes Count");
         }
 
-
-
-
-
-
-
-        /*
         [TestMethod()]
-        public void CreateLinkedRelationshipTypes_Child_WhenProvidedValuesAreValid_ReturnRouteValues_Test()
+        public void Create_Post_WhenProvidedParentViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
-            AssetTypeRelationshipTypeController controller = _controller;
+            IList<AssetTypeRelationshipType> _assetTypesRelationshipTypes = new List<AssetTypeRelationshipType>(); // clear values
+            _unitOfWork.AssetTypesRelationshipTypes = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
+            AssetTypeRelationshipTypeController controller = new AssetTypeRelationshipTypeController(_unitOfWork);
+            var vmExpected = new CreateViewModel()
+            {
+                SuppliedAssetTypeId = 6,
+                SelectedRelationshipLevel = "Parent",
+                SelectedRelationshipType = "2",
+                SelectedLinkAssetType = "5"
+            };
+            int newId = 1;
+
+            // Act
+            controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
+            var dbAssetTypeRelationshipType = _assetTypesRelationshipTypes.FirstOrDefault(r => r.Id == newId);
+            Assert.AreEqual(vmExpected.SuppliedAssetTypeId, dbAssetTypeRelationshipType.ParentAssetTypeId, "Parent AssetType Id");
+            Assert.AreEqual(vmExpected.SelectedLinkAssetType, dbAssetTypeRelationshipType.ChildAssetTypeId.ToString(), "Child AssetType Id");
+            Assert.AreEqual(vmExpected.SelectedRelationshipType, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
+            Assert.IsTrue(dbAssetTypeRelationshipType.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedChildViewModelIsValid_UpdateDatabase_Test()
+        {
+            // Arrange
+            IList<AssetTypeRelationshipType> _assetTypesRelationshipTypes = new List<AssetTypeRelationshipType>(); // clear values
+            _unitOfWork.AssetTypesRelationshipTypes = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
+            AssetTypeRelationshipTypeController controller = new AssetTypeRelationshipTypeController(_unitOfWork);
+            var vmExpected = new CreateViewModel()
+            {
+                SuppliedAssetTypeId = 6,
+                SelectedRelationshipLevel = "Child",
+                SelectedRelationshipType = "2",
+                SelectedLinkAssetType = "5"
+            };
+            int newId = 1;
+
+            // Act
+            controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
+            var dbAssetTypeRelationshipType = _assetTypesRelationshipTypes.FirstOrDefault(r => r.Id == newId);
+            Assert.AreEqual(vmExpected.SelectedLinkAssetType, dbAssetTypeRelationshipType.ParentAssetTypeId.ToString(), "Parent AssetType Id");
+            Assert.AreEqual(vmExpected.SuppliedAssetTypeId, dbAssetTypeRelationshipType.ChildAssetTypeId, "Child AssetType Id");
+            Assert.AreEqual(vmExpected.SelectedRelationshipType, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
+            Assert.IsTrue(dbAssetTypeRelationshipType.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var _assetTypesRelationshipTypes = new List<AssetTypeRelationshipType>(); // clear values
+            _unitOfWork.AssetTypesRelationshipTypes = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
+            var controller = new AssetTypeRelationshipTypeController(_unitOfWork);
+            var vmExpected = new CreateViewModel()
+            {
+                SuppliedAssetTypeId = 6,
+                SelectedRelationshipLevel = "Child",
+                SelectedRelationshipType = "2",
+                SelectedLinkAssetType = "5"
+            };
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual(vmExpected.SuppliedAssetTypeId, routeResult.RouteValues["id"], "assetTypeId");
+            Assert.IsNull(controller.TempData["SuccessMessage"], "Success Message");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenModelStateNotValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            controller.ModelState.AddModelError("", "mock error message");
+            var vmExpected = new CreateViewModel();
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
+            Assert.AreEqual("Encountered a problem. Try again.", controller.TempData["ErrorMessage"].ToString(), "Message");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedLinkedRelationshipIsDuplicated_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var _assetTypesRelationshipTypes = new List<AssetTypeRelationshipType>();
+            _assetTypesRelationshipTypes.Add(new AssetTypeRelationshipType() { Id = 1, ParentAssetTypeId = 6, ChildAssetTypeId = 5, ParentChildRelationshipTypeId = 2, IsActive = true });
+            _unitOfWork.AssetTypesRelationshipTypes = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
+            var controller = new AssetTypeRelationshipTypeController(_unitOfWork);
+            var vmExpected = new CreateViewModel()
+            {
+                SuppliedAssetTypeId = 6,
+                SelectedRelationshipLevel = "Parent",
+                SelectedRelationshipType = "2",
+                SelectedLinkAssetType = "5"
+            };
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Create", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel), "View Model");
+            var vmResult = viewResult.ViewData.Model as CreateViewModel;
+            Assert.IsNotNull(vmResult.RelationshipLevels, "Relationship Levels");
+            Assert.IsNotNull(vmResult.ParentRelationshipTypes, "Parent Relationship Types");
+            Assert.IsNotNull(vmResult.ChildRelationshipTypes, "Child Relationship Types");
+            Assert.IsNotNull(vmResult.LinkAssetTypes, "Linked AssetTypes");
+            Assert.AreEqual("Record already exists", controller.ViewData["ErrorMessage"], "Message");
+        }
+
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedValuesAreValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            int id = 1;
+            int assetTypeId = 2;
+
+            // Act
+            var result = controller.Edit(id, assetTypeId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName);
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel));
+        }
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedValuesAreValid_ReturnSuppliedAssetValuesFromDatabase_Test()
+        {
+            // Arrange
+            var _assetTypesRelationshipTypes = new List<AssetTypeRelationshipType>();
+            _assetTypesRelationshipTypes.Add(new AssetTypeRelationshipType() { Id = 1, ParentAssetTypeId = 2, ChildAssetTypeId = 3, ParentChildRelationshipTypeId = 5, IsActive = true });
+            var _assetTypes = new List<AssetType>();
+            _assetTypes.Add(new AssetType() { Id = 2, Name = "Parent AssetType", IsActive = true });
+            _assetTypes.Add(new AssetType() { Id = 3, Name = "Child AssetType", IsActive = true });
+
+            _unitOfWork.AssetTypesRelationshipTypes = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
+            var controller = new AssetTypeRelationshipTypeController(_unitOfWork);
+            int id = 1;
+            int assetTypeId = 2;
+
+            // Act
+            var result = controller.Edit(id, assetTypeId);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(assetTypeId, vmResult.SuppliedAssetTypeId, "Id");
+            Assert.AreEqual("Parent AssetType", vmResult.SuppliedAssetTypeName, "Name");
+        }
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedValuesAreValid_ReturnRelationshipLevels_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            int id = 1;
             int assetTypeId = 1;
-            string relationshipLevel = "Parent";
 
             // Act
-            var result = controller.CreateLinkedRelationshipTypes(assetTypeId, relationshipLevel);
+            var result = controller.Edit(id, assetTypeId);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(PartialViewResult));
-            var viewResult = result as PartialViewResult;
-            Assert.AreEqual("_CreateLinkedRelationshipTypes", viewResult.ViewName);
-            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateLinkedRelationshipTypesViewModel));
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(2, vmResult.RelationshipLevels.Count(), "RelationshipLevels Count"); // parent / child
         }
 
-        [TestMethod()]
-        public void CreateLinkedRelationshipTypes_Child_WhenProvidedParentValuesAreValid_ReturnActiveValuesFromDatabase_Test()
-        {
-            // Arrange
-            IList<AssetTypeRelationshipType> _assetTypesRelationshipTypes = new List<AssetTypeRelationshipType>(); // clear all records
-            IList<ParentChildRelationshipType> _parentChildRelationshipTypes = new List<ParentChildRelationshipType>();
-            _parentChildRelationshipTypes.Add(new ParentChildRelationshipType() { Id = 1, ParentRelationshipTypeId = 3, ChildRelationshipTypeId = 4, IsActive = true }); // count
-            _parentChildRelationshipTypes.Add(new ParentChildRelationshipType() { Id = 2, ParentRelationshipTypeId = 3, ChildRelationshipTypeId = 5, IsActive = false }); // NOT active
-            IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
-            _relationshipTypes.Add(new RelationshipType() { Id = 3, Name = "Parent RelationshipType", IsActive = true });
-            _relationshipTypes.Add(new RelationshipType() { Id = 4, Name = "Child RelationshipType 1", IsActive = true });
-            _relationshipTypes.Add(new RelationshipType() { Id = 5, Name = "Child RelationshipType 2", IsActive = true });
-            _unitOfWork.AssetTypesRelationshipTypes = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
-            _unitOfWork.ParentChildRelationshipTypes = new InMemoryParentChildRelationshipTypeRepository(_parentChildRelationshipTypes);
-            _unitOfWork.RelationshipTypes = new InMemoryRelationshipTypeRepository(_relationshipTypes);
-            AssetTypeRelationshipTypeController controller = new AssetTypeRelationshipTypeController(_unitOfWork);
-            int assetTypeId = 3;
-            string relationshipLevel = "Parent";
-            int expectedCount = 1;
 
-            // Act
-            var result = controller.CreateLinkedRelationshipTypes(assetTypeId, relationshipLevel);
 
-            // Assert
-            var viewResult = result as PartialViewResult;
-            var vmResult = viewResult.ViewData.Model as CreateLinkedRelationshipTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.RelationshipTypes.Count(), "RelationshipTypes Count");
-        }
-
-        [TestMethod()]
-        public void CreateLinkedRelationshipTypes_Child_WhenProvidedChildValuesAreValid_ReturnActiveValuesFromDatabase_Test()
-        {
-            // Arrange
-            IList<AssetTypeRelationshipType> _assetTypesRelationshipTypes = new List<AssetTypeRelationshipType>(); // clear all records
-            IList<ParentChildRelationshipType> _parentChildRelationshipTypes = new List<ParentChildRelationshipType>();
-            _parentChildRelationshipTypes.Add(new ParentChildRelationshipType() { Id = 1, ParentRelationshipTypeId = 4, ChildRelationshipTypeId = 3, IsActive = true }); // count
-            _parentChildRelationshipTypes.Add(new ParentChildRelationshipType() { Id = 2, ParentRelationshipTypeId = 5, ChildRelationshipTypeId = 3, IsActive = false }); // NOT active
-            IList<RelationshipType> _relationshipTypes = new List<RelationshipType>();
-            _relationshipTypes.Add(new RelationshipType() { Id = 3, Name = "Child RelationshipType", IsActive = true });
-            _relationshipTypes.Add(new RelationshipType() { Id = 4, Name = "Parent RelationshipType 1", IsActive = true });
-            _relationshipTypes.Add(new RelationshipType() { Id = 5, Name = "Parent RelationshipType 2", IsActive = true });
-            _unitOfWork.AssetTypesRelationshipTypes = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
-            _unitOfWork.ParentChildRelationshipTypes = new InMemoryParentChildRelationshipTypeRepository(_parentChildRelationshipTypes);
-            _unitOfWork.RelationshipTypes = new InMemoryRelationshipTypeRepository(_relationshipTypes);
-            AssetTypeRelationshipTypeController controller = new AssetTypeRelationshipTypeController(_unitOfWork);
-            int assetTypeId = 3;
-            string relationshipLevel = "Child";
-            int expectedCount = 1;
-
-            // Act
-            var result = controller.CreateLinkedRelationshipTypes(assetTypeId, relationshipLevel);
-
-            // Assert
-            var viewResult = result as PartialViewResult;
-            var vmResult = viewResult.ViewData.Model as CreateLinkedRelationshipTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.RelationshipTypes.Count(), "RelationshipTypes Count");
-        }
-        */
     }
 }

@@ -14,28 +14,13 @@ using Financial.Core.ViewModels.RelationshipType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class RelationshipTypeControllerTestsBase
+    public class RelationshipTypeControllerTestsBase : ControllerTestsBase
     {
         public RelationshipTypeControllerTestsBase()
         {
-            // Fake Data
-            _relationshipTypes = FakeRelationshipTypes.InitialFakeRelationshipTypes().ToList();
-            _assetTypesRelationshipTypes = FakeAssetTypesRelationshipTypes.InitialFakeAssetTypesRelationshipTypes().ToList();
-            // Fake Repositories
-            _repositoryRelationshipType = new InMemoryRelationshipTypeRepository(_relationshipTypes);
-            _repositoryAssetTypeRelationshipType = new InMemoryAssetTypeRelationshipTypeRepository(_assetTypesRelationshipTypes);
-            // Fake Unit of Work
-            _unitOfWork.RelationshipTypes = _repositoryRelationshipType;
-            _unitOfWork.AssetTypesRelationshipTypes = _repositoryAssetTypeRelationshipType;
-            // Controller
             _controller = new RelationshipTypeController(_unitOfWork);
         }
 
-        protected IList<RelationshipType> _relationshipTypes;
-        protected IList<AssetTypeRelationshipType> _assetTypesRelationshipTypes;
-        protected InMemoryRelationshipTypeRepository _repositoryRelationshipType;
-        protected InMemoryAssetTypeRelationshipTypeRepository _repositoryAssetTypeRelationshipType;
-        protected InMemoryUnitOfWork _unitOfWork = new InMemoryUnitOfWork();
         protected RelationshipTypeController _controller;
     }
 
@@ -134,14 +119,14 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 Name = "New Name"
             };
-            int newId = _relationshipTypes.Count() + 1;
+            int newId = _dataRelationshipTypes.Count() + 1;
 
             // Act
             var result = controller.Create(vmExpected);
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _relationshipTypes.FirstOrDefault(r => r.Id == newId);
+            var dbResult = _dataRelationshipTypes.FirstOrDefault(r => r.Id == newId);
             Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
             Assert.AreEqual(true, dbResult.IsActive, "IsActive");
         }
@@ -270,7 +255,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _relationshipTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            var dbResult = _dataRelationshipTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
             Assert.AreEqual(vmExpected.Id, dbResult.Id, "Id");
             Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
             Assert.AreEqual(vmExpected.IsActive, dbResult.IsActive, "IsActive");

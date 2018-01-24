@@ -12,17 +12,17 @@ namespace Financial.Core.ViewModels.ParentChildRelationshipType
     {
         public CreateViewModel(){}
 
-        public CreateViewModel(Models.RelationshipType dtoRelationshipType, List<SelectListItem> sliRelationshipLevels, List<SelectListItem> sliRelationshipTypes)
+        public CreateViewModel(Models.RelationshipType dtoSuppliedRelationshipType, List<SelectListItem> sliRelationshipLevels, List<SelectListItem> sliLinkedRelationshipTypes)
         {
-            Id = dtoRelationshipType.Id;
-            RelationshipTypeName = dtoRelationshipType.Name;
+            SuppliedRelationshipTypeId = dtoSuppliedRelationshipType.Id;
+            SuppliedRelationshipTypeName = dtoSuppliedRelationshipType.Name;
             RelationshipLevels = sliRelationshipLevels;
-            RelationshipTypes = sliRelationshipTypes;
+            LinkedRelationshipTypes = sliLinkedRelationshipTypes;
         }
 
-        public int Id { get; set; }
+        public int SuppliedRelationshipTypeId { get; set; }
         [Display(Name = "Relationship Type")]
-        public string RelationshipTypeName { get; set; }
+        public string SuppliedRelationshipTypeName { get; set; }
 
         [Required]
         [Display(Name = "Relationship Level")]
@@ -31,8 +31,8 @@ namespace Financial.Core.ViewModels.ParentChildRelationshipType
 
         [Required]
         [Display(Name = "Linked Relationship Type")]
-        public string SelectedRelationshipType { get; set; }
-        public IEnumerable<SelectListItem> RelationshipTypes { get; set; }
+        public string SelectedLinkedRelationshipType { get; set; }
+        public IEnumerable<SelectListItem> LinkedRelationshipTypes { get; set; }
 
     }
 }

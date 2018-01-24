@@ -14,20 +14,13 @@ using Financial.Core.ViewModels.AssetType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class AssetTypeControllerTestsBase
+    public class AssetTypeControllerTestsBase : ControllerTestsBase
     {
         public AssetTypeControllerTestsBase()
         {
-            _assetTypes = FakeAssetTypes.InitialFakeAssetTypes().ToList();
-            _repositoryAssetType = new InMemoryAssetTypeRepository(_assetTypes);
-            _unitOfWork = new InMemoryUnitOfWork();
-            _unitOfWork.AssetTypes = _repositoryAssetType;
             _controller = new AssetTypeController(_unitOfWork);
         }
 
-        protected IList<AssetType> _assetTypes;
-        protected InMemoryAssetTypeRepository _repositoryAssetType;
-        protected InMemoryUnitOfWork _unitOfWork;
         protected AssetTypeController _controller;
     }
 
@@ -281,14 +274,14 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 Name = "New Name"
             };
-            int newId = _assetTypes.Count() + 1;
+            int newId = _dataAssetTypes.Count() + 1;
 
             // Act
             var result = controller.Create(vmExpected);
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _assetTypes.FirstOrDefault(r => r.Id == newId);
+            var dbResult = _dataAssetTypes.FirstOrDefault(r => r.Id == newId);
             Assert.AreEqual(vmExpected.Name, dbResult.Name, "AssetType Name");
             Assert.AreEqual(true, dbResult.IsActive, "AssetType IsActive");
         }
@@ -302,7 +295,7 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 Name = "New Name"
             };
-            int newId = _assetTypes.Count() + 1;
+            int newId = _dataAssetTypes.Count() + 1;
 
             // Act
             var result = controller.Create(vmExpected);
@@ -642,7 +635,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dbResult = _assetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
+            var dbResult = _dataAssetTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
             Assert.AreEqual(vmExpected.Id, dbResult.Id, "Id");
             Assert.AreEqual(vmExpected.Name, dbResult.Name, "Name");
             Assert.AreEqual(vmExpected.IsActive, dbResult.IsActive, "IsActive");

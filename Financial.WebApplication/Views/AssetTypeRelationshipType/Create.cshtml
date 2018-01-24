@@ -37,12 +37,9 @@
         <div id="relationship_types">
             <div class="form-group">
                 @Html.LabelFor(model => model.SelectedRelationshipType, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div id="parent_relationship_types" class="col-md-10">
+                <div class="col-md-10">
                     @Html.DropDownListFor(x => x.SelectedRelationshipType, Model.ParentRelationshipTypes, "-- Select a Relationship Type --", new { @id = "parent_relationship_type", @class = "form-control", onchange = "updateParentRelationshipType()" })
-                    @Html.ValidationMessageFor(model => model.SelectedRelationshipType, "", new { @class = "text-danger" })
-                </div>
-                <div  id="child_relationship_types" class="col-md-10" style="display:none">
-                    @Html.DropDownListFor(x => x.SelectedRelationshipType, Model.ChildRelationshipTypes, "-- Select a Relationship Type --", new { @id = "child_relationship_type", @class = "form-control", onchange = "updateChildRelationshipType()" })
+                    @Html.DropDownListFor(x => x.SelectedRelationshipType, Model.ChildRelationshipTypes, "-- Select a Relationship Type --", new { @id = "child_relationship_type", @class = "form-control", onchange = "updateChildRelationshipType()", @style = "display:none" })
                     @Html.ValidationMessageFor(model => model.SelectedRelationshipType, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -65,14 +62,11 @@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Details", "AssetType", new { id = Model.SuppliedAssetTypeId }, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>
 }
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
 
 <script>
 
@@ -84,16 +78,22 @@
         {
             @*Show Parent Relationship Types*@
             $('#linked_asset_types').hide('fast');
-            $('#child_relationship_types').hide('fast');
-            $('#parent_relationship_types').show('fast');
+            $('#child_relationship_type').hide('fast');
+            $('#parent_relationship_type').show('fast');
         }
         else if(selectedRelationshipLevel == 'Child')
         {
             @*Show Child Relationship Types*@
             $('#linked_asset_types').hide('fast');
-            $('#parent_relationship_types').hide('fast');
-            $('#child_relationship_types').show('fast');
+            $('#parent_relationship_type').hide('fast');
+            $('#child_relationship_type').show('fast');
         }
     }
 
+    function updateParentRelationshipType() {
+        $('#child_relationship_type').val($('#parent_relationship_type').val());
+    }
+    function updateChildRelationshipType() {
+        $('#parent_relationship_type').val($('#child_relationship_type').val());
+    }
 </script>

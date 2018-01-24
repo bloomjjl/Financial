@@ -14,30 +14,13 @@ using Financial.Core.ViewModels.AssetTypeSettingType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {
-    public class AssetTypeSettingTypeControllerTestsBase
+    public class AssetTypeSettingTypeControllerTestsBase : ControllerTestsBase
     {
         public AssetTypeSettingTypeControllerTestsBase()
         {
-            _assetTypes = FakeAssetTypes.InitialFakeAssetTypes().ToList();
-            _assetTypesSettingTypes = FakeAssetTypesSettingTypes.InitialFakeAssetTypesSettingTypes().ToList();
-            _settingTypes = FakeSettingTypes.InitialFakeSettingTypes().ToList();
-            _repositoryAssetType = new InMemoryAssetTypeRepository(_assetTypes);
-            _repositoryAssetTypeSettingType = new InMemoryAssetTypeSettingTypeRepository(_assetTypesSettingTypes);
-            _repositorySettingType = new InMemorySettingTypeRepository(_settingTypes);
-            _unitOfWork = new InMemoryUnitOfWork();
-            _unitOfWork.AssetTypes = _repositoryAssetType;
-            _unitOfWork.AssetTypesSettingTypes = _repositoryAssetTypeSettingType;
-            _unitOfWork.SettingTypes = _repositorySettingType;
             _controller = new AssetTypeSettingTypeController(_unitOfWork);
         }
 
-        protected IList<AssetType> _assetTypes;
-        protected IList<AssetTypeSettingType> _assetTypesSettingTypes;
-        protected IList<SettingType> _settingTypes;
-        protected InMemoryAssetTypeRepository _repositoryAssetType;
-        protected InMemoryAssetTypeSettingTypeRepository _repositoryAssetTypeSettingType;
-        protected InMemorySettingTypeRepository _repositorySettingType;
-        protected InMemoryUnitOfWork _unitOfWork;
         protected AssetTypeSettingTypeController _controller;
     }
 
@@ -208,8 +191,8 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeSettingTypeController controller = _controller;
-            int assetTypeId = _assetTypes.Count() + 1; 
-            _assetTypes.Add(new AssetType() { Id = assetTypeId, Name = "Name", IsActive = true });
+            int assetTypeId = _dataAssetTypes.Count() + 1;
+            _dataAssetTypes.Add(new AssetType() { Id = assetTypeId, Name = "Name", IsActive = true });
 
             // Act
             var result = controller.CreateLinkedSettingTypes(assetTypeId);
@@ -226,8 +209,8 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeSettingTypeController controller = _controller;
-            int assetTypeId = _assetTypes.Count() + 1;
-            _assetTypes.Add(new AssetType() { Id = assetTypeId, Name = "Name", IsActive = true });
+            int assetTypeId = _dataAssetTypes.Count() + 1;
+            _dataAssetTypes.Add(new AssetType() { Id = assetTypeId, Name = "Name", IsActive = true });
             controller.TempData["SuccessMessage"] = "Test Success Message";
 
             // Act
@@ -244,8 +227,8 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeSettingTypeController controller = _controller;
-            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
-            _assetTypes.Add(new AssetType() { Id = assetTypeId, Name = "New Name", IsActive = true });
+            int assetTypeId = _dataAssetTypes.Count() + 1; // new AssetType Id
+            _dataAssetTypes.Add(new AssetType() { Id = assetTypeId, Name = "New Name", IsActive = true });
 
             // Act
             var result = controller.CreateLinkedSettingTypes(assetTypeId);
@@ -268,8 +251,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
             AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
 
-            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
-            _assetTypes.Add(new AssetType() { Id = assetTypeId, Name = "New Name", IsActive = true });
+            int assetTypeId = _dataAssetTypes.Count() + 1; // new AssetType Id
+            _dataAssetTypes.Add(new AssetType() { Id = assetTypeId, Name = "New Name", IsActive = true });
             int expectedCount = 3;
 
             // Act
@@ -292,7 +275,7 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
             AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
 
-            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
+            int assetTypeId = _dataAssetTypes.Count() + 1; // new AssetType Id
             List<CreateViewModel> vmCreateList = new List<CreateViewModel>();
             vmCreateList.Add(new CreateViewModel() { AssetTypeId = assetTypeId, SettingTypeId = 1, IsActive = true }); // count
             vmCreateList.Add(new CreateViewModel() { AssetTypeId = assetTypeId, SettingTypeId = 2, IsActive = false }); // count
@@ -309,7 +292,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Database Updated");
-            var dbResult = _assetTypesSettingTypes.Where(r => r.AssetTypeId == assetTypeId).ToList();
+            var dbResult = _dataAssetTypesSettingTypes.Where(r => r.AssetTypeId == assetTypeId).ToList();
             Assert.AreEqual(expectedCount, dbResult.Count(), "New Records Added Count");
         }
 
@@ -322,7 +305,7 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_settingTypes);
             AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
 
-            int assetTypeId = _assetTypes.Count() + 1; // new AssetType Id
+            int assetTypeId = _dataAssetTypes.Count() + 1; // new AssetType Id
             List<CreateViewModel> vmCreateList = new List<CreateViewModel>();
             vmCreateList.Add(new CreateViewModel() { AssetTypeId = assetTypeId, SettingTypeId = 1, IsActive = true }); // count
             CreateLinkedSettingTypesViewModel vmExpected = new CreateLinkedSettingTypesViewModel()
@@ -349,7 +332,7 @@ namespace Financial.Tests.WebApplication.Controllers
             AssetTypeSettingTypeController controller = _controller;
             CreateLinkedSettingTypesViewModel vmExpected = new CreateLinkedSettingTypesViewModel()
             {
-                AssetTypeId = _assetTypes.Count() + 1, // new AssetType Id
+                AssetTypeId = _dataAssetTypes.Count() + 1, // new AssetType Id
                 SuccessMessage = "Previous Success Message",
                 CreateViewModels = new List<CreateViewModel>()
             };
@@ -369,8 +352,8 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeSettingTypeController controller = _controller;
-            int settingTypeId = _settingTypes.Count() + 1;
-            _settingTypes.Add(new SettingType() { Id = settingTypeId, Name = "new Name", IsActive = true });
+            int settingTypeId = _dataSettingTypes.Count() + 1;
+            _dataSettingTypes.Add(new SettingType() { Id = settingTypeId, Name = "new Name", IsActive = true });
 
             // Act
             var result = controller.CreateLinkedAssetTypes(settingTypeId);
@@ -387,8 +370,8 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeSettingTypeController controller = _controller;
-            int settingTypeId = _settingTypes.Count() + 1;
-            _settingTypes.Add(new SettingType() { Id = settingTypeId, Name = "new Name", IsActive = true });
+            int settingTypeId = _dataSettingTypes.Count() + 1;
+            _dataSettingTypes.Add(new SettingType() { Id = settingTypeId, Name = "new Name", IsActive = true });
             controller.TempData["SuccessMessage"] = "Test Success Message";
 
             // Act
@@ -405,8 +388,8 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             AssetTypeSettingTypeController controller = _controller;
-            int settingTypeId = _settingTypes.Count() + 1; // new SettingType Id
-            _settingTypes.Add(new SettingType() { Id = settingTypeId, Name = "New Name", IsActive = true });
+            int settingTypeId = _dataSettingTypes.Count() + 1; // new SettingType Id
+            _dataSettingTypes.Add(new SettingType() { Id = settingTypeId, Name = "New Name", IsActive = true });
 
             // Act
             var result = controller.CreateLinkedAssetTypes(settingTypeId);
@@ -429,8 +412,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
             AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
 
-            int settingTypeId = _settingTypes.Count() + 1; // new SettingType Id
-            _settingTypes.Add(new SettingType() { Id = settingTypeId, Name = "New Name", IsActive = true });
+            int settingTypeId = _dataSettingTypes.Count() + 1; // new SettingType Id
+            _dataSettingTypes.Add(new SettingType() { Id = settingTypeId, Name = "New Name", IsActive = true });
             int expectedCount = 3;
 
             // Act
@@ -454,7 +437,7 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
             AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
 
-            int settingTypeId = _settingTypes.Count() + 1; // new SettingType Id
+            int settingTypeId = _dataSettingTypes.Count() + 1; // new SettingType Id
             List<CreateViewModel> vmCreateList = new List<CreateViewModel>();
             vmCreateList.Add(new CreateViewModel() { AssetTypeId = 1, SettingTypeId = settingTypeId, IsActive = true }); // count
             vmCreateList.Add(new CreateViewModel() { AssetTypeId = 2, SettingTypeId = settingTypeId, IsActive = false }); // count
@@ -471,7 +454,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Database Updated");
-            var dbResult = _assetTypesSettingTypes.Where(r => r.SettingTypeId == settingTypeId).ToList();
+            var dbResult = _dataAssetTypesSettingTypes.Where(r => r.SettingTypeId == settingTypeId).ToList();
             Assert.AreEqual(expectedCount, dbResult.Count(), "New Records Added Count");
         }
 
@@ -484,7 +467,7 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_assetTypes);
             AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
 
-            int settingTypeId = _settingTypes.Count() + 1; // new SettingType Id
+            int settingTypeId = _dataSettingTypes.Count() + 1; // new SettingType Id
             List<CreateViewModel> vmCreateList = new List<CreateViewModel>();
             vmCreateList.Add(new CreateViewModel() { AssetTypeId = 1, SettingTypeId = settingTypeId, IsActive = true }); // count
             CreateLinkedAssetTypesViewModel vmExpected = new CreateLinkedAssetTypesViewModel()
@@ -511,7 +494,7 @@ namespace Financial.Tests.WebApplication.Controllers
             AssetTypeSettingTypeController controller = _controller;
             CreateLinkedAssetTypesViewModel vmExpected = new CreateLinkedAssetTypesViewModel()
             {
-                SettingTypeId = _settingTypes.Count() + 1, // new SettingType Id
+                SettingTypeId = _dataSettingTypes.Count() + 1, // new SettingType Id
                 SuccessMessage = "Previous Success Message",
                 CreateViewModels = new List<CreateViewModel>()
             };

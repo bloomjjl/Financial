@@ -82,7 +82,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\ParentChildRelationshipTypeControllerTests.cs" />
+    <Compile Include="WebApplication\Controllers\ControllerTestsBase.cs" />
+    <Compile Include="WebApplication\Controllers\ParentChildRelationshipTypeControllerTests.cs" />
     <Compile Include="Data\Fakes\FakeParentChildRelationshipTypes.cs" />
     <Compile Include="Data\Repositories\InMemoryParentChildRelationshipTypeRepository.cs" />
     <Compile Include="WebApplication\Controllers\AssetTypeRelationshipTypeControllerTests.cs" />
@@ -117,9 +118,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="WebApplication\Controllers\Core\Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Financial.Core\Financial.Core.csproj">
       <Project>{B454AEF2-D9B8-45C0-AE22-AEAD2DE95567}</Project>
