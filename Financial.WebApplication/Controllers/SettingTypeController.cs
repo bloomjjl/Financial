@@ -10,24 +10,22 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class SettingTypeController : Controller
+    public class SettingTypeController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
-
         public SettingTypeController()
+            : base()
         {
-            _unitOfWork = new UnitOfWork();
         }
 
         public SettingTypeController(IUnitOfWork unitOfWork)
+            : base(unitOfWork)
         {
-            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public ViewResult Index()
         {
-            // get TempData
+            // get messages from other controllers to display in view
             if (TempData["SuccessMessage"] != null)
             {
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
@@ -37,8 +35,8 @@ namespace Financial.WebApplication.Controllers
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
             }
 
-            // transfer db to vm
-            var vmIndex = _unitOfWork.SettingTypes.GetAll()
+            // transfer dto to vm
+            var vmIndex = UOW.SettingTypes.GetAll()
                 .Select(r => new IndexViewModel(r))
                 .ToList();
 
@@ -49,6 +47,7 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Create()
         {
+            // display view
             return View("Create");
         }
 
@@ -56,19 +55,18 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
+            // validation
             if(!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "SettingType");
+                return View("Create", vmCreate);
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.SettingTypes.GetAll()
-                .Where(r => r.IsActive)
+            var existingCount = UOW.SettingTypes.GetAll()
                 .Count(r => r.Name == vmCreate.Name);
             if (existingCount > 0)
             {
-                // display view
+                // display view with message
                 ViewData["ErrorMessage"] = "Record already exists";
                 return View("Create", vmCreate);
             }
@@ -81,10 +79,10 @@ namespace Financial.WebApplication.Controllers
             };
 
             // update db
-            _unitOfWork.SettingTypes.Add(dtoSettingType);
-            _unitOfWork.CommitTrans();
+            UOW.SettingTypes.Add(dtoSettingType);
+            UOW.CommitTrans();
 
-            // display view
+            // display view with message
             TempData["SuccessMessage"] = "Record created";
             return RedirectToAction("CreateLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = dtoSettingType.Id });
         }
@@ -92,8 +90,8 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Edit(int id)
         {
-            // transfer db to vm
-            var vmEdit = _unitOfWork.SettingTypes.GetAll()
+            // transfer dto to vm
+            var vmEdit = UOW.SettingTypes.GetAll()
                 .Select(r => new EditViewModel(r))
                 .FirstOrDefault(r => r.Id == id);
 
@@ -105,34 +103,32 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EditViewModel vmEdit)
         {
+            // validation
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "SettingType");
+                return View("Edit", vmEdit);
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.SettingTypes.GetAll()
-                .Where(r => r.IsActive)
+            var existingCount = UOW.SettingTypes.GetAll()
                 .Where(r => r.Name == vmEdit.Name)
                 .Count(r => r.Id != vmEdit.Id);
             if (existingCount > 0)
             {
-                // display view
+                // display view with message
                 ViewData["ErrorMessage"] = "Record already exists";
                 return View("Edit", vmEdit);
             }
 
             // transfer vm to dto
-            var dtoSettingType = _unitOfWork.SettingTypes.Get(vmEdit.Id);
+            var dtoSettingType = UOW.SettingTypes.Get(vmEdit.Id);
             dtoSettingType.Name = vmEdit.Name;
             dtoSettingType.IsActive = vmEdit.IsActive;
 
             // update db
-            _unitOfWork.SettingTypes.Update(dtoSettingType);
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
-            // display view
+            // display view with message
             TempData["SuccessMessage"] = "Record updated";
             return RedirectToAction("Index", "SettingType");
         }
@@ -141,7 +137,7 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Details(int? id)
         {
             // transfer dto to vm
-            var vmDetails = _unitOfWork.SettingTypes.GetAll()
+            var vmDetails = UOW.SettingTypes.GetAll()
                 .Select(r => new DetailsViewModel(r))
                 .FirstOrDefault(r => r.Id == id);
 

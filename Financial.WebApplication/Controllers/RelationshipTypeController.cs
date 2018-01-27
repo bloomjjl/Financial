@@ -10,25 +10,23 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class RelationshipTypeController : Controller
+    public class RelationshipTypeController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
-
         public RelationshipTypeController()
+            : base()
         {
-            _unitOfWork = new UnitOfWork();
         }
 
         public RelationshipTypeController(IUnitOfWork unitOfWork)
+            : base(unitOfWork)
         {
-            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public ViewResult Index()
         {
-            // Transfer TempData messages to ViewData
-            if(TempData["SuccessMessage"] != null)
+            // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
             {
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
             }
@@ -37,8 +35,8 @@ namespace Financial.WebApplication.Controllers
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
             }
 
-            // transfer db to vm
-            var vmIndex = _unitOfWork.RelationshipTypes.GetAll()
+            // transfer dto to vm
+            var vmIndex = UOW.RelationshipTypes.GetAll()
                 .Select(r => new IndexViewModel(r))
                 .ToList();
 
@@ -56,34 +54,33 @@ namespace Financial.WebApplication.Controllers
         [HttpPost]
         public ActionResult Create(CreateViewModel vmCreate)
         {
+            // validation
             if(!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "RelationshipType");
+                return View("Create", vmCreate);
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.RelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
+            var count = UOW.RelationshipTypes.GetAll()
                 .Count(r => r.Name == vmCreate.Name);
-            if (existingCount > 0)
+            if (count > 0)
             {
-                // display view
+                // display view with message
                 ViewData["ErrorMessage"] = "Record already exists";
                 return View("Create", vmCreate);
             }
 
             // transfer vm to dto
-            _unitOfWork.RelationshipTypes.Add(new RelationshipType()
+            UOW.RelationshipTypes.Add(new RelationshipType()
             {
                 Name = vmCreate.Name,
                 IsActive = true
             });
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
-            // display view
+            // display view with message
             TempData["SuccessMessage"] = "Record created";
             return RedirectToAction("Index", "RelationshipType");
         }
@@ -92,42 +89,43 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Edit(int id)
         {
             // transfer dto to vm
-            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(id);
+            var vmEdit = UOW.RelationshipTypes.GetAll()
+                .Select(r => new EditViewModel(r))
+                .FirstOrDefault(r => r.Id == id);
 
             // display view
-            return View("Edit", new EditViewModel(dtoRelationshipType));
+            return View("Edit", vmEdit);
         }
 
         [HttpPost]
         public ActionResult Edit(EditViewModel vmEdit)
         {
+            // validation
             if(!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "RelationshipType");
+                return View("Edit", vmEdit);
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.RelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
+            var count = UOW.RelationshipTypes.GetAll()
                 .Where(r => r.Name == vmEdit.Name)
                 .Count(r => r.Id != vmEdit.Id);
-            if(existingCount > 0)
+            if(count > 0)
             {
-                // display view
+                // display view with message
                 ViewData["ErrorMessage"] = "Record already exists";
                 return View("Edit", vmEdit);
             }
 
             // transfer vm to dto
-            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(vmEdit.Id);
+            var dtoRelationshipType = UOW.RelationshipTypes.Get(vmEdit.Id);
             dtoRelationshipType.Name = vmEdit.Name;
             dtoRelationshipType.IsActive = vmEdit.IsActive;
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
-            // display view
+            // display view with message
             TempData["SuccessMessage"] = "Record updated";
             return RedirectToAction("Index", "RelationshipType");
         }
@@ -135,17 +133,19 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Details(int id)
         {
-            // Transfer TempData messages to ViewData
+            // get messages from other controllers to display in view
             if (TempData["ErrorMessage"] != null)
             {
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
             }
 
-            // get dto for id
-            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(id);
+            // transfer dto to vm
+            var vmDetails = UOW.RelationshipTypes.GetAll()
+                .Select(r => new DetailsViewModel(r))
+                .FirstOrDefault(r => r.Id == id);
 
             // display view
-            return View("Details", new DetailsViewModel(dtoRelationshipType));
+            return View("Details", vmDetails);
         }
     }
 }

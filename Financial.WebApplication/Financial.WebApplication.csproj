@@ -173,6 +173,7 @@
     <Compile Include="Controllers\AssetTypeController.cs" />
     <Compile Include="Controllers\AssetTypeRelationshipTypeController.cs" />
     <Compile Include="Controllers\AssetTypeSettingTypeController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ParentChildRelationshipTypeController.cs" />
@@ -274,6 +275,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Views\AccountType\" />
     <Folder Include="Views\Asset\" />
+    <Folder Include="Views\Base\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

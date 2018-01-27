@@ -90,10 +90,12 @@ namespace Financial.WebApplication.Controllers
 
             // link duplicated?
             var countExistingParentLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                .Where(r => r.ParentRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId && r.ChildRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
+                .Where(r => r.ParentRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
+                .Where(r => r.ChildRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
             var countExistingChildLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                .Where(r => r.ChildRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId && r.ParentRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
+                .Where(r => r.ChildRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
+                .Where(r => r.ParentRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
             if (countExistingParentLinks > 0 || countExistingChildLinks > 0)
             {
@@ -169,11 +171,13 @@ namespace Financial.WebApplication.Controllers
             // duplicated relationship?
             var countExistingParentChildRelationship = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
-                .Where(r => r.ParentRelationshipTypeId == vmEdit.RelationshipTypeId && r.ChildRelationshipTypeId == int.Parse(vmEdit.SelectedRelationshipType))
+                .Where(r => r.ParentRelationshipTypeId == vmEdit.RelationshipTypeId)
+                .Where(r => r.ChildRelationshipTypeId == int.Parse(vmEdit.SelectedRelationshipType))
                 .Count(r => r.IsActive);
             var countExistingChildParentRelationship = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
-                .Where(r => r.ChildRelationshipTypeId == vmEdit.RelationshipTypeId && r.ParentRelationshipTypeId == int.Parse(vmEdit.SelectedRelationshipType))
+                .Where(r => r.ChildRelationshipTypeId == vmEdit.RelationshipTypeId)
+                .Where(r => r.ParentRelationshipTypeId == int.Parse(vmEdit.SelectedRelationshipType))
                 .Count(r => r.IsActive);
 
             if (countExistingParentChildRelationship > 0 || countExistingChildParentRelationship > 0)
@@ -257,12 +261,16 @@ namespace Financial.WebApplication.Controllers
             foreach (var dtoRelationshipType in dbRelationshipTypes)
             {
                 var countLinkedParentRelationships = _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                    .Where(r => r.ParentRelationshipTypeId == relationshipTypeId && r.ChildRelationshipTypeId == dtoRelationshipType.Id)
-                    .Where(r => r.ParentRelationshipTypeId != selectedId && r.ChildRelationshipTypeId != selectedId)
+                    .Where(r => r.ParentRelationshipTypeId == relationshipTypeId)
+                    .Where(r => r.ChildRelationshipTypeId == dtoRelationshipType.Id)
+                    .Where(r => r.ParentRelationshipTypeId != selectedId)
+                    .Where(r => r.ChildRelationshipTypeId != selectedId)
                     .Count(r => r.IsActive);
                 var countLinkedChildRelationships = _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                    .Where(r => r.ChildRelationshipTypeId == relationshipTypeId && r.ParentRelationshipTypeId == dtoRelationshipType.Id)
-                    .Where(r => r.ChildRelationshipTypeId != selectedId && r.ParentRelationshipTypeId != selectedId)
+                    .Where(r => r.ChildRelationshipTypeId == relationshipTypeId)
+                    .Where(r => r.ParentRelationshipTypeId == dtoRelationshipType.Id)
+                    .Where(r => r.ChildRelationshipTypeId != selectedId)
+                    .Where(r => r.ParentRelationshipTypeId != selectedId)
                     .Count(r => r.IsActive);
 
                 // add if existing link not found

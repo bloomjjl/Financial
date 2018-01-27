@@ -14,12 +14,11 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
 
         }
 
-        public CreateLinkedAssetTypesViewModel(Models.SettingType dtoSettingType, string successMessage, List<CreateViewModel> vmCreate)
+        public CreateLinkedAssetTypesViewModel(Models.SettingType dtoSettingType, List<CreateViewModel> vmCreate)
         {
             SettingTypeId = dtoSettingType.Id;
             SettingTypeName = dtoSettingType.Name;
             CreateViewModels = vmCreate;
-            SuccessMessage = successMessage;
         }
 
 
@@ -29,8 +28,5 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
         public string SettingTypeName { get; set; }
 
         public List<CreateViewModel> CreateViewModels { get; set; }
-
-        public string SuccessMessage { get; set; }
-
     }
 }

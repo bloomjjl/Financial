@@ -10,24 +10,22 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class AssetTypeController : Controller
+    public class AssetTypeController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
-
         public AssetTypeController()
+            : base()
         {
-            _unitOfWork = new UnitOfWork();
         }
 
         public AssetTypeController(IUnitOfWork unitOfWork)
+            : base(unitOfWork)
         {
-            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public ViewResult Index()
         {
-            // get TempData
+            // get messages from other controllers to display in view
             if (TempData["SuccessMessage"] != null)
             {
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
@@ -37,8 +35,8 @@ namespace Financial.WebApplication.Controllers
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
             }
 
-            // transfer db to vm
-            var vmIndex = _unitOfWork.AssetTypes.GetAll()
+            // transfer dto to vm
+            var vmIndex = UOW.AssetTypes.GetAll()
                 .Select(r => new IndexViewModel(r))
                 .ToList();
 
@@ -57,19 +55,18 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
-            if(!ModelState.IsValid)
+            // validation
+            if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "AssetType");
+                return View("Index", vmCreate);
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.AssetTypes.GetAll()
-                .Where(r => r.IsActive)
+            var count = UOW.AssetTypes.GetAll()
                 .Count(r => r.Name == vmCreate.Name);
-            if (existingCount > 0)
+            if (count > 0)
             {
-                // display view
+                // display view with message
                 ViewData["ErrorMessage"] = "Record already exists";
                 return View("Create", vmCreate);
             }
@@ -81,11 +78,11 @@ namespace Financial.WebApplication.Controllers
                 IsActive = true
             };
 
-            // transfer dto to db
-            _unitOfWork.AssetTypes.Add(dtoAssetType);
-            _unitOfWork.CommitTrans();
+            // update db
+            UOW.AssetTypes.Add(dtoAssetType);
+            UOW.CommitTrans();
 
-            // display View
+            // display View with message
             TempData["SuccessMessage"] = "Asset Type Created";
             return RedirectToAction("CreateLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = dtoAssetType.Id });
         }
@@ -93,8 +90,10 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            // transfer db to vm
-            var vmEdit = new EditViewModel(_unitOfWork.AssetTypes.Get(id));
+            // transfer dto to vm
+            var vmEdit = UOW.AssetTypes.GetAll()
+                .Select(r => new EditViewModel(r))
+                .FirstOrDefault(r => r.Id == id);
 
             // display view
             return View("Edit", vmEdit);
@@ -104,43 +103,43 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EditViewModel vmEdit)
         {
+            // validation
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "AssetType");
+                return View("Edit", vmEdit);
             }
 
             // check for duplicate
-            var existingCount = _unitOfWork.AssetTypes.GetAll()
-                .Where(r => r.IsActive)
+            var count = UOW.AssetTypes.GetAll()
                 .Where(r => r.Name == vmEdit.Name)
                 .Count(r => r.Id != vmEdit.Id);
-            if (existingCount > 0)
+            if (count > 0)
             {
-                // display view
+                // display view with message
                 ViewData["ErrorMessage"] = "Record already exists";
                 return View("Edit", vmEdit);
             }
 
             // transfer vm to dto
-            var dtoAssetType = _unitOfWork.AssetTypes.Get(vmEdit.Id);
+            var dtoAssetType = UOW.AssetTypes.Get(vmEdit.Id);
             dtoAssetType.Name = vmEdit.Name;
             dtoAssetType.IsActive = vmEdit.IsActive;
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
-            // display view
+            // display view with message
             TempData["SuccessMessage"] = "Record updated.";
             return RedirectToAction("Index", "AssetType");
         }
 
         [HttpGet]
-        public ActionResult Details(int? id)
+        public ActionResult Details(int id)
         {
             // transfer dto to vm
-            var dtoAssetType = _unitOfWork.AssetTypes.Get((int)id);
-            var vmDetails = new DetailsViewModel(dtoAssetType);
+            var vmDetails = UOW.AssetTypes.GetAll()
+                .Select(r => new DetailsViewModel(r))
+                .FirstOrDefault( r => r.Id == id);
 
             // display view
             return View("Details", vmDetails);

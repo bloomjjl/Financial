@@ -23,7 +23,7 @@ namespace Financial.Core.ViewModels.AssetType
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        [Display(Name = "Visible")]
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
     }
 }
