@@ -75,7 +75,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             var viewResult = result as ViewResult;
-            Assert.AreEqual("Test Message", viewResult.ViewData["SuccessMessage"].ToString(), "Message");
+            Assert.AreEqual("Test Message", viewResult.ViewData["SuccessMessage"], "Message");
         }
 
         [TestMethod()]
@@ -90,7 +90,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             var viewResult = result as ViewResult;
-            Assert.AreEqual("Test Message", viewResult.ViewData["ErrorMessage"].ToString(), "Message");
+            Assert.AreEqual("Test Message", viewResult.ViewData["ErrorMessage"], "Message");
         }
 
 
@@ -108,6 +108,21 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
             var viewResult = result as ViewResult;
             Assert.AreEqual("Create", viewResult.ViewName, "View Name");
+        }
+
+        [TestMethod()]
+        public void Create_Get_WhenProvidedSuccessMessage_ReturnViewData_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            controller.TempData["SuccessMessage"] = "Test Message";
+
+            // Act
+            var result = controller.Create();
+
+            // Assert
+            var viewResult = result as ViewResult;
+            Assert.IsNotNull(viewResult.ViewData["SuccessMessage"], "Message");
         }
 
         [TestMethod()]

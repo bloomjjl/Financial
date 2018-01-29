@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Financial.Core.ViewModels.AssetTypeRelationshipType
 {
-    public class IndexLinkedRelationshipTypesViewModel
+    public class IndexViewModel
     {
-        public IndexLinkedRelationshipTypesViewModel() { }
+        public IndexViewModel() { }
 
-        public IndexLinkedRelationshipTypesViewModel(Models.AssetTypeRelationshipType dtoAssetTypeRelationshipType, 
+        public IndexViewModel(Models.AssetTypeRelationshipType dtoAssetTypeRelationshipType, 
             Models.AssetType dtoParentAssetType, Models.AssetType dtoChildAssetType, 
             Models.RelationshipType dtoParentRelationshipType, Models.RelationshipType dtoChildRelationshipType)
         {

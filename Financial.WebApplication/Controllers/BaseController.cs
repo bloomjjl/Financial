@@ -34,5 +34,12 @@ namespace Financial.WebApplication.Controllers
             }
         }
 
+        public int GetIntegerFromString(string stringValue)
+        {
+            int integerValue = 0;
+            int.TryParse(stringValue, out integerValue);
+            return integerValue;
+        }
+
     }
 }

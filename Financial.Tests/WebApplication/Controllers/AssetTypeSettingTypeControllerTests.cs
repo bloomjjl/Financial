@@ -217,8 +217,6 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.CreateLinkedSettingTypes(assetTypeId);
 
             // Assert
-            var viewResult = result as ViewResult;
-            var vmResult = viewResult.Model as CreateLinkedSettingTypesViewModel;
             Assert.IsNotNull(controller.ViewData["SuccessMessage"], "Message");
         }
 
@@ -329,36 +327,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
             var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Route Action");
-            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Route Controller");
-            Assert.AreEqual(assetTypeId, routeResult.RouteValues["id"], "Route Id");
-        }
-
-        [TestMethod()]
-        public void CreateLinkedSettingTypes_Post_WhenProvidedViewModelIsValid_ReturnSuccessMessage_Test()
-        {
-            // Arrange
-            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>(); // clear links
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var _dataAssetTypes = new List<AssetType>() {
-                new AssetType() { Id = 20, Name = "AssetType Name", IsActive = true }};
-            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var _dataSettingTypes = new List<SettingType>() {
-                new SettingType() { Id = 30, Name = "SettingType Name", IsActive = true }}; // NOT active
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            var controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int assetTypeId = 1;
-            CreateLinkedSettingTypesViewModel vmExpected = new CreateLinkedSettingTypesViewModel()
-            {
-                AssetTypeId = assetTypeId,
-                CreateViewModels = new List<CreateViewModel>()                {
-                    new CreateViewModel() { AssetTypeId = assetTypeId, SettingTypeId = 30, IsActive = true } }
-            };
-
-            // Act
-            controller.CreateLinkedSettingTypes(vmExpected);
-
-            // Assert
+            Assert.AreEqual("Create", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("AssetTypeRelationshipType", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual(assetTypeId, routeResult.RouteValues["assetTypeId"], "Route AssetTypeId");
             Assert.AreEqual("Linked setting types created.", controller.TempData["SuccessMessage"], "Success Message");
         }
 
@@ -520,33 +491,6 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Index", routeResult.RouteValues["action"], "Route Action");
             Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Route Controller");
             Assert.AreEqual(settingTypeId, routeResult.RouteValues["id"], "Route Id");
-        }
-
-        [TestMethod()]
-        public void CreateLinkedAssetTypes_Post_WhenProvidedViewModelIsValid_ReturnSuccessMessage_Test()
-        {
-            // Arrange
-            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>(); // clear links
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var _dataSettingTypes = new List<SettingType>() {
-                new SettingType() { Id = 20, Name = "SettingType Name", IsActive = true } };
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            var _dataAssetTypes = new List<AssetType>() {
-                new AssetType() { Id = 30, Name = "AssetType Name", IsActive = true } };
-            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int settingTypeId = 20;
-            var vmExpected = new CreateLinkedAssetTypesViewModel()
-            {
-                SettingTypeId = settingTypeId,
-                CreateViewModels = new List<CreateViewModel>() {
-                    new CreateViewModel() { AssetTypeId = 30, SettingTypeId = settingTypeId, IsActive = true } }
-            };
-
-            // Act
-            controller.CreateLinkedAssetTypes(vmExpected);
-
-            // Assert
             Assert.AreEqual("Linked asset types created", controller.TempData["SuccessMessage"], "Message");
         }
 
@@ -654,22 +598,20 @@ namespace Financial.Tests.WebApplication.Controllers
         public void EditLinkedSettingTypes_Get_WhenProvidedAssetTypeIdIsValid_ReturnActiveSettingTypesFromDatabase_Test()
         {
             // Arrange
-            IList<AssetTypeSettingType> _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>();
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 1, AssetTypeId = 4, SettingTypeId = 5, IsActive = true });
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 2, AssetTypeId = 4, SettingTypeId = 6, IsActive = true });
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 3, AssetTypeId = 4, SettingTypeId = 7, IsActive = true });
-            IList<AssetType> _dataAssetTypes = new List<AssetType>();
-            _dataAssetTypes.Add(new AssetType() { Id = 4, Name = "AssetType Name", IsActive = true });
-            IList<SettingType> _dataSettingTypes = new List<SettingType>();
-            _dataSettingTypes.Add(new SettingType() { Id = 5, Name = "SettingType Name", IsActive = true }); // count
-            _dataSettingTypes.Add(new SettingType() { Id = 6, Name = "SettingType Name", IsActive = false });
-            _dataSettingTypes.Add(new SettingType() { Id = 7, Name = "SettingType Name", IsActive = true }); // count
+            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
+                new AssetTypeSettingType() { Id = 10, AssetTypeId = 20, SettingTypeId = 30, IsActive = true },
+                new AssetTypeSettingType() { Id = 11, AssetTypeId = 20, SettingTypeId = 31, IsActive = true } };
             _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 20, Name = "AssetType Name", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var _dataSettingTypes = new List<SettingType>() {
+                new SettingType() { Id = 30, Name = "SettingType Name", IsActive = true }, // count
+                new SettingType() { Id = 31, Name = "SettingType Name", IsActive = false } }; // NOT Active
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int assetTypeId = 4;
-            int expectedCount = 2;
+            var controller = new AssetTypeSettingTypeController(_unitOfWork);
+            int assetTypeId = 20;
+            int expectedCount = 1;
 
             // Act
             var result = controller.EditLinkedSettingTypes(assetTypeId);
@@ -677,31 +619,29 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as EditLinkedSettingTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "EditViewModel Count");
+            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "ViewModel Count");
         }
 
         [TestMethod()]
         public void EditLinkedSettingTypes_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
-            IList<AssetTypeSettingType> _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>();
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 1, AssetTypeId = 2, SettingTypeId = 3, IsActive = true }); 
-            IList<AssetType> _dataAssetTypes = new List<AssetType>();
-            _dataAssetTypes.Add(new AssetType() { Id =2, Name = "AssetType Name", IsActive = true });
-            IList<SettingType> _dataSettingTypes = new List<SettingType>();
-            _dataSettingTypes.Add(new SettingType() { Id = 3, Name = "SettingType Name", IsActive = true });
+            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
+                new AssetTypeSettingType() { Id = 10, AssetTypeId = 20, SettingTypeId = 30, IsActive = true } };
             _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 20, Name = "AssetType Name", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var _dataSettingTypes = new List<SettingType>() {
+                new SettingType() { Id = 30, Name = "SettingType Name", IsActive = true } };
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int assetTypeId = 2;
-            List<EditViewModel> vmEditList = new List<EditViewModel>();
-            vmEditList.Add(new EditViewModel() { Id = 1, AssetTypeId = assetTypeId, SettingTypeId = 3, IsActive = false }); // changed
-
-            EditLinkedSettingTypesViewModel vmExpected = new EditLinkedSettingTypesViewModel()
+            var controller = new AssetTypeSettingTypeController(_unitOfWork);
+            int assetTypeId = 20;
+            var vmExpected = new EditLinkedSettingTypesViewModel()
             {
                 AssetTypeId = assetTypeId,
-                EditViewModels = vmEditList
+                EditViewModels = new List<EditViewModel>() {
+                    new EditViewModel() { Id = 10, AssetTypeId = assetTypeId, SettingTypeId = 30, IsActive = false }} // changed
             };
 
             // Act
@@ -709,7 +649,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dtoResult = _dataAssetTypesSettingTypes.FirstOrDefault(r => r.Id == 1);
+            var dtoResult = _dataAssetTypesSettingTypes.FirstOrDefault(r => r.Id == 10);
             Assert.AreEqual(false, dtoResult.IsActive, "Record Updated");
         }
 
@@ -717,9 +657,9 @@ namespace Financial.Tests.WebApplication.Controllers
         public void EditLinkedSettingTypes_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            AssetTypeSettingTypeController controller = _controller;
-            int expectedAssetTypeId = 1; // 
-            EditLinkedSettingTypesViewModel vmExpected = new EditLinkedSettingTypesViewModel()
+            var controller = _controller;
+            int expectedAssetTypeId = 1; 
+            var vmExpected = new EditLinkedSettingTypesViewModel()
             {
                 AssetTypeId = expectedAssetTypeId,
                 EditViewModels = new List<EditViewModel>()
@@ -729,11 +669,12 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.EditLinkedSettingTypes(vmExpected);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
             var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
-            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller");
-            Assert.AreEqual(expectedAssetTypeId, routeResult.RouteValues["id"], "AssetType Id");
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual(expectedAssetTypeId, routeResult.RouteValues["id"], "Route Id");
+            Assert.AreEqual("Linked setting types updated.", controller.TempData["SuccessMessage"], "Message");
         }
 
 
@@ -749,27 +690,27 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.EditLinkedAssetTypes(settingTypeId);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
             var viewResult = result as ViewResult;
-            Assert.AreEqual("EditLinkedAssetTypes", viewResult.ViewName);
-            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditLinkedAssetTypesViewModel));
+            Assert.AreEqual("EditLinkedAssetTypes", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditLinkedAssetTypesViewModel), "View Model");
         }
 
         [TestMethod()]
-        public void EditLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnSettingTypeValuesFromDatabase_Test()
+        public void EditLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnActiveSettingTypeValuesFromDatabase_Test()
         {
             // Arrange
-            IList<AssetTypeSettingType> _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>();
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 1, AssetTypeId = 5, SettingTypeId = 4, IsActive = true });
-            IList<SettingType> _dataSettingTypes = new List<SettingType>();
-            _dataSettingTypes.Add(new SettingType() { Id = 4, Name = "SettingType Name", IsActive = true });
-            IList<AssetType> _dataAssetTypes = new List<AssetType>();
-            _dataAssetTypes.Add(new AssetType() { Id = 5, Name = "AssetType Name", IsActive = true });
+            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
+                new AssetTypeSettingType() { Id = 10, AssetTypeId = 30, SettingTypeId = 20, IsActive = true } };
             _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var _dataSettingTypes = new List<SettingType>() {
+                new SettingType() { Id = 20, Name = "SettingType Name", IsActive = true } };
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 30, Name = "AssetType Name", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int settingTypeId = 4;
+            var controller = new AssetTypeSettingTypeController(_unitOfWork);
+            int settingTypeId = 20;
 
             // Act
             var result = controller.EditLinkedAssetTypes(settingTypeId);
@@ -777,59 +718,27 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as EditLinkedAssetTypesViewModel;
-            Assert.AreEqual(settingTypeId, vmResult.SettingTypeId, "SettingType Id");
-            Assert.AreEqual("SettingType Name", vmResult.SettingTypeName, "SettingType Name");
+            Assert.AreEqual(settingTypeId, vmResult.SettingTypeId, "Id");
+            Assert.AreEqual("SettingType Name", vmResult.SettingTypeName, "Name");
         }
 
         [TestMethod()]
-        public void EditLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnLinkedAssetTypesFromDatabase_Test()
+        public void EditLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnAllLinkedAssetTypesFromDatabase_Test()
         {
             // Arrange
-            IList<AssetTypeSettingType> _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>();
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 1, AssetTypeId = 5, SettingTypeId = 4, IsActive = true }); // count
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 2, AssetTypeId = 6, SettingTypeId = 4, IsActive = false }); // count
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 3, AssetTypeId = 7, SettingTypeId = 4, IsActive = true }); // count
-            IList<SettingType> _dataSettingTypes = new List<SettingType>();
-            _dataSettingTypes.Add(new SettingType() { Id = 4, Name = "SettingType Name", IsActive = true });
-            IList<AssetType> _dataAssetTypes = new List<AssetType>();
-            _dataAssetTypes.Add(new AssetType() { Id = 5, Name = "AssetType Name", IsActive = true });
-            _dataAssetTypes.Add(new AssetType() { Id = 6, Name = "AssetType Name", IsActive = true });
-            _dataAssetTypes.Add(new AssetType() { Id = 7, Name = "AssetType Name", IsActive = true });
+            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
+                new AssetTypeSettingType() { Id = 10, AssetTypeId = 30, SettingTypeId = 20, IsActive = true }, // count
+                new AssetTypeSettingType() { Id = 11, AssetTypeId = 31, SettingTypeId = 20, IsActive = false } }; // count
             _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var _dataSettingTypes = new List<SettingType>() {
+                new SettingType() { Id = 20, Name = "SettingType Name", IsActive = true }};
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 30, Name = "AssetType Name 1", IsActive = true },
+                new AssetType() { Id = 31, Name = "AssetType Name 2", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int settingTypeId = 4;
-            int expectedCount = 3;
-
-            // Act
-            var result = controller.EditLinkedAssetTypes(settingTypeId);
-
-            // Assert
-            var viewResult = result as ViewResult;
-            var vmResult = viewResult.ViewData.Model as EditLinkedAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "EditViewModel Count");
-        }
-
-        [TestMethod()]
-        public void EditLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnActiveAssetTypesFromDatabase_Test()
-        {
-            // Arrange
-            IList<AssetTypeSettingType> _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>();
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 1, AssetTypeId = 5, SettingTypeId = 4, IsActive = true });
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 2, AssetTypeId = 6, SettingTypeId = 4, IsActive = true });
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 3, AssetTypeId = 7, SettingTypeId = 4, IsActive = true });
-            IList<SettingType> _dataSettingTypes = new List<SettingType>();
-            _dataSettingTypes.Add(new SettingType() { Id = 4, Name = "SettingType Name", IsActive = true });
-            IList<AssetType> _dataAssetTypes = new List<AssetType>();
-            _dataAssetTypes.Add(new AssetType() { Id = 5, Name = "AssetType Name", IsActive = true }); // count
-            _dataAssetTypes.Add(new AssetType() { Id = 6, Name = "AssetType Name", IsActive = false });
-            _dataAssetTypes.Add(new AssetType() { Id = 7, Name = "AssetType Name", IsActive = true }); // count
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int settingTypeId = 4;
+            var controller = new AssetTypeSettingTypeController(_unitOfWork);
+            int settingTypeId = 20;
             int expectedCount = 2;
 
             // Act
@@ -838,31 +747,84 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.ViewData.Model as EditLinkedAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "EditViewModel Count");
+            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "ViewModel Count");
+        }
+
+        [TestMethod()]
+        public void EditLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnNewAssetTypesFromDatabase_Test()
+        {
+            // Arrange
+            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
+                new AssetTypeSettingType() { Id = 10, AssetTypeId = 30, SettingTypeId = 20, IsActive = true } }; 
+            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var _dataSettingTypes = new List<SettingType>() {
+                new SettingType() { Id = 20, Name = "SettingType Name", IsActive = true }};
+            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 30, Name = "Old AssetType Name 1", IsActive = true }, // count
+                new AssetType() { Id = 31, Name = "New AssetType Name 2", IsActive = true }}; // NEW count
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetTypeSettingTypeController(_unitOfWork);
+            int settingTypeId = 20;
+            int expectedCount = 2;
+
+            // Act
+            var result = controller.EditLinkedAssetTypes(settingTypeId);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditLinkedAssetTypesViewModel;
+            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "ViewModel Count");
+        }
+
+        [TestMethod()]
+        public void EditLinkedAssetTypes_Get_WhenProvidedSettingTypeIdIsValid_ReturnActiveAssetTypesFromDatabase_Test()
+        {
+            // Arrange
+            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
+                new AssetTypeSettingType() { Id = 10, AssetTypeId = 30, SettingTypeId = 20, IsActive = true },
+                new AssetTypeSettingType() { Id = 11, AssetTypeId = 31, SettingTypeId = 20, IsActive = true } };
+            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var _dataSettingTypes = new List<SettingType>() {
+                new SettingType() { Id = 20, Name = "SettingType Name", IsActive = true }};
+            _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 30, Name = "AssetType Name 1", IsActive = true }, // count
+                new AssetType() { Id = 31, Name = "AssetType Name 2", IsActive = false }}; // NOT active
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetTypeSettingTypeController(_unitOfWork);
+            int settingTypeId = 20;
+            int expectedCount = 1;
+
+            // Act
+            var result = controller.EditLinkedAssetTypes(settingTypeId);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditLinkedAssetTypesViewModel;
+            Assert.AreEqual(expectedCount, vmResult.EditViewModels.Count(), "ViewModel Count");
         }
 
         [TestMethod()]
         public void EditLinkedAssetTypes_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
-            IList<AssetTypeSettingType> _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>();
-            _dataAssetTypesSettingTypes.Add(new AssetTypeSettingType() { Id = 1, AssetTypeId = 3, SettingTypeId = 2, IsActive = true });
-            IList<SettingType> _dataSettingTypes = new List<SettingType>();
-            _dataSettingTypes.Add(new SettingType() { Id = 2, Name = "SettingType Name", IsActive = true });
-            IList<AssetType> _dataAssetTypes = new List<AssetType>();
-            _dataAssetTypes.Add(new AssetType() { Id = 3, Name = "AssetType Name", IsActive = true });
+            var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
+                new AssetTypeSettingType() { Id = 10, AssetTypeId = 30, SettingTypeId = 20, IsActive = true } };
             _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var _dataSettingTypes = new List<SettingType>() {
+                new SettingType() { Id = 20, Name = "SettingType Name", IsActive = true }};
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 30, Name = "AssetType Name", IsActive = true }}; 
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            AssetTypeSettingTypeController controller = new AssetTypeSettingTypeController(_unitOfWork);
-            int settingTypeId = 2;
-            List<EditViewModel> vmEditList = new List<EditViewModel>();
-            vmEditList.Add(new EditViewModel() { Id = 1, AssetTypeId = 3, SettingTypeId = settingTypeId, IsActive = false }); // changed
-
-            EditLinkedAssetTypesViewModel vmExpected = new EditLinkedAssetTypesViewModel()
+            var controller = new AssetTypeSettingTypeController(_unitOfWork);
+            int settingTypeId = 20;
+            var vmExpected = new EditLinkedAssetTypesViewModel()
             {
                 SettingTypeId = settingTypeId,
-                EditViewModels = vmEditList
+                EditViewModels = new List<EditViewModel>() {
+                    new EditViewModel() { Id = 10, AssetTypeId = 30, SettingTypeId = settingTypeId, IsActive = false } } // changed
             };
 
             // Act
@@ -870,7 +832,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
             // Assert
             Assert.AreEqual(true, _unitOfWork.Committed, "Transaction Committed");
-            var dtoResult = _dataAssetTypesSettingTypes.FirstOrDefault(r => r.Id == 1);
+            var dtoResult = _dataAssetTypesSettingTypes.FirstOrDefault(r => r.Id == 10);
             Assert.AreEqual(false, dtoResult.IsActive, "Record Updated");
         }
 
@@ -878,9 +840,9 @@ namespace Financial.Tests.WebApplication.Controllers
         public void EditLinkedAssetTypes_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            AssetTypeSettingTypeController controller = _controller;
-            int expectedSettingTypeId = 1; // 
-            EditLinkedAssetTypesViewModel vmExpected = new EditLinkedAssetTypesViewModel()
+            var controller = _controller;
+            int expectedSettingTypeId = 1; 
+            var vmExpected = new EditLinkedAssetTypesViewModel()
             {
                 SettingTypeId = expectedSettingTypeId,
                 EditViewModels = new List<EditViewModel>()
@@ -890,11 +852,12 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.EditLinkedAssetTypes(vmExpected);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult));
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
             var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Action");
-            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller");
-            Assert.AreEqual(expectedSettingTypeId, routeResult.RouteValues["id"], "SettingType Id");
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual(expectedSettingTypeId, routeResult.RouteValues["id"], "Route Id");
+            Assert.AreEqual("Linked asset types updated.", controller.TempData["SuccessMessage"], "Message");
         }
 
     }

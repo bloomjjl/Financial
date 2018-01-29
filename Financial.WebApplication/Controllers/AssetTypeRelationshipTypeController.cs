@@ -10,89 +10,44 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class AssetTypeRelationshipTypeController : Controller
+    public class AssetTypeRelationshipTypeController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
-
         public AssetTypeRelationshipTypeController()
+            : base()
         {
-            _unitOfWork = new UnitOfWork();
         }
 
         public AssetTypeRelationshipTypeController(IUnitOfWork unitOfWork)
+            : base(unitOfWork)
         {
-            _unitOfWork = unitOfWork;
         }
         
         [ChildActionOnly]
-        public ActionResult IndexLinkedAssetTypes(int relationshipTypeId)
-        {
-            /*
-            // get ParentAssetTypes linked to Id
-            var dbParentChildRelationships = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.ParentChildRelationshipTypeId == relationshipTypeId)
-                .ToList();
-
-            // get ChildAssetTypes linked to Id
-            var dbChildParentRelationships = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.ChildParentRelationshipTypeId == relationshipTypeId)
-                .ToList();
-
-            // transfer Parent to vm
-            var vmIndexLinkedAssetTypes = new List<IndexLinkedAssetTypesViewModel>();
-            foreach (var dtoParentRelationship in dbParentChildRelationships)
-            {
-                var dtoParentAssetType = _unitOfWork.AssetTypes.Get(dtoParentRelationship.ParentAssetTypeId);
-                var dtoChildAssetType = _unitOfWork.AssetTypes.Get(dtoParentRelationship.ChildAssetTypeId);
-                var dtoParentChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentRelationship.ParentChildRelationshipTypeId);
-                var dtoChildParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentRelationship.ChildParentRelationshipTypeId);
-                vmIndexLinkedAssetTypes.Add(new IndexLinkedAssetTypesViewModel(dtoParentRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentChildRelationshipType, dtoChildParentRelationshipType));
-            }
-
-            // transfer Child to vm
-            foreach (var dtoChildRelationship in dbChildParentRelationships)
-            {
-                var dtoParentAssetType = _unitOfWork.AssetTypes.Get(dtoChildRelationship.ParentAssetTypeId);
-                var dtoChildAssetType = _unitOfWork.AssetTypes.Get(dtoChildRelationship.ChildAssetTypeId);
-                var dtoParentChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoChildRelationship.ParentChildRelationshipTypeId);
-                var dtoChildParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoChildRelationship.ChildParentRelationshipTypeId);
-                vmIndexLinkedAssetTypes.Add(new IndexLinkedAssetTypesViewModel(dtoChildRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentChildRelationshipType, dtoChildParentRelationshipType));
-            }
-
-            // display view
-            return PartialView("_IndexLinkedAssetTypes", vmIndexLinkedAssetTypes);
-            */
-            return PartialView();
-        }
-
-        [ChildActionOnly]
-        public ActionResult IndexLinkedRelationshipTypes(int assetTypeId)
+        public ActionResult Index(int assetTypeId)
         {
             // transfer supplied Id to dto
-            var dtoSuppliedAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
+            var dtoSuppliedAssetType = UOW.AssetTypes.Get(assetTypeId);
 
             // get linked ParentRelationshipTypes to Id
-            var dbParentRelationships = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
+            var dbParentRelationships = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.ParentAssetTypeId == assetTypeId)
                 .ToList();
 
             // transfer db to vm
-            var vmIndexLinkedRelationshipTypes = new List<IndexLinkedRelationshipTypesViewModel>();
+            var vmIndexLinkedRelationshipTypes = new List<IndexViewModel>();
             foreach (var dtoParentRelationship in dbParentRelationships)
             {
-                var dtoParentAssetType = _unitOfWork.AssetTypes.Get(dtoParentRelationship.ParentAssetTypeId);
-                var dtoChildAssetType = _unitOfWork.AssetTypes.Get(dtoParentRelationship.ChildAssetTypeId);
-                var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(dtoParentRelationship.ParentChildRelationshipTypeId);
-                var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
-                vmIndexLinkedRelationshipTypes.Add(new IndexLinkedRelationshipTypesViewModel(dtoParentRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentRelationshipType, dtoChildRelationshipType));
+                var dtoParentAssetType = UOW.AssetTypes.Get(dtoParentRelationship.ParentAssetTypeId);
+                var dtoChildAssetType = UOW.AssetTypes.Get(dtoParentRelationship.ChildAssetTypeId);
+                var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(dtoParentRelationship.ParentChildRelationshipTypeId);
+                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+                vmIndexLinkedRelationshipTypes.Add(new IndexViewModel(dtoParentRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentRelationshipType, dtoChildRelationshipType));
             }
 
             // get linked ChildRelationshipTypes to Id
-            var dbChildRelationships = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
+            var dbChildRelationships = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.ChildAssetTypeId == assetTypeId)
                 .ToList();
@@ -100,112 +55,135 @@ namespace Financial.WebApplication.Controllers
             // transfer ChildParent to vm
             foreach (var dtoChildRelationship in dbChildRelationships)
             {
-                var dtoParentAssetType = _unitOfWork.AssetTypes.Get(dtoChildRelationship.ParentAssetTypeId);
-                var dtoChildAssetType = _unitOfWork.AssetTypes.Get(dtoChildRelationship.ChildAssetTypeId);
-                var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(dtoChildRelationship.ParentChildRelationshipTypeId);
-                var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
-                vmIndexLinkedRelationshipTypes.Add(new IndexLinkedRelationshipTypesViewModel(dtoChildRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentRelationshipType, dtoChildRelationshipType));
+                var dtoParentAssetType = UOW.AssetTypes.Get(dtoChildRelationship.ParentAssetTypeId);
+                var dtoChildAssetType = UOW.AssetTypes.Get(dtoChildRelationship.ChildAssetTypeId);
+                var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(dtoChildRelationship.ParentChildRelationshipTypeId);
+                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+                vmIndexLinkedRelationshipTypes.Add(new IndexViewModel(dtoChildRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentRelationshipType, dtoChildRelationshipType));
             }
 
-            return PartialView("_IndexLinkedRelationshipTypes", vmIndexLinkedRelationshipTypes);
+            return PartialView("_Index", vmIndexLinkedRelationshipTypes);
         }
 
         [HttpGet]
         public ViewResult Create(int assetTypeId)
         {
+            // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+
             // transfer id to dto
-            var dtoSuppliedAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
+            var dtoSuppliedAssetType = UOW.AssetTypes.Get(assetTypeId);
 
             // get drop down lists
             List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels(null);
-            List<SelectListItem> sliParentRelationshipTypes = GetParentRelationshipTypes();
-            List<SelectListItem> sliChildRelationshipTypes = GetChildRelationshipTypes();
-            List<SelectListItem> sliLinkAssetTypes = GetLinkAssetTypes(assetTypeId);
 
             // display view
-            return View("Create", new CreateViewModel(dtoSuppliedAssetType, sliRelationshipLevels, sliParentRelationshipTypes, sliChildRelationshipTypes, sliLinkAssetTypes));
+            return View("Create", new CreateViewModel(dtoSuppliedAssetType, sliRelationshipLevels));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
-            if(!ModelState.IsValid)
+            // validation
+            if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "AssetType");
+                return View("Create", vmCreate);
             }
 
-            // check for existing link
-            var countParent = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
-                .Count(r => r.ParentAssetTypeId == vmCreate.SuppliedAssetTypeId &&
-                            r.ChildAssetTypeId == GetIntegerForString(vmCreate.SelectedLinkAssetType) &&
-                            r.ParentChildRelationshipTypeId == GetIntegerForString(vmCreate.SelectedRelationshipType) &&
-                            r.IsActive);
-            var countChild = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
-                .Count(r => r.ParentAssetTypeId == GetIntegerForString(vmCreate.SelectedLinkAssetType) &&
-                            r.ChildAssetTypeId == vmCreate.SuppliedAssetTypeId &&
-                            r.ParentChildRelationshipTypeId == GetIntegerForString(vmCreate.SelectedRelationshipType) &&
-                            r.IsActive);
-            if(countParent > 0 || countChild > 0)
-            {
-                // get drop down lists
-                vmCreate.RelationshipLevels = GetRelationshipLevels(null);
-                vmCreate.ParentRelationshipTypes = GetParentRelationshipTypes();
-                vmCreate.ChildRelationshipTypes = GetChildRelationshipTypes();
-                vmCreate.LinkAssetTypes = GetLinkAssetTypes(vmCreate.SuppliedAssetTypeId);
+            // count existing link
+            int id = 0;
+            int count = CountExistingLinks(id, vmCreate.SuppliedAssetTypeId, vmCreate.SelectedLinkAssetType, vmCreate.SelectedParentChildRelationshipType);
 
-                // redisplay view
-                ViewData["ErrorMessage"] = "Record already exists";
+            // links found
+            if (count > 0)
+            {
+                // YES. get drop down lists
+                vmCreate.RelationshipLevels = GetRelationshipLevels(null);
+
+                // redisplay view with message
+                ViewData["ErrorMessage"] = "Link already exists";
                 return View("Create", vmCreate);
             }
 
             // transfer vm to dto
             if (vmCreate.SelectedRelationshipLevel == "Parent")
             {
-                _unitOfWork.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
+                UOW.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
                 {
                     ParentAssetTypeId = vmCreate.SuppliedAssetTypeId,
-                    ChildAssetTypeId = GetIntegerForString(vmCreate.SelectedLinkAssetType),
-                    ParentChildRelationshipTypeId = GetIntegerForString(vmCreate.SelectedRelationshipType),
+                    ChildAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkAssetType.ToString()),
+                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipType),
                     IsActive = true
                 });
             }
             else // supplied AssetType == Child
             {
-                _unitOfWork.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
+                UOW.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
                 {
-                    ParentAssetTypeId = GetIntegerForString(vmCreate.SelectedLinkAssetType),
+                    ParentAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkAssetType),
                     ChildAssetTypeId = vmCreate.SuppliedAssetTypeId,
-                    ParentChildRelationshipTypeId = GetIntegerForString(vmCreate.SelectedRelationshipType),
+                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipType),
                     IsActive = true
                 });
             }
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
-            // return view
+            // return view with message
+            TempData["SuccessMessage"] = "Parent-Child link created.";
             return RedirectToAction("Details", "AssetType", new { id = vmCreate.SuppliedAssetTypeId });
         }
 
-        [ChildActionOnly]
-        public ActionResult CreateLinkedRelationshipTypes(int assetTypeId, string relationshipLevel)
+        private int CountExistingLinks(int id, int suppliedAssetTypeId, string selectedAssetTypeId, string selectedParentChildRelationshipType)
         {
-            /*
-            List<SelectListItem> sliRelationshipTypes = NewMethod(relationshipLevel);
-            */
-            // display view
-            return PartialView("_CreateLinkedRelationshipTypes", new CreateLinkedRelationshipTypesViewModel());
+            var countParent = UOW.AssetTypesRelationshipTypes.GetAll()
+                .Where(r => r.Id != id)
+                .Where(r => r.ParentAssetTypeId == suppliedAssetTypeId)
+                .Where(r => r.ChildAssetTypeId == GetIntegerFromString(selectedAssetTypeId))
+                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(selectedParentChildRelationshipType))
+                .Count(r => r.IsActive);
+            var countChild = UOW.AssetTypesRelationshipTypes.GetAll()
+                .Where(r => r.Id != id)
+                .Where(r => r.ParentAssetTypeId == GetIntegerFromString(selectedAssetTypeId))
+                .Where(r => r.ChildAssetTypeId == suppliedAssetTypeId)
+                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(selectedParentChildRelationshipType))
+                .Count(r => r.IsActive);
+
+            return countParent + countChild;
         }
 
         [HttpGet]
-        public ViewResult Edit(int id, int assetTypeId)
+        public ActionResult DisplayParentChildRelationshipTypes(int suppliedAssetTypeId, string selectedRelationshipLevelId, int? selectedParentChildRelationshipTypeId)
+        {
+            // get filtered list to display
+            List<SelectListItem> sliParentChildRelationshipTypes = GetParentChildRelationshipTypes(suppliedAssetTypeId, selectedRelationshipLevelId, selectedParentChildRelationshipTypeId);
+            
+            // display view
+            return PartialView("_DisplayParentChildRelationshipTypes", new DisplayParentChildRelationshipTypesViewModel(sliParentChildRelationshipTypes, selectedParentChildRelationshipTypeId.ToString()));
+        }
+        
+        [HttpGet]
+        public ActionResult DisplayLinkAssetTypes(int suppliedAssetTypeId, string selectedRelationshipLevelId, string selectedParentChildRelationshipTypeId, int? selectedAssetTypeId)
+        {
+            // get filtered list to display
+            List<SelectListItem> sliAssetTypes = GetAssetTypes(suppliedAssetTypeId, selectedRelationshipLevelId, selectedParentChildRelationshipTypeId, selectedAssetTypeId);
+
+            // display view
+            return PartialView("_DisplayLinkAssetTypes", new DisplayLinkAssetTypesViewModel(sliAssetTypes, selectedAssetTypeId.ToString()));
+        }
+
+        [HttpGet]
+        public ViewResult Edit(int id, int suppliedAssetTypeId)
         {
             // get dto for supplied id
-            var dtoSuppliedAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
-            var dtoAssetTypeRelationshipType = _unitOfWork.AssetTypesRelationshipTypes.Get(id);
+            var dtoSuppliedAssetType = UOW.AssetTypes.Get(suppliedAssetTypeId);
+            var dtoAssetTypeRelationshipType = UOW.AssetTypesRelationshipTypes.Get(id);
 
             // Selected values
             var selectedRelationshipLevel = dtoAssetTypeRelationshipType.ParentAssetTypeId == dtoSuppliedAssetType.Id ?
@@ -215,65 +193,210 @@ namespace Financial.WebApplication.Controllers
             List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels(selectedRelationshipLevel);
 
             // display view
-            return View("Edit", new EditViewModel(dtoSuppliedAssetType, sliRelationshipLevels, selectedRelationshipLevel));
+            return View("Edit", new EditViewModel(dtoAssetTypeRelationshipType, dtoSuppliedAssetType, sliRelationshipLevels, selectedRelationshipLevel));
         }
 
-        private List<SelectListItem> GetLinkAssetTypes(int assetTypeId)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(EditViewModel vmEdit)
         {
-            List<SelectListItem> sliLinkAssetTypes = new List<SelectListItem>();
-            var dbAssetTypes = _unitOfWork.AssetTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.Id != assetTypeId)
-                .ToList();
-
-            foreach (var dtoLinkAssetType in dbAssetTypes)
+            // validation
+            if (!ModelState.IsValid)
             {
-                var countParentLinks = _unitOfWork.AssetTypesRelationshipTypes.GetAll()
-                    .Where(r => r.ParentAssetTypeId == assetTypeId && r.ChildAssetTypeId == dtoLinkAssetType.Id)
+                return View("Edit", vmEdit);
+            }
+
+            // count existing link
+            int count = CountExistingLinks(vmEdit.Id, vmEdit.SuppliedAssetTypeId, vmEdit.SelectedAssetTypeId, vmEdit.SelectedParentChildRelationshipTypeId);
+
+            // links found
+            if (count > 0)
+            {
+                // YES. get drop down lists
+                vmEdit.RelationshipLevels = GetRelationshipLevels(vmEdit.SelectedRelationshipLevel);
+
+                // redisplay view with message
+                ViewData["ErrorMessage"] = "Link already exists";
+                return View("Edit", vmEdit);
+            }
+
+            // check for identical record
+            var countParentRelationship = UOW.AssetTypesRelationshipTypes.GetAll()
+                .Where(r => r.Id == vmEdit.Id)
+                .Where(r => r.ParentAssetTypeId == vmEdit.SuppliedAssetTypeId)
+                .Where(r => r.ChildAssetTypeId == GetIntegerFromString(vmEdit.SelectedAssetTypeId))
+                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
+                .Count(r => r.IsActive);
+            var countChildRelationship = UOW.AssetTypesRelationshipTypes.GetAll()
+                .Where(r => r.Id == vmEdit.Id)
+                .Where(r => r.ParentAssetTypeId == GetIntegerFromString(vmEdit.SelectedAssetTypeId))
+                .Where(r => r.ChildAssetTypeId == vmEdit.SuppliedAssetTypeId)
+                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
+                .Count(r => r.IsActive);
+
+            // record changed?
+            if (countParentRelationship + countChildRelationship == 0)
+            {
+                // transfer vm to dto
+                var dtoAssetTypeRelationshipType = UOW.AssetTypesRelationshipTypes.Get(vmEdit.Id);
+
+
+                // transfer vm to dto
+                dtoAssetTypeRelationshipType.ParentChildRelationshipTypeId = GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId);
+                if (vmEdit.SelectedRelationshipLevel == "Parent")
+                {
+                    dtoAssetTypeRelationshipType.ParentAssetTypeId = vmEdit.SuppliedAssetTypeId;
+                    dtoAssetTypeRelationshipType.ChildAssetTypeId = GetIntegerFromString(vmEdit.SelectedAssetTypeId);
+                }
+                else
+                {
+                    dtoAssetTypeRelationshipType.ParentAssetTypeId = GetIntegerFromString(vmEdit.SelectedAssetTypeId);
+                    dtoAssetTypeRelationshipType.ChildAssetTypeId = vmEdit.SuppliedAssetTypeId;
+                }
+
+                // update db
+                UOW.CommitTrans();
+            }
+
+            // display view with message
+            TempData["SuccessMessage"] = "Parent-Child link updated.";
+            return RedirectToAction("Details", "AssetType", new { id = vmEdit.SuppliedAssetTypeId });
+        }
+
+        private List<SelectListItem> GetAssetTypes(int suppliedAssetTypeId, string selectedRelationshipLevelId, string selectedParentChildRelationshipTypeId, int? selectedAssetTypeId)
+        {
+            // create sli
+            List<SelectListItem> sliAssetTypes = new List<SelectListItem>();
+
+            // store all available asset types
+            var dbAssetTypes = UOW.AssetTypes.FindAll(r => r.IsActive);
+
+            // add to sli if link does NOT exist
+            foreach(var dtoAssetType in dbAssetTypes)
+            {
+                // check for matching Parent-Child link
+                var countParentLinks = UOW.AssetTypesRelationshipTypes.GetAll()
+                    .Where(r => r.ParentAssetTypeId == suppliedAssetTypeId)
+                    .Where(r => r.ChildAssetTypeId == dtoAssetType.Id)
+                    .Where(r => r.ChildAssetTypeId != selectedAssetTypeId)
                     .Count(r => r.IsActive);
 
-                if (countParentLinks == 0)
+                // check for matching Child-Parent link
+                var countChildLinks = UOW.AssetTypesRelationshipTypes.GetAll()
+                    .Where(r => r.ParentAssetTypeId == dtoAssetType.Id)
+                    .Where(r => r.ParentAssetTypeId != selectedAssetTypeId)
+                    .Where(r => r.ChildAssetTypeId == suppliedAssetTypeId)
+                    .Count(r => r.IsActive);
+
+                // add if link not found
+                if(countParentLinks + countChildLinks == 0)
                 {
-                    sliLinkAssetTypes.Add(new SelectListItem()
+                    sliAssetTypes.Add(new SelectListItem()
                     {
-                        Value = dtoLinkAssetType.Id.ToString(),
-                        Text = dtoLinkAssetType.Name
+                        Value = dtoAssetType.Id.ToString(),
+                        Selected = dtoAssetType.Id == selectedAssetTypeId,
+                        Text = dtoAssetType.Name
                     });
                 }
             }
 
-            return sliLinkAssetTypes;
+            return sliAssetTypes;
         }
 
-        private List<SelectListItem> GetParentRelationshipTypes()
+        private List<SelectListItem> GetParentChildRelationshipTypes(int suppliedAssetTypeId, string selectedRelationshipLevelId, int? selectedParentChildRelationshipTypeId)
         {
-            return _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Join(_unitOfWork.RelationshipTypes.GetAll().Where(r => r.IsActive).ToList(),
-                    atrt => atrt.ParentRelationshipTypeId, rt => rt.Id, (atrt, rt) => new SelectListItem()
-                    {
-                        Value = atrt.Id.ToString(),
-                        Text = rt.Name
-                    })
-                .ToList();
-        }
+            // get list based on relationship level
+            if (selectedRelationshipLevelId == "Parent")
+            {
+                // display list of all child relationship types
+                return UOW.RelationshipTypes.GetAll()
+                    .Where(r => r.IsActive)
+                    .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
+                        rt => rt.Id, pcrt => pcrt.ChildRelationshipTypeId,
+                        (rt, pcrt) => new SelectListItem()
+                        {
+                            Value = pcrt.Id.ToString(),
+                            Selected = pcrt.Id == selectedParentChildRelationshipTypeId,
+                            Text = rt.Name
+                        })
+                    .ToList();
+                /*
+                // only display linked child relationship types
+                return UOW.AssetTypesRelationshipTypes.GetAll()
+                    .Where(r => r.IsActive)
+                    .Where(r => r.ParentAssetTypeId == suppliedAssetTypeId)
+                    .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
+                        atrt => atrt.ParentChildRelationshipTypeId, pcrt => pcrt.Id,
+                        (atrt, pcrt) => new ParentChildRelationshipType()
+                        {
+                            Id = pcrt.Id,
+                            ParentRelationshipTypeId = pcrt.ParentRelationshipTypeId,
+                            ChildRelationshipTypeId = pcrt.ChildRelationshipTypeId,
+                            IsActive = pcrt.IsActive
+                        })
+                    .ToList()
+                    .Join(UOW.RelationshipTypes.FindAll(r => r.IsActive),
+                        pcrt => pcrt.ChildRelationshipTypeId, rt => rt.Id,
+                        (pcrt, rt) => new SelectListItem()
+                        {
+                            Value = pcrt.Id.ToString(),
+                            Selected = pcrt.Id == selectedParentChildRelationshipTypeId,
+                            Text = rt.Name
+                        })
+                    .ToList();
+                */
+            }
+            else if (selectedRelationshipLevelId == "Child")
+            {
+                // display list of all parent relationship types
+                return UOW.RelationshipTypes.GetAll()
+                    .Where(r => r.IsActive)
+                    .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
+                        rt => rt.Id, pcrt => pcrt.ParentRelationshipTypeId,
+                        (rt, pcrt) => new SelectListItem()
+                        {
+                            Value = pcrt.Id.ToString(),
+                            Selected = pcrt.Id == selectedParentChildRelationshipTypeId,
+                            Text = rt.Name
+                        })
+                    .ToList();
+                /*
+                // only display linked parent relationship types
+                return UOW.AssetTypesRelationshipTypes.GetAll()
+                    .Where(r => r.IsActive)
+                    .Where(r => r.ChildAssetTypeId == suppliedAssetTypeId)
+                    .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
+                        atrt => atrt.ParentChildRelationshipTypeId, pcrt => pcrt.Id,
+                        (atrt, pcrt) => new ParentChildRelationshipType()
+                        {
+                            Id = pcrt.Id,
+                            ParentRelationshipTypeId = pcrt.ParentRelationshipTypeId,
+                            ChildRelationshipTypeId = pcrt.ChildRelationshipTypeId,
+                            IsActive = pcrt.IsActive
+                        })
+                    .ToList()
+                    .Join(UOW.RelationshipTypes.FindAll(r => r.IsActive),
+                        pcrt => pcrt.ParentRelationshipTypeId, rt => rt.Id,
+                        (pcrt, rt) => new SelectListItem()
+                        {
+                            Value = pcrt.Id.ToString(),
+                            Selected = pcrt.Id == selectedParentChildRelationshipTypeId,
+                            Text = rt.Name
+                        })
+                    .ToList();
+                */
+            }
 
-        private List<SelectListItem> GetChildRelationshipTypes()
-        {
-            return _unitOfWork.ParentChildRelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Join(_unitOfWork.RelationshipTypes.GetAll().Where(r => r.IsActive).ToList(),
-                    atrt => atrt.ChildRelationshipTypeId, rt => rt.Id, (atrt, rt) => new SelectListItem()
-                    {
-                        Value = atrt.Id.ToString(),
-                        Text = rt.Name
-                    })
-                .ToList();
+            // default empty list
+            return new List<SelectListItem>();
         }
 
         private static List<SelectListItem> GetRelationshipLevels(string selectedValue)
         {
+            // create sli
             List<SelectListItem> sliRelationshipLevel = new List<SelectListItem>();
+
+            // transfer values to sli
             sliRelationshipLevel.Add(new SelectListItem()
             {
                 Value = "Parent",
@@ -286,14 +409,9 @@ namespace Financial.WebApplication.Controllers
                 Selected = "Child" == selectedValue,
                 Text = "Child"
             });
+
             return sliRelationshipLevel;
         }
 
-        private int GetIntegerForString(string stringValue)
-        {
-            int integerValue = 0;
-            int.TryParse(stringValue, out integerValue);
-            return integerValue;
-        }
     }
 }

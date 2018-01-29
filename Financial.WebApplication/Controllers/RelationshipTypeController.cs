@@ -47,6 +47,12 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Create()
         {
+            // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+
             // display view
             return View("Create");
         }

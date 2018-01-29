@@ -105,11 +105,11 @@
     <Compile Include="RepositoryInterfaces\IRepository.cs" />
     <Compile Include="RepositoryInterfaces\ITransactionTypeRepository.cs" />
     <Compile Include="ViewModels\AssetSetting\CreateViewModel.cs" />
-    <Compile Include="ViewModels\AssetTypeRelationshipType\CreateLinkedRelationshipTypesViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeRelationshipType\DisplayLinkAssetTypesViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeRelationshipType\DisplayParentChildRelationshipTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\CreateViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\EditViewModel.cs" />
-    <Compile Include="ViewModels\AssetTypeRelationshipType\IndexLinkedAssetTypesViewModel.cs" />
-    <Compile Include="ViewModels\AssetTypeRelationshipType\IndexLinkedRelationshipTypesViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeRelationshipType\IndexViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeSettingType\CreateLinkedAssetTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeSettingType\CreateLinkedSettingTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeSettingType\CreateViewModel.cs" />

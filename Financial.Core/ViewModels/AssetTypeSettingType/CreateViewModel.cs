@@ -18,7 +18,7 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
             AssetTypeId = assetTypeId;
             SettingTypeId = dtoSettingType.Id;
             SettingTypeName = dtoSettingType.Name;
-            IsActive = true;
+            IsActive = false;
         }
 
         public CreateViewModel(int settingTypeId, Models.AssetType dtoAssetType)
@@ -26,7 +26,7 @@ namespace Financial.Core.ViewModels.AssetTypeSettingType
             SettingTypeId = settingTypeId;
             AssetTypeId = dtoAssetType.Id;
             AssetTypeName = dtoAssetType.Name;
-            IsActive = true;
+            IsActive = false;
         }
 
 

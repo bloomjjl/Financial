@@ -79,7 +79,7 @@ else if (ViewData["SuccessMessage"] != null)
         </p>
 
         @{
-            Html.RenderAction("IndexLinkedRelationshipTypes", "AssetTypeRelationshipType", new { assetTypeId = Model.Id });
+            Html.RenderAction("Index", "AssetTypeRelationshipType", new { assetTypeId = Model.Id });
         }
     </div>
 </div>

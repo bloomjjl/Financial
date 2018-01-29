@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "CreateLinkedAssetTypes";
-    TempData["SuccessMessage"] = Model.Message.ToString(); // store message if canceled
 }
 <h2>Setting Type</h2>
 
@@ -39,7 +38,6 @@
         @for (int i = 0; i < Model.CreateViewModels.Count(); i++)
         {
             @Html.HiddenFor(modelItem => Model.SettingTypeId)
-            @Html.HiddenFor(modelItem => Model.Message)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].AssetTypeId)
             @Html.HiddenFor(modelItem => Model.CreateViewModels[i].SettingTypeId)
 

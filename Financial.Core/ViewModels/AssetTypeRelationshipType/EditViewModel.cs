@@ -12,15 +12,17 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
     {
         public EditViewModel() { }
 
-        public EditViewModel(Models.AssetType dtoAssetType, 
+        public EditViewModel(Models.AssetTypeRelationshipType dtoAssetTypeRelationshipType, Models.AssetType dtoAssetType, 
             List<SelectListItem> sliRelationshipLevels, string selectedRelationshipLevel)
         {
+            Id = dtoAssetTypeRelationshipType.Id;
             SuppliedAssetTypeId = dtoAssetType.Id;
             SuppliedAssetTypeName = dtoAssetType.Name;
             RelationshipLevels = sliRelationshipLevels;
             SelectedRelationshipLevel = selectedRelationshipLevel;
         }
 
+        public int Id { get; set; }
 
         public int SuppliedAssetTypeId { get; set; }
         [Display(Name = "Asset Type")]
@@ -31,7 +33,13 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
         public string SelectedRelationshipLevel { get; set; }
         public IEnumerable<SelectListItem> RelationshipLevels { get; set; }
 
+        [Required]
+        [Display(Name = "Relationship Type")]
+        public string SelectedParentChildRelationshipTypeId { get; set; }
 
+        [Required]
+        [Display(Name = "Link Asset Type")]
+        public string SelectedAssetTypeId { get; set; }
 
     }
 }

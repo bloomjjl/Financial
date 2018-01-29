@@ -12,16 +12,11 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
     {
         public CreateViewModel() { }
 
-        public CreateViewModel(Models.AssetType dtoSuppliedAssetType, List<SelectListItem> sliRelationshipLevels, 
-            List<SelectListItem> sliParentRelationshipTypes, List<SelectListItem> sliChildRelationshipTypes,
-            List<SelectListItem> sliLinkAssetTypes)
+        public CreateViewModel(Models.AssetType dtoSuppliedAssetType, List<SelectListItem> sliRelationshipLevels)
         {
             SuppliedAssetTypeId = dtoSuppliedAssetType.Id;
             SuppliedAssetTypeName = dtoSuppliedAssetType.Name;
             RelationshipLevels = sliRelationshipLevels;
-            ParentRelationshipTypes = sliParentRelationshipTypes;
-            ChildRelationshipTypes = sliChildRelationshipTypes;
-            LinkAssetTypes = sliLinkAssetTypes;
         }
 
 
@@ -36,9 +31,8 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
 
         [Required]
         [Display(Name = "Relationship Type")]
-        public string SelectedRelationshipType { get; set; }
-        public IEnumerable<SelectListItem> ParentRelationshipTypes { get; set; }
-        public IEnumerable<SelectListItem> ChildRelationshipTypes { get; set; }
+        public string SelectedParentChildRelationshipType { get; set; }
+        public IEnumerable<SelectListItem> ParentChildRelationshipTypes { get; set; }
 
         [Required]
         [Display(Name = "Link Asset Type")]

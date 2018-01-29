@@ -142,6 +142,21 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         [TestMethod()]
+        public void Create_Get_WhenProvidedSuccessMessage_ReturnViewData_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            controller.TempData["SuccessMessage"] = "Test Message";
+
+            // Act
+            var result = controller.Create();
+
+            // Assert
+            var viewResult = result as ViewResult;
+            Assert.IsNotNull(controller.ViewData["SuccessMessage"], "Message");
+        }
+
+        [TestMethod()]
         public void Create_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange

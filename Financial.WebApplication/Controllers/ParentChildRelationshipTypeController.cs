@@ -10,34 +10,32 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class ParentChildRelationshipTypeController : Controller
+    public class ParentChildRelationshipTypeController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
-
         public ParentChildRelationshipTypeController()
+            : base()
         {
-            _unitOfWork = new UnitOfWork();
         }
 
         public ParentChildRelationshipTypeController(IUnitOfWork unitOfWork)
+            : base(unitOfWork)
         {
-            _unitOfWork = unitOfWork;
         }
 
         [ChildActionOnly]
         public ActionResult Index(int relationshipTypeId)
         {
             //transfer dto for id
-            var dtoSuppliedRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
+            var dtoSuppliedRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
 
             // transfer db for supplied ParentId
-            var dbParentRelationshipTypes = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+            var dbParentRelationshipTypes = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.ParentRelationshipTypeId == relationshipTypeId)
                 .ToList();
             
             // transfer db for supplied ChildId
-            var dbChildRelationshipTypes = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+            var dbChildRelationshipTypes = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.ChildRelationshipTypeId == relationshipTypeId)
                 .ToList();
@@ -46,16 +44,16 @@ namespace Financial.WebApplication.Controllers
             var vmIndex = new List<IndexViewModel>();
             foreach(var dtoParentChildRelationshipType in dbParentRelationshipTypes)
             {
-                var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
                 vmIndex.Add(new IndexViewModel(dtoParentChildRelationshipType, dtoSuppliedRelationshipType, dtoParentRelationshipType, dtoChildRelationshipType));
             }
 
             // tranfer dbChild to vm
             foreach (var dtoParentChildRelationshipType in dbChildRelationshipTypes)
             {
-                var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
                 vmIndex.Add(new IndexViewModel(dtoParentChildRelationshipType, dtoSuppliedRelationshipType, dtoParentRelationshipType, dtoChildRelationshipType));
             }
 
@@ -67,7 +65,7 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Create(int relationshipTypeId)
         {
             // transfer dto for id
-            var dtoSuppliedRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
+            var dtoSuppliedRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
 
             // transfer db to sli
             List<SelectListItem> sliRelationshipTypes = GetDropDownListForRelationshipTypes(relationshipTypeId, null);
@@ -82,20 +80,20 @@ namespace Financial.WebApplication.Controllers
         [HttpPost]
         public ActionResult Create(CreateViewModel vmCreate)
         {
+            // validation
             if(!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Details", "RelationshipType");
+                return View("Create", vmCreate);
             }
 
             // link duplicated?
-            var countExistingParentLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+            var countExistingParentLinks = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.ParentRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
-                .Where(r => r.ChildRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
+                .Where(r => r.ChildRelationshipTypeId == GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
-            var countExistingChildLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+            var countExistingChildLinks = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.ChildRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
-                .Where(r => r.ParentRelationshipTypeId == int.Parse(vmCreate.SelectedLinkedRelationshipType))
+                .Where(r => r.ParentRelationshipTypeId == GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
             if (countExistingParentLinks > 0 || countExistingChildLinks > 0)
             {
@@ -114,16 +112,16 @@ namespace Financial.WebApplication.Controllers
             if(vmCreate.SelectedRelationshipLevel == "Parent-Child")
             {
                 parentRelationshipType = vmCreate.SuppliedRelationshipTypeId;
-                childRelationshipType = int.Parse(vmCreate.SelectedLinkedRelationshipType);
+                childRelationshipType = GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType);
             }
             else // Child-Parent
             { 
-                parentRelationshipType = int.Parse(vmCreate.SelectedLinkedRelationshipType);
+                parentRelationshipType = GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType);
                 childRelationshipType = vmCreate.SuppliedRelationshipTypeId;
             }
 
             // transfer vm to dto
-            _unitOfWork.ParentChildRelationshipTypes.Add(new ParentChildRelationshipType()
+            UOW.ParentChildRelationshipTypes.Add(new ParentChildRelationshipType()
             {
                 ParentRelationshipTypeId = parentRelationshipType,
                 ChildRelationshipTypeId = childRelationshipType,
@@ -131,7 +129,7 @@ namespace Financial.WebApplication.Controllers
             });
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
             // display view
             return RedirectToAction("Details", "RelationshipType", new { id = vmCreate.SuppliedRelationshipTypeId });
@@ -141,8 +139,8 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Edit(int id, int relationshipTypeId)
         {
             // transfer dto for id
-            var dtoSuppliedParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(id);
-            var dtoSuppliedRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
+            var dtoSuppliedParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(id);
+            var dtoSuppliedRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
 
             // transfer levels to sli
             var selectedRelationshipLevelId = dtoSuppliedParentChildRelationshipType.ParentRelationshipTypeId == relationshipTypeId ?
@@ -164,26 +162,25 @@ namespace Financial.WebApplication.Controllers
         {
             if(!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "RelationshipType");
+                return View("Edit", vmEdit);
             }
 
             // duplicated relationship?
-            var countExistingParentChildRelationship = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+            var countExistingParentChildRelationship = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
                 .Where(r => r.ParentRelationshipTypeId == vmEdit.RelationshipTypeId)
-                .Where(r => r.ChildRelationshipTypeId == int.Parse(vmEdit.SelectedRelationshipType))
+                .Where(r => r.ChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedRelationshipType))
                 .Count(r => r.IsActive);
-            var countExistingChildParentRelationship = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+            var countExistingChildParentRelationship = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
                 .Where(r => r.ChildRelationshipTypeId == vmEdit.RelationshipTypeId)
-                .Where(r => r.ParentRelationshipTypeId == int.Parse(vmEdit.SelectedRelationshipType))
+                .Where(r => r.ParentRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedRelationshipType))
                 .Count(r => r.IsActive);
 
             if (countExistingParentChildRelationship > 0 || countExistingChildParentRelationship > 0)
             {
                 // update Drop Down Lists for vm
-                vmEdit.RelationshipTypes = GetDropDownListForRelationshipTypes(vmEdit.RelationshipTypeId, int.Parse(vmEdit.SelectedRelationshipType));
+                vmEdit.RelationshipTypes = GetDropDownListForRelationshipTypes(vmEdit.RelationshipTypeId, GetIntegerFromString(vmEdit.SelectedRelationshipType));
                 vmEdit.RelationshipLevels = GetDropDownListForRelationshipLevels(vmEdit.SelectedRelationshipLevel);
 
                 // redisplay view
@@ -192,20 +189,20 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(vmEdit.Id);
+            var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(vmEdit.Id);
             if(vmEdit.SelectedRelationshipLevel == "Parent-Child")
             {
                 dtoParentChildRelationshipType.ParentRelationshipTypeId = vmEdit.RelationshipTypeId;
-                dtoParentChildRelationshipType.ChildRelationshipTypeId = int.Parse(vmEdit.SelectedRelationshipType);
+                dtoParentChildRelationshipType.ChildRelationshipTypeId = GetIntegerFromString(vmEdit.SelectedRelationshipType);
             }
             else // Child-Parent
             {
-                dtoParentChildRelationshipType.ParentRelationshipTypeId = int.Parse(vmEdit.SelectedRelationshipType);
+                dtoParentChildRelationshipType.ParentRelationshipTypeId = GetIntegerFromString(vmEdit.SelectedRelationshipType);
                 dtoParentChildRelationshipType.ChildRelationshipTypeId = vmEdit.RelationshipTypeId; 
             }
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
             // display view
             return RedirectToAction("Details", "RelationshipType", new { id = vmEdit.RelationshipTypeId });
@@ -215,10 +212,10 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Delete(int id, int relationshipTypeId)
         {
             // transfer values to dto
-            var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(id);
-            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
-            var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-            var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+            var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(id);
+            var dtoRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
+            var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+            var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
             
             // display view
             return View("Delete", new DeleteViewModel(dtoParentChildRelationshipType, dtoRelationshipType, dtoParentRelationshipType, dtoChildRelationshipType));
@@ -229,16 +226,15 @@ namespace Financial.WebApplication.Controllers
         {
             if(!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Encountered a problem. Try again.";
-                return RedirectToAction("Index", "RelationshipType");
+                return View("Delete", vmDelete);
             }
 
             // update dto
-            var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(vmDelete.Id);
+            var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(vmDelete.Id);
             dtoParentChildRelationshipType.IsActive = false;
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
             // display view
             return RedirectToAction("Details", "RelationshipType", new { id = vmDelete.RelationshipTypeId });
@@ -251,7 +247,7 @@ namespace Financial.WebApplication.Controllers
             int.TryParse(selectedId.ToString(), out intSelectedId);
 
             // transfer db
-            var dbRelationshipTypes = _unitOfWork.RelationshipTypes.GetAll()
+            var dbRelationshipTypes = UOW.RelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.Id != relationshipTypeId)
                 .ToList();
@@ -260,13 +256,13 @@ namespace Financial.WebApplication.Controllers
             var sliRelationshipTypes = new List<SelectListItem>();
             foreach (var dtoRelationshipType in dbRelationshipTypes)
             {
-                var countLinkedParentRelationships = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+                var countLinkedParentRelationships = UOW.ParentChildRelationshipTypes.GetAll()
                     .Where(r => r.ParentRelationshipTypeId == relationshipTypeId)
                     .Where(r => r.ChildRelationshipTypeId == dtoRelationshipType.Id)
                     .Where(r => r.ParentRelationshipTypeId != selectedId)
                     .Where(r => r.ChildRelationshipTypeId != selectedId)
                     .Count(r => r.IsActive);
-                var countLinkedChildRelationships = _unitOfWork.ParentChildRelationshipTypes.GetAll()
+                var countLinkedChildRelationships = UOW.ParentChildRelationshipTypes.GetAll()
                     .Where(r => r.ChildRelationshipTypeId == relationshipTypeId)
                     .Where(r => r.ParentRelationshipTypeId == dtoRelationshipType.Id)
                     .Where(r => r.ChildRelationshipTypeId != selectedId)

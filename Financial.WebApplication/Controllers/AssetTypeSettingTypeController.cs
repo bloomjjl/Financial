@@ -93,9 +93,9 @@ namespace Financial.WebApplication.Controllers
             // complete db update
             UOW.CommitTrans();
 
-            // display view
+            // display view with message
             TempData["SuccessMessage"] = "Linked setting types created.";
-            return RedirectToAction("Index", "AssetType", new { id = vmCreateLinkedSettingTypes.AssetTypeId });
+            return RedirectToAction("Create", "AssetTypeRelationshipType", new { assetTypeId = vmCreateLinkedSettingTypes.AssetTypeId });
         }
 
         [HttpGet]
@@ -108,10 +108,10 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer dto to vm
-            var dtoSettingType = UOW.SettingTypes.Get((int)settingTypeId);
+            var dtoSettingType = UOW.SettingTypes.Get(GetIntegerFromString(settingTypeId.ToString()));
             var vmCreate = UOW.AssetTypes.GetAll()
                 .Where(r => r.IsActive)
-                .Select(r => new CreateViewModel((int)settingTypeId, r))
+                .Select(r => new CreateViewModel(dtoSettingType.Id, r))
                 .ToList();
 
             // display view
@@ -136,7 +136,7 @@ namespace Financial.WebApplication.Controllers
             // complete db update
             UOW.CommitTrans();
 
-            // display view
+            // display view with message
             TempData["SuccessMessage"] = "Linked asset types created";
             return RedirectToAction("Index", "SettingType", new { id = vmCreateLinkedAssetTypes.SettingTypeId });
         }
@@ -147,23 +147,31 @@ namespace Financial.WebApplication.Controllers
             // transfer dto for Id
             var dtoAssetType = UOW.AssetTypes.Get(assetTypeId);
 
-            // transfer dto to vm
-            var vmEdit = UOW.SettingTypes.GetAll()
+            // get all setting types to display
+            var dbSettingTypes = UOW.SettingTypes.GetAll()
                 .Where(r => r.IsActive)
-                .ToList()
-                .Join(UOW.AssetTypesSettingTypes.GetAll(),
-                    st => st.Id, atst => atst.SettingTypeId,
-                    (st, atst) => new EditViewModel(st, atst))
-                .Where(st => st.IsActive)
                 .ToList();
-/*            var vmEditList = UOW.AssetTypesSettingTypes.GetAll()
-                .Where(r => r.AssetTypeId == assetTypeId)
-                .Join(UOW.SettingTypes.GetAll().Where(r => r.IsActive).ToList(), 
-                    atst => atst.SettingTypeId, st => st.Id, 
-                    (atst, st) =>  new (st, atst))
-                    .
-                .ToList();
-*/
+
+            // store values in vm
+            var vmEdit = new List<EditViewModel>();
+            foreach(var dtoSettingType in dbSettingTypes)
+            {
+                // look for existing link
+                var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.GetAll()
+                    .Where(r => r.AssetTypeId == dtoAssetType.Id)
+                    .Where(r => r.SettingTypeId == dtoSettingType.Id)
+                    .FirstOrDefault(r => r.IsActive);
+
+                // validate link found
+                if(dtoAssetTypeSettingType == null)
+                {
+                    dtoAssetTypeSettingType = new Core.Models.AssetTypeSettingType();
+                }
+
+                // transfer dto to vm
+                vmEdit.Add(new EditViewModel(dtoSettingType, dtoAssetTypeSettingType));
+            }
+
             // display view
             return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel(dtoAssetType, vmEdit));
         }
@@ -182,7 +190,8 @@ namespace Financial.WebApplication.Controllers
             // complete db update
             UOW.CommitTrans();
 
-            // display view
+            // display view with message
+            TempData["SuccessMessage"] = "Linked setting types updated.";
             return RedirectToAction("Details", "AssetType", new { id = vmEditLinkedSettingTypes.AssetTypeId });
         }
 
@@ -192,16 +201,33 @@ namespace Financial.WebApplication.Controllers
             // transfer dto for id
             var dtoSettingType = UOW.SettingTypes.Get(settingTypeId);
 
-            // transfer db to vm
-            var vmEditList = UOW.AssetTypesSettingTypes.GetAll()
-                .Where(r => r.SettingTypeId == settingTypeId)
-                .Join(UOW.AssetTypes.GetAll().Where(r => r.IsActive).ToList(),
-                atst => atst.AssetTypeId, at => at.Id,
-                (atst, at) => new EditViewModel(at, atst))
+            // get all asset types to display
+            var dbAssetTypes = UOW.AssetTypes.GetAll()
+                .Where(r => r.IsActive)
                 .ToList();
 
+            // store values in vm
+            var vmEdit = new List<EditViewModel>();
+            foreach (var dtoAssetType in dbAssetTypes)
+            {
+                // look for existing link
+                var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.GetAll()
+                    .Where(r => r.AssetTypeId == dtoAssetType.Id)
+                    .Where(r => r.SettingTypeId == dtoSettingType.Id)
+                    .FirstOrDefault(r => r.IsActive);
+
+                // validate link found
+                if (dtoAssetTypeSettingType == null)
+                {
+                    dtoAssetTypeSettingType = new Core.Models.AssetTypeSettingType();
+                }
+
+                // transfer dto to vm
+                vmEdit.Add(new EditViewModel(dtoAssetType, dtoAssetTypeSettingType));
+            }
+
             // display view
-            return View("EditLinkedAssetTypes", new EditLinkedAssetTypesViewModel(dtoSettingType, vmEditList));
+            return View("EditLinkedAssetTypes", new EditLinkedAssetTypesViewModel(dtoSettingType, vmEdit));
         }
 
         [HttpPost]
@@ -218,7 +244,8 @@ namespace Financial.WebApplication.Controllers
             // update db
             UOW.CommitTrans();
 
-            // display view
+            // display view with message
+            TempData["SuccessMessage"] = "Linked asset types updated.";
             return RedirectToAction("Details", "SettingType", new { id = vmEditLinkedAssetTypes.SettingTypeId });
         }
     }
