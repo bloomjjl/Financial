@@ -1,9 +1,10 @@
 ﻿@model Financial.Core.ViewModels.AssetTypeRelationshipType.DisplayLinkAssetTypesViewModel
 
 <div class="form-group">
-    @Html.LabelFor(model => model.SelectedAssetTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+    @Html.LabelFor(model => model.SelectedLinkedAssetTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
     <div class="col-md-10">
-        @Html.DropDownListFor(x => x.SelectedAssetTypeId, Model.AssetTypes, "-- Select an Asset Type --", new { @id = "link_asset_type", @class = "form-control", onchange = "updateLinkAssetType()" })
-        @Html.ValidationMessageFor(model => model.SelectedAssetTypeId, "", new { @class = "text-danger" })
+        @Html.DropDownListFor(x => x.SelectedLinkedAssetTypeId, Model.LinkAssetTypes, "-- Select an Asset Type --",
+            new { @id = "select_link_asset_type", @class = "form-control", onchange = "updateLinkedAssetType($(this).val())" })
+        @Html.ValidationMessageFor(model => model.SelectedLinkedAssetTypeId, "", new { @class = "text-danger" })
     </div>
 </div>

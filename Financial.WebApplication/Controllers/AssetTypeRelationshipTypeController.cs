@@ -28,42 +28,45 @@ namespace Financial.WebApplication.Controllers
             // transfer supplied Id to dto
             var dtoSuppliedAssetType = UOW.AssetTypes.Get(assetTypeId);
 
-            // get linked ParentRelationshipTypes to Id
-            var dbParentRelationships = UOW.AssetTypesRelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.ParentAssetTypeId == assetTypeId)
+            // transfer dto to vm for supplied asset type id == child
+            var vmIndex = UOW.AssetTypes.FindAll(r => r.IsActive)
+                .Join(UOW.AssetTypesRelationshipTypes.FindAll(r => r.IsActive),
+                    at => at.Id, atrt => atrt.ParentAssetTypeId,
+                    (at, atrt) => new { at, atrt })
+                .Where(j => j.atrt.ChildAssetTypeId == dtoSuppliedAssetType.Id)
+                .ToList()
+                .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
+                    j => j.atrt.ParentChildRelationshipTypeId, pcrt => pcrt.Id,
+                    (j, pcrt) => new { j, pcrt })
+                .ToList()
+                .Join(UOW.RelationshipTypes.FindAll(r => r.IsActive),
+                    j2 => j2.pcrt.ChildRelationshipTypeId, rt => rt.Id,
+                    (j2, rt) => new IndexViewModel(j2.j.atrt, dtoSuppliedAssetType, j2.j.at, rt))
+                .OrderBy(r => r.LinkedAssetTypeName)
                 .ToList();
 
-            // transfer db to vm
-            var vmIndexLinkedRelationshipTypes = new List<IndexViewModel>();
-            foreach (var dtoParentRelationship in dbParentRelationships)
-            {
-                var dtoParentAssetType = UOW.AssetTypes.Get(dtoParentRelationship.ParentAssetTypeId);
-                var dtoChildAssetType = UOW.AssetTypes.Get(dtoParentRelationship.ChildAssetTypeId);
-                var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(dtoParentRelationship.ParentChildRelationshipTypeId);
-                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
-                vmIndexLinkedRelationshipTypes.Add(new IndexViewModel(dtoParentRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentRelationshipType, dtoChildRelationshipType));
-            }
-
-            // get linked ChildRelationshipTypes to Id
-            var dbChildRelationships = UOW.AssetTypesRelationshipTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.ChildAssetTypeId == assetTypeId)
+            // transfer dto to vm for supplied asset type id == parent
+            var vmIndexParent = UOW.AssetTypes.FindAll(r => r.IsActive)
+                .Join(UOW.AssetTypesRelationshipTypes.FindAll(r => r.IsActive),
+                    at => at.Id, atrt => atrt.ChildAssetTypeId,
+                    (at, atrt) => new { at, atrt })
+                .Where(j => j.atrt.ParentAssetTypeId == dtoSuppliedAssetType.Id)
+                .ToList()
+                .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
+                    j => j.atrt.ParentChildRelationshipTypeId, pcrt => pcrt.Id,
+                    (j, pcrt) => new { j, pcrt })
+                .ToList()
+                .Join(UOW.RelationshipTypes.FindAll(r => r.IsActive),
+                    j2 => j2.pcrt.ParentRelationshipTypeId, rt => rt.Id,
+                    (j2, rt) => new IndexViewModel(j2.j.atrt, dtoSuppliedAssetType, j2.j.at, rt))
+                .OrderBy(r => r.LinkedAssetTypeName)
                 .ToList();
-
-            // transfer ChildParent to vm
-            foreach (var dtoChildRelationship in dbChildRelationships)
+            foreach(var vmParent in vmIndexParent)
             {
-                var dtoParentAssetType = UOW.AssetTypes.Get(dtoChildRelationship.ParentAssetTypeId);
-                var dtoChildAssetType = UOW.AssetTypes.Get(dtoChildRelationship.ChildAssetTypeId);
-                var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(dtoChildRelationship.ParentChildRelationshipTypeId);
-                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
-                vmIndexLinkedRelationshipTypes.Add(new IndexViewModel(dtoChildRelationship, dtoParentAssetType, dtoChildAssetType, dtoParentRelationshipType, dtoChildRelationshipType));
+                vmIndex.Add(vmParent);
             }
 
-            return PartialView("_Index", vmIndexLinkedRelationshipTypes);
+            return PartialView("_Index", vmIndex);
         }
 
         [HttpGet]
@@ -97,7 +100,7 @@ namespace Financial.WebApplication.Controllers
 
             // count existing link
             int id = 0;
-            int count = CountExistingLinks(id, vmCreate.SuppliedAssetTypeId, vmCreate.SelectedLinkAssetType, vmCreate.SelectedParentChildRelationshipType);
+            int count = CountExistingLinks(id, vmCreate.SuppliedAssetTypeId, vmCreate.SelectedLinkedAssetTypeId, vmCreate.SelectedParentChildRelationshipTypeId);
 
             // links found
             if (count > 0)
@@ -116,8 +119,8 @@ namespace Financial.WebApplication.Controllers
                 UOW.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
                 {
                     ParentAssetTypeId = vmCreate.SuppliedAssetTypeId,
-                    ChildAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkAssetType.ToString()),
-                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipType),
+                    ChildAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkedAssetTypeId.ToString()),
+                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipTypeId),
                     IsActive = true
                 });
             }
@@ -125,9 +128,9 @@ namespace Financial.WebApplication.Controllers
             {
                 UOW.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
                 {
-                    ParentAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkAssetType),
+                    ParentAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkedAssetTypeId),
                     ChildAssetTypeId = vmCreate.SuppliedAssetTypeId,
-                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipType),
+                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipTypeId),
                     IsActive = true
                 });
             }
@@ -207,7 +210,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // count existing link
-            int count = CountExistingLinks(vmEdit.Id, vmEdit.SuppliedAssetTypeId, vmEdit.SelectedAssetTypeId, vmEdit.SelectedParentChildRelationshipTypeId);
+            int count = CountExistingLinks(vmEdit.Id, vmEdit.SuppliedAssetTypeId, vmEdit.SelectedLinkedAssetTypeId, vmEdit.SelectedParentChildRelationshipTypeId);
 
             // links found
             if (count > 0)
@@ -224,12 +227,12 @@ namespace Financial.WebApplication.Controllers
             var countParentRelationship = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.Id == vmEdit.Id)
                 .Where(r => r.ParentAssetTypeId == vmEdit.SuppliedAssetTypeId)
-                .Where(r => r.ChildAssetTypeId == GetIntegerFromString(vmEdit.SelectedAssetTypeId))
+                .Where(r => r.ChildAssetTypeId == GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId))
                 .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
                 .Count(r => r.IsActive);
             var countChildRelationship = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.Id == vmEdit.Id)
-                .Where(r => r.ParentAssetTypeId == GetIntegerFromString(vmEdit.SelectedAssetTypeId))
+                .Where(r => r.ParentAssetTypeId == GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId))
                 .Where(r => r.ChildAssetTypeId == vmEdit.SuppliedAssetTypeId)
                 .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
                 .Count(r => r.IsActive);
@@ -246,11 +249,11 @@ namespace Financial.WebApplication.Controllers
                 if (vmEdit.SelectedRelationshipLevel == "Parent")
                 {
                     dtoAssetTypeRelationshipType.ParentAssetTypeId = vmEdit.SuppliedAssetTypeId;
-                    dtoAssetTypeRelationshipType.ChildAssetTypeId = GetIntegerFromString(vmEdit.SelectedAssetTypeId);
+                    dtoAssetTypeRelationshipType.ChildAssetTypeId = GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId);
                 }
                 else
                 {
-                    dtoAssetTypeRelationshipType.ParentAssetTypeId = GetIntegerFromString(vmEdit.SelectedAssetTypeId);
+                    dtoAssetTypeRelationshipType.ParentAssetTypeId = GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId);
                     dtoAssetTypeRelationshipType.ChildAssetTypeId = vmEdit.SuppliedAssetTypeId;
                 }
 

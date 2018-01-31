@@ -312,8 +312,8 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 SuppliedAssetTypeId = 20,
                 SelectedRelationshipLevel = "Parent",
-                SelectedParentChildRelationshipType = "30",
-                SelectedLinkAssetType = "5"
+                SelectedParentChildRelationshipTypeId = "30",
+                SelectedLinkedAssetTypeId = "5"
             };
             int newId = 1;
 
@@ -324,8 +324,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
             var dbAssetTypeRelationshipType = _dataAssetTypesRelationshipTypes.FirstOrDefault(r => r.Id == newId);
             Assert.AreEqual(vmExpected.SuppliedAssetTypeId, dbAssetTypeRelationshipType.ParentAssetTypeId, "Parent AssetType Id");
-            Assert.AreEqual(vmExpected.SelectedLinkAssetType, dbAssetTypeRelationshipType.ChildAssetTypeId.ToString(), "Child AssetType Id");
-            Assert.AreEqual(vmExpected.SelectedParentChildRelationshipType, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
+            Assert.AreEqual(vmExpected.SelectedLinkedAssetTypeId, dbAssetTypeRelationshipType.ChildAssetTypeId.ToString(), "Child AssetType Id");
+            Assert.AreEqual(vmExpected.SelectedParentChildRelationshipTypeId, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
             Assert.IsTrue(dbAssetTypeRelationshipType.IsActive, "IsActive");
         }
 
@@ -351,8 +351,8 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 SuppliedAssetTypeId = 21,
                 SelectedRelationshipLevel = "Child",
-                SelectedParentChildRelationshipType = "30",
-                SelectedLinkAssetType = "20"
+                SelectedParentChildRelationshipTypeId = "30",
+                SelectedLinkedAssetTypeId = "20"
             };
             int newId = 1;
 
@@ -362,9 +362,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
             var dbAssetTypeRelationshipType = _dataAssetTypesRelationshipTypes.FirstOrDefault(r => r.Id == newId);
-            Assert.AreEqual(vmExpected.SelectedLinkAssetType, dbAssetTypeRelationshipType.ParentAssetTypeId.ToString(), "Parent AssetType Id");
+            Assert.AreEqual(vmExpected.SelectedLinkedAssetTypeId, dbAssetTypeRelationshipType.ParentAssetTypeId.ToString(), "Parent AssetType Id");
             Assert.AreEqual(vmExpected.SuppliedAssetTypeId, dbAssetTypeRelationshipType.ChildAssetTypeId, "Child AssetType Id");
-            Assert.AreEqual(vmExpected.SelectedParentChildRelationshipType, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
+            Assert.AreEqual(vmExpected.SelectedParentChildRelationshipTypeId, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
             Assert.IsTrue(dbAssetTypeRelationshipType.IsActive, "IsActive");
         }
 
@@ -390,8 +390,8 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 SuppliedAssetTypeId = 20,
                 SelectedRelationshipLevel = "Parent",
-                SelectedParentChildRelationshipType = "30",
-                SelectedLinkAssetType = "5"
+                SelectedParentChildRelationshipTypeId = "30",
+                SelectedLinkedAssetTypeId = "5"
             };
 
             // Act
@@ -447,8 +447,8 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 SuppliedAssetTypeId = 20,
                 SelectedRelationshipLevel = "Parent",
-                SelectedParentChildRelationshipType = "30",
-                SelectedLinkAssetType = "21"
+                SelectedParentChildRelationshipTypeId = "30",
+                SelectedLinkedAssetTypeId = "21"
             };
 
             // Act
@@ -461,8 +461,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel), "View Model");
             var vmResult = viewResult.ViewData.Model as CreateViewModel;
             Assert.IsNotNull(vmResult.RelationshipLevels, "Relationship Levels");
-            Assert.IsNotNull(vmResult.SelectedParentChildRelationshipType, "Selected ParentChildRelationshipTypes");
-            Assert.IsNotNull(vmResult.SelectedLinkAssetType, "Selected LinkedAssetType");
+            Assert.IsNotNull(vmResult.SelectedParentChildRelationshipTypeId, "Selected ParentChildRelationshipTypes");
+            Assert.IsNotNull(vmResult.SelectedLinkedAssetTypeId, "Selected LinkedAssetType");
             Assert.AreEqual("Link already exists", controller.ViewData["ErrorMessage"], "Message");
         }
 
@@ -489,8 +489,8 @@ namespace Financial.Tests.WebApplication.Controllers
             {
                 SuppliedAssetTypeId = 21,
                 SelectedRelationshipLevel = "Child",
-                SelectedParentChildRelationshipType = "30",
-                SelectedLinkAssetType = "20"
+                SelectedParentChildRelationshipTypeId = "30",
+                SelectedLinkedAssetTypeId = "20"
             };
 
             // Act
@@ -503,8 +503,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(CreateViewModel), "View Model");
             var vmResult = viewResult.ViewData.Model as CreateViewModel;
             Assert.IsNotNull(vmResult.RelationshipLevels, "Relationship Levels");
-            Assert.IsNotNull(vmResult.SelectedParentChildRelationshipType, "Selected ParentChildRelationshipTypes");
-            Assert.IsNotNull(vmResult.SelectedLinkAssetType, "Selected LinkedAssetType");
+            Assert.IsNotNull(vmResult.SelectedParentChildRelationshipTypeId, "Selected ParentChildRelationshipTypes");
+            Assert.IsNotNull(vmResult.SelectedLinkedAssetTypeId, "Selected LinkedAssetType");
             Assert.AreEqual("Link already exists", controller.ViewData["ErrorMessage"], "Message");
         }
 
@@ -695,9 +695,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.AssetTypes.Count(), "LinkAssetTypes Count");
-            Assert.IsNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
-            Assert.AreEqual(String.Empty, vmResult.SelectedAssetTypeId, "Selected LinkAssetType Id");
+            Assert.AreEqual(expectedCount, vmResult.LinkAssetTypes.Count(), "LinkAssetTypes Count");
+            Assert.IsNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
+            Assert.AreEqual(String.Empty, vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetType Id");
         }
 
         [TestMethod()]
@@ -730,9 +730,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.AssetTypes.Count(), "Link AssetTypes Count");
-            Assert.IsNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
-            Assert.AreEqual(String.Empty, vmResult.SelectedAssetTypeId, "Selected LinkAssetType Id");
+            Assert.AreEqual(expectedCount, vmResult.LinkAssetTypes.Count(), "Link AssetTypes Count");
+            Assert.IsNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
+            Assert.AreEqual(String.Empty, vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetType Id");
         }
 
         // remove asset types already linked to supplied asset type that are active
@@ -768,9 +768,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.AssetTypes.Count(), "LinkAssetTypes Count");
-            Assert.IsNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
-            Assert.AreEqual(String.Empty, vmResult.SelectedAssetTypeId, "Selected LinkAssetType Id");
+            Assert.AreEqual(expectedCount, vmResult.LinkAssetTypes.Count(), "LinkAssetTypes Count");
+            Assert.IsNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
+            Assert.AreEqual(String.Empty, vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetType Id");
         }
 
         [TestMethod()]
@@ -805,9 +805,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.AssetTypes.Count(), "Link AssetTypes Count");
-            Assert.IsNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
-            Assert.AreEqual(String.Empty, vmResult.SelectedAssetTypeId, "Selected LinkAssetType Id");
+            Assert.AreEqual(expectedCount, vmResult.LinkAssetTypes.Count(), "Link AssetTypes Count");
+            Assert.IsNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
+            Assert.AreEqual(String.Empty, vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetType Id");
         }
 
         // list all asset types whose link to the supplied asset type is NOT active
@@ -842,9 +842,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.AssetTypes.Count(), "LinkAssetTypes Count");
-            Assert.IsNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
-            Assert.AreEqual(String.Empty, vmResult.SelectedAssetTypeId, "Selected LinkAssetType Id");
+            Assert.AreEqual(expectedCount, vmResult.LinkAssetTypes.Count(), "LinkAssetTypes Count");
+            Assert.IsNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
+            Assert.AreEqual(String.Empty, vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetType Id");
         }
 
         [TestMethod()]
@@ -878,9 +878,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.AreEqual(expectedCount, vmResult.AssetTypes.Count(), "Link AssetTypes Count");
-            Assert.IsNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
-            Assert.AreEqual(String.Empty, vmResult.SelectedAssetTypeId, "Selected LinkAssetType Id");
+            Assert.AreEqual(expectedCount, vmResult.LinkAssetTypes.Count(), "Link AssetTypes Count");
+            Assert.IsNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
+            Assert.AreEqual(String.Empty, vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetType Id");
         }
 
         // list all asset types with selected asset type
@@ -914,8 +914,8 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.IsNotNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value selected in list");
-            Assert.AreEqual(selectedLinkedAssetTypeId.ToString(), vmResult.SelectedAssetTypeId, "Selected LinkAssetTypes Id");
+            Assert.IsNotNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value selected in list");
+            Assert.AreEqual(selectedLinkedAssetTypeId.ToString(), vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetTypes Id");
         }
 
         [TestMethod()]
@@ -948,8 +948,8 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayLinkAssetTypesViewModel;
-            Assert.IsNotNull(vmResult.AssetTypes.FirstOrDefault(r => r.Selected), "Value selected in list");
-            Assert.AreEqual(selectedLinkedAssetTypeId.ToString(), vmResult.SelectedAssetTypeId, "Selected LinkAssetTypes Id");
+            Assert.IsNotNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value selected in list");
+            Assert.AreEqual(selectedLinkedAssetTypeId.ToString(), vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetTypes Id");
         }
 
 
@@ -1126,7 +1126,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SuppliedAssetTypeId = 20,
                 SelectedRelationshipLevel = "Parent",
                 SelectedParentChildRelationshipTypeId = "30",
-                SelectedAssetTypeId = "22"
+                SelectedLinkedAssetTypeId = "22"
             };
 
             // Act
@@ -1136,7 +1136,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
             var dbAssetTypeRelationshipType = _dataAssetTypesRelationshipTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
             Assert.AreEqual(vmExpected.SuppliedAssetTypeId, dbAssetTypeRelationshipType.ParentAssetTypeId, "Parent AssetType Id");
-            Assert.AreEqual(vmExpected.SelectedAssetTypeId, dbAssetTypeRelationshipType.ChildAssetTypeId.ToString(), "Child AssetType Id");
+            Assert.AreEqual(vmExpected.SelectedLinkedAssetTypeId, dbAssetTypeRelationshipType.ChildAssetTypeId.ToString(), "Child AssetType Id");
             Assert.AreEqual(vmExpected.SelectedParentChildRelationshipTypeId, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
             Assert.IsTrue(dbAssetTypeRelationshipType.IsActive, "IsActive");
         }
@@ -1167,7 +1167,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SuppliedAssetTypeId = 21,
                 SelectedRelationshipLevel = "Child",
                 SelectedParentChildRelationshipTypeId = "30",
-                SelectedAssetTypeId = "22"
+                SelectedLinkedAssetTypeId = "22"
             };
 
             // Act
@@ -1176,7 +1176,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
             var dbAssetTypeRelationshipType = _dataAssetTypesRelationshipTypes.FirstOrDefault(r => r.Id == vmExpected.Id);
-            Assert.AreEqual(vmExpected.SelectedAssetTypeId, dbAssetTypeRelationshipType.ParentAssetTypeId.ToString(), "Parent AssetType Id");
+            Assert.AreEqual(vmExpected.SelectedLinkedAssetTypeId, dbAssetTypeRelationshipType.ParentAssetTypeId.ToString(), "Parent AssetType Id");
             Assert.AreEqual(vmExpected.SuppliedAssetTypeId, dbAssetTypeRelationshipType.ChildAssetTypeId, "Child AssetType Id");
             Assert.AreEqual(vmExpected.SelectedParentChildRelationshipTypeId, dbAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), "ParentChildRelationshipType Id");
             Assert.IsTrue(dbAssetTypeRelationshipType.IsActive, "IsActive");
@@ -1208,7 +1208,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SuppliedAssetTypeId = 20,
                 SelectedRelationshipLevel = "Parent",
                 SelectedParentChildRelationshipTypeId = "30",
-                SelectedAssetTypeId = "22"
+                SelectedLinkedAssetTypeId = "22"
             };
 
             // Act
@@ -1268,7 +1268,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SuppliedAssetTypeId = 20,
                 SelectedRelationshipLevel = "Parent",
                 SelectedParentChildRelationshipTypeId = "30",
-                SelectedAssetTypeId = "22"
+                SelectedLinkedAssetTypeId = "22"
             };
 
             // Act
@@ -1282,7 +1282,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var vmResult = viewResult.ViewData.Model as EditViewModel;
             Assert.IsNotNull(vmResult.RelationshipLevels, "Relationship Levels");
             Assert.IsNotNull(vmResult.SelectedParentChildRelationshipTypeId, "Selected ParentChildRelationshipTypes");
-            Assert.IsNotNull(vmResult.SelectedAssetTypeId, "Selected LinkedAssetType");
+            Assert.IsNotNull(vmResult.SelectedLinkedAssetTypeId, "Selected LinkedAssetType");
             Assert.AreEqual("Link already exists", controller.ViewData["ErrorMessage"], "Message");
         }
 
@@ -1313,7 +1313,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SuppliedAssetTypeId = 21,
                 SelectedRelationshipLevel = "Child",
                 SelectedParentChildRelationshipTypeId = "30",
-                SelectedAssetTypeId = "22"
+                SelectedLinkedAssetTypeId = "22"
             };
 
             // Act
@@ -1327,7 +1327,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var vmResult = viewResult.ViewData.Model as EditViewModel;
             Assert.IsNotNull(vmResult.RelationshipLevels, "Relationship Levels");
             Assert.IsNotNull(vmResult.SelectedParentChildRelationshipTypeId, "Selected ParentChildRelationshipTypes");
-            Assert.IsNotNull(vmResult.SelectedAssetTypeId, "Selected LinkedAssetType");
+            Assert.IsNotNull(vmResult.SelectedLinkedAssetTypeId, "Selected LinkedAssetType");
             Assert.AreEqual("Link already exists", controller.ViewData["ErrorMessage"], "Message");
         }
 
@@ -1356,7 +1356,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SuppliedAssetTypeId = 20,
                 SelectedRelationshipLevel = "Parent",
                 SelectedParentChildRelationshipTypeId = "30",
-                SelectedAssetTypeId = "21"
+                SelectedLinkedAssetTypeId = "21"
             };
 
             // Act
@@ -1396,7 +1396,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SuppliedAssetTypeId = 21,
                 SelectedRelationshipLevel = "Child",
                 SelectedParentChildRelationshipTypeId = "30",
-                SelectedAssetTypeId = "20"
+                SelectedLinkedAssetTypeId = "20"
             };
 
             // Act

@@ -3,16 +3,10 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.ParentRelationshipTypeName)
+            @Html.DisplayNameFor(model => model.RelationshipTypeName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ChildRelationshipTypeName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ParentAssetTypeName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ChildAssetTypeName)
+            @Html.DisplayNameFor(model => model.LinkedAssetTypeName)
         </th>
         <th></th>
     </tr>
@@ -20,16 +14,10 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.ParentRelationshipTypeName)
+            @Html.DisplayFor(modelItem => item.RelationshipTypeName)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.ChildRelationshipTypeName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ParentAssetTypeName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ChildAssetTypeName)
+            @Html.DisplayFor(modelItem => item.LinkedAssetTypeName)
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

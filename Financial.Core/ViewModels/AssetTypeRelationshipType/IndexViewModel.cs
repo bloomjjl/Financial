@@ -12,8 +12,22 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
         public IndexViewModel() { }
 
         public IndexViewModel(Models.AssetTypeRelationshipType dtoAssetTypeRelationshipType, 
-            Models.AssetType dtoParentAssetType, Models.AssetType dtoChildAssetType, 
-            Models.RelationshipType dtoParentRelationshipType, Models.RelationshipType dtoChildRelationshipType)
+                              Models.AssetType dtoSuppliedAssetType, 
+                              Models.AssetType dtoLinkedAssetType, 
+                              Models.RelationshipType dtoRelationshipType)
+        {
+            Id = dtoAssetTypeRelationshipType.Id;
+            SuppliedAssetTypeId = dtoSuppliedAssetType.Id;
+            SuppliedAssetTypeName = dtoSuppliedAssetType.Name;
+            LinkedAssetTypeName = dtoLinkedAssetType.Name;
+            RelationshipTypeName = dtoRelationshipType.Name;
+        }
+
+        public IndexViewModel(Models.AssetTypeRelationshipType dtoAssetTypeRelationshipType,
+                      Models.AssetType dtoParentAssetType,
+                      Models.AssetType dtoChildAssetType,
+                      Models.RelationshipType dtoParentRelationshipType,
+                      Models.RelationshipType dtoChildRelationshipType)
         {
             Id = dtoAssetTypeRelationshipType.Id;
             ParentAssetTypeName = dtoParentAssetType.Name;
@@ -22,14 +36,22 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
             ChildRelationshipTypeName = dtoChildRelationshipType.Name;
         }
 
-    public int Id { get; set; }
-    [Display(Name = "Parent")]
-    public string ParentAssetTypeName { get; set; }
-    [Display(Name = "Child")]
-    public string ChildAssetTypeName { get; set; }
-    [Display(Name = "Parent-Child")]
-    public string ParentRelationshipTypeName { get; set; }
-    [Display(Name = "Child-Parent")]
-    public string ChildRelationshipTypeName { get; set; }
-}
+
+        public int Id { get; set; }
+        public int SuppliedAssetTypeId { get; set; }
+        public string SuppliedAssetTypeName { get; set; }
+        [Display(Name = "Linked Asset Type")]
+        public string LinkedAssetTypeName { get; set; }
+        [Display(Name = "Relationship Type")]
+        public string RelationshipTypeName { get; set; }
+
+        [Display(Name = "Parent")]
+        public string ParentAssetTypeName { get; set; }
+        [Display(Name = "Child")]
+        public string ChildAssetTypeName { get; set; }
+        [Display(Name = "Parent-Child")]
+        public string ParentRelationshipTypeName { get; set; }
+        [Display(Name = "Child-Parent")]
+        public string ChildRelationshipTypeName { get; set; }
+    }
 }

@@ -12,6 +12,7 @@
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
+
         <h4>Create</h4>
         <hr />
 
@@ -29,20 +30,18 @@
         <div class="form-group">
             @Html.LabelFor(model => model.SelectedRelationshipLevel, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(x => x.SelectedRelationshipLevel, Model.RelationshipLevels, "-- Select a Relationship Level --", new { @id = "selected_relationship_level", @class = "form-control" })
+                @Html.DropDownListFor(x => x.SelectedRelationshipLevel, Model.RelationshipLevels, "-- Select a Relationship Level --",
+                    new { @id = "selected_relationship_level", @class = "form-control", onchange = "updateRelationshipLevel($(this).val())" })
                 @Html.ValidationMessageFor(model => model.SelectedRelationshipLevel, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div id="relationship_types" style="display:none">
-            @Html.HiddenFor(model => model.SelectedParentChildRelationshipType, new { id = "selected_parent_child_relationship_type" })
+            @Html.HiddenFor(model => model.SelectedLinkedAssetTypeId, new { id = "selected_parent_child_relationship_type" })
         </div>
 
         <div id="link_asset_types" style="display:none">
-            @Html.HiddenFor(model => model.SelectedLinkAssetType, new { id = "selected_link_asset_type" })
-            @{
-                Html.RenderAction("DisplayLinkAssetTypes", "AssetTypeRelationshipType", new { suppliedAssetTypeId = Model.SuppliedAssetTypeId, selectedRelationshipLevelId = Model.SelectedRelationshipLevel });
-            }
+            @Html.HiddenFor(model => model.SelectedLinkedAssetTypeId, new { id = "selected_link_asset_type" })
         </div>
 
         <div class="form-group">
@@ -52,83 +51,107 @@
             </div>
         </div>
     </div>
-                }
+}
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
     <script>
-        @* DIV *@
+        @* Current View DIV *@
         var $relationship_types = $("#relationship_types");
         var $link_asset_types = $("#link_asset_types");
 
-        @* VALUES *@
+        @* Current View VALUES *@
         var $supplied_asset_type_id = $("#supplied_asset_type_id");
         var $selected_relationship_level = $("#selected_relationship_level");
         var $selected_parent_child_relationship_type = $("#selected_parent_child_relationship_type");
+        var $selected_link_asset_type = $("#selected_link_asset_type");
+
+        @* Partial View DIV *@
+        var $select_relationship_type = $("#select_relationship_type");
+        var $select_link_asset_type = $("#select_link_asset_type");
 
         $(document).ready(function () {
-
-
         });
 
-        $selected_relationship_level.change(function () {
-            if ($selected_relationship_level.val() == 'Parent' || $selected_relationship_level.val() == 'Child') {
+        function updateRelationshipLevel(selectedLevel) {
+            if (selectedLevel == 'Parent' || selectedLevel == 'Child') {
                 @* Show Relationship Types drop down list *@
                 $link_asset_types.hide('fast');
-                updateRelationshipTypes($supplied_asset_type_id.val(), $selected_relationship_level.val());
-                $relationship_types.show('fast');
-            }
-            else {
+                $relationship_types.hide('fast');
+                showRelationshipTypes($supplied_asset_type_id.val(), selectedLevel);
+            } else {
                 @* Hide other drop down lists *@
                 $link_asset_types.hide('fast');
                 $relationship_types.hide('fast');
+                $link_asset_types.val("");
+                $relationship_types.val("");
             }
-        });
+        }
 
-        function updateRelationshipTypes(suppliedAssetTypeId, selectedLevel) {
+        function showRelationshipTypes(suppliedAssetTypeId, selectedLevel) {
             $.ajax({
                 url: '/AssetTypeRelationshipType/DisplayParentChildRelationshipTypes',
                 type: 'GET',
-                cache: false,
-                data: { suppliedAssetTypeId: suppliedAssetTypeId, selectedRelationshipLevelId: selectedLevel },
+                data: {
+                    suppliedAssetTypeId: suppliedAssetTypeId,
+                    selectedRelationshipLevelId: selectedLevel
+                },
                 success: function (data) {
                     $relationship_types.html(data);
+                    $relationship_types.show('fast');
                 },
                 error: function (e) {
                 }
             });
         }
 
-        $relationship_types.change(function () {
+        function updateRelationshipType(selectedType) {
 
-            console.log("Supplied: " + $supplied_asset_type_id.val());
-            console.log("Level: " + $selected_relationship_level.val());
-            console.log("Type: " + $selected_parent_child_relationship_type.val());
+            $selected_parent_child_relationship_type.val(selectedType);
 
-            if ($selected_relationship_level.val() != null || $selected_relationship_level.val() == "") {
+            console.log("Value Type: " + selectedType);
+            console.log("Selected Type: " + $select_relationship_type.val());
+            console.log("Transfer Type: " + $selected_parent_child_relationship_type.val());
+
+            @* store value from partial view in current view *@
+            $selected_parent_child_relationship_type.val($relationship_types.val());
+
+            if (selectedType != null && selectedType != "") {
                 @* Show Link Asset Types drop down list *@
-                updateLinkAssetTypes($supplied_asset_type_id.val(), $selected_relationship_level.val());
-                $link_asset_types.show('fast');
-            }
-            else {
+                $link_asset_types.hide('fast');
+                showLinkAssetTypes($supplied_asset_type_id.val(), $selected_relationship_level.val());
+            } else {
                 @* Hide drop down list *@
                 $link_asset_types.hide('fast');
+                $link_asset_types.val("");
             }
-        });
+        };
 
-        function updateLinkAssetTypes(suppliedAssetTypeId, selectedLevel) {
+        function showLinkAssetTypes(suppliedAssetTypeId, selectedLevel) {
             $.ajax({
                 url: '/AssetTypeRelationshipType/DisplayLinkAssetTypes',
                 type: 'GET',
-                cache: false,
-                data: { suppliedAssetTypeId: suppliedAssetTypeId, selectedRelationshipLevelId: selectedLevel },
+                data: {
+                    suppliedAssetTypeId: suppliedAssetTypeId,
+                    selectedRelationshipLevelId: selectedLevel
+                },
                 success: function (data) {
                     $link_asset_types.html(data);
+                    $link_asset_types.show('fast');
                 },
                 error: function (e) {
                 }
             });
+        }
+
+        function updateLinkedAssetType(selectedLink) {
+
+            $selected_link_asset_type.val(selectedLink);
+
+            console.log("Value Link: " + selectedLink);
+            console.log("Selected Link: " + $select_link_asset_type.val())
+            console.log("Transfer Link: " + $selected_link_asset_type.val());
         }
 
     </script>

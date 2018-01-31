@@ -33,13 +33,17 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
         public string SelectedRelationshipLevel { get; set; }
         public IEnumerable<SelectListItem> RelationshipLevels { get; set; }
 
+
         [Required]
         [Display(Name = "Relationship Type")]
         public string SelectedParentChildRelationshipTypeId { get; set; }
+        public IEnumerable<SelectListItem> ParentChildRelationshipTypes { get; set; }
 
         [Required]
         [Display(Name = "Link Asset Type")]
-        public string SelectedAssetTypeId { get; set; }
+        public string SelectedLinkedAssetTypeId { get; set; }
+        public IEnumerable<SelectListItem> LinkAssetTypes { get; set; }
+
 
     }
 }

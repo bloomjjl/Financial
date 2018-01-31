@@ -12,16 +12,16 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
     {
         public DisplayLinkAssetTypesViewModel() { }
 
-        public DisplayLinkAssetTypesViewModel(List<SelectListItem> sliAssetTypes, string selectedAssetTypeId)
+        public DisplayLinkAssetTypesViewModel(List<SelectListItem> sliLinkAssetTypes, string selectedLinkedAssetTypeId)
         {
-            AssetTypes = sliAssetTypes;
-            SelectedAssetTypeId = selectedAssetTypeId;
+            LinkAssetTypes = sliLinkAssetTypes;
+            SelectedLinkedAssetTypeId = selectedLinkedAssetTypeId;
         }
 
 
         [Required]
         [Display(Name = "Link Asset Type")]
-        public string SelectedAssetTypeId { get; set; }
-        public IEnumerable<SelectListItem> AssetTypes { get; set; }
+        public string SelectedLinkedAssetTypeId { get; set; }
+        public IEnumerable<SelectListItem> LinkAssetTypes { get; set; }
     }
 }
