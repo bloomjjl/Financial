@@ -1110,7 +1110,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
 
         [TestMethod()]
-        public void DisplayParentChildRelationshipTypes_Get_WhenProvidedAssetTypeIdIsValidParent_ReturnActiveLinkedParentChildRelationshipTypesFromDatabase_Test()
+        public void DisplayParentChildRelationshipTypes_Get_WhenProvidedAssetTypeIdIsValidParent_ReturnActiveParentChildRelationshipTypesFromDatabase_Test()
         {
             // Arrange
             var _dataAssetTypesRelationshipTypes = new List<AssetTypeRelationshipType>() {
@@ -1135,6 +1135,8 @@ namespace Financial.Tests.WebApplication.Controllers
             string selectedRelationshipLevelId = "Parent";
             int? selectedLinkedAssetTypeId = null;
             int expectedCount = 1;
+            var expectedValue = "30";
+            var expectedText = "Parent-Child RelationshipType";
 
             // Act
             var result = controller.DisplayParentChildRelationshipTypes(suppliedAssetTypeId, selectedRelationshipLevelId, selectedLinkedAssetTypeId);
@@ -1143,12 +1145,14 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayParentChildRelationshipTypesViewModel;
             Assert.AreEqual(expectedCount, vmResult.ParentChildRelationshipTypes.Count(), "ParentChildRelationshipTypes Count");
+            Assert.IsNotNull(vmResult.ParentChildRelationshipTypes.FirstOrDefault(r => r.Value == expectedValue), "Value found in list");
+            Assert.IsNotNull(vmResult.ParentChildRelationshipTypes.FirstOrDefault(r => r.Text == expectedText), "Text found in list");
             Assert.IsNull(vmResult.ParentChildRelationshipTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
             Assert.AreEqual(String.Empty, vmResult.SelectedParentChildRelationshipTypeId, "Selected ParentChildRelationsihpType Id");
         }
 
         [TestMethod()]
-        public void DisplayParentChildRelationshipTypes_Get_WhenProvidedAssetTypeIdIsValidChild_ReturnActiveLinkedParentChildRelationshipTypesFromDatabase_Test()
+        public void DisplayParentChildRelationshipTypes_Get_WhenProvidedAssetTypeIdIsValidChild_ReturnActiveParentChildRelationshipTypesFromDatabase_Test()
         {
             // Arrange
             var _dataAssetTypesRelationshipTypes = new List<AssetTypeRelationshipType>(){
@@ -1173,6 +1177,8 @@ namespace Financial.Tests.WebApplication.Controllers
             string selectedRelationshipLevelId = "Child";
             int? selectedLinkedAssetTypeId = null;
             int expectedCount = 1;
+            var expectedValue = "30";
+            var expectedText = "Child-Parent RelationshipType";
 
             // Act
             var result = controller.DisplayParentChildRelationshipTypes(suppliedAssetTypeId, selectedRelationshipLevelId, selectedLinkedAssetTypeId);
@@ -1181,6 +1187,8 @@ namespace Financial.Tests.WebApplication.Controllers
             var viewResult = result as PartialViewResult;
             var vmResult = viewResult.ViewData.Model as DisplayParentChildRelationshipTypesViewModel;
             Assert.AreEqual(expectedCount, vmResult.ParentChildRelationshipTypes.Count(), "ParentChildRelationshipTypes Count");
+            Assert.IsNotNull(vmResult.ParentChildRelationshipTypes.FirstOrDefault(r => r.Value == expectedValue), "Value found in list");
+            Assert.IsNotNull(vmResult.ParentChildRelationshipTypes.FirstOrDefault(r => r.Text == expectedText), "Text found in list");
             Assert.IsNull(vmResult.ParentChildRelationshipTypes.FirstOrDefault(r => r.Selected), "Value NOT selected in list");
             Assert.AreEqual(String.Empty, vmResult.SelectedParentChildRelationshipTypeId, "Selected ParentChildRelationsihpType Id");
         }

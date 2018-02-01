@@ -140,6 +140,10 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Details(int id)
         {
             // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
             if (TempData["ErrorMessage"] != null)
             {
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];

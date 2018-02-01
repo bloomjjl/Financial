@@ -366,46 +366,6 @@ namespace Financial.WebApplication.Controllers
                 return UOW.RelationshipTypes.GetAll()
                     .Where(r => r.IsActive)
                     .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
-                        rt => rt.Id, pcrt => pcrt.ChildRelationshipTypeId,
-                        (rt, pcrt) => new SelectListItem()
-                        {
-                            Value = pcrt.Id.ToString(),
-                            Selected = pcrt.Id == selectedParentChildRelationshipTypeId,
-                            Text = rt.Name
-                        })
-                    .ToList();
-                /*
-                // only display linked child relationship types
-                return UOW.AssetTypesRelationshipTypes.GetAll()
-                    .Where(r => r.IsActive)
-                    .Where(r => r.ParentAssetTypeId == suppliedAssetTypeId)
-                    .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
-                        atrt => atrt.ParentChildRelationshipTypeId, pcrt => pcrt.Id,
-                        (atrt, pcrt) => new ParentChildRelationshipType()
-                        {
-                            Id = pcrt.Id,
-                            ParentRelationshipTypeId = pcrt.ParentRelationshipTypeId,
-                            ChildRelationshipTypeId = pcrt.ChildRelationshipTypeId,
-                            IsActive = pcrt.IsActive
-                        })
-                    .ToList()
-                    .Join(UOW.RelationshipTypes.FindAll(r => r.IsActive),
-                        pcrt => pcrt.ChildRelationshipTypeId, rt => rt.Id,
-                        (pcrt, rt) => new SelectListItem()
-                        {
-                            Value = pcrt.Id.ToString(),
-                            Selected = pcrt.Id == selectedParentChildRelationshipTypeId,
-                            Text = rt.Name
-                        })
-                    .ToList();
-                */
-            }
-            else if (selectedRelationshipLevelId == "Child")
-            {
-                // display list of all parent relationship types
-                return UOW.RelationshipTypes.GetAll()
-                    .Where(r => r.IsActive)
-                    .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
                         rt => rt.Id, pcrt => pcrt.ParentRelationshipTypeId,
                         (rt, pcrt) => new SelectListItem()
                         {
@@ -414,31 +374,21 @@ namespace Financial.WebApplication.Controllers
                             Text = rt.Name
                         })
                     .ToList();
-                /*
-                // only display linked parent relationship types
-                return UOW.AssetTypesRelationshipTypes.GetAll()
+            }
+            else if (selectedRelationshipLevelId == "Child")
+            {
+                // display list of all parent relationship types
+                return UOW.RelationshipTypes.GetAll()
                     .Where(r => r.IsActive)
-                    .Where(r => r.ChildAssetTypeId == suppliedAssetTypeId)
                     .Join(UOW.ParentChildRelationshipTypes.FindAll(r => r.IsActive),
-                        atrt => atrt.ParentChildRelationshipTypeId, pcrt => pcrt.Id,
-                        (atrt, pcrt) => new ParentChildRelationshipType()
-                        {
-                            Id = pcrt.Id,
-                            ParentRelationshipTypeId = pcrt.ParentRelationshipTypeId,
-                            ChildRelationshipTypeId = pcrt.ChildRelationshipTypeId,
-                            IsActive = pcrt.IsActive
-                        })
-                    .ToList()
-                    .Join(UOW.RelationshipTypes.FindAll(r => r.IsActive),
-                        pcrt => pcrt.ParentRelationshipTypeId, rt => rt.Id,
-                        (pcrt, rt) => new SelectListItem()
+                        rt => rt.Id, pcrt => pcrt.ChildRelationshipTypeId,
+                        (rt, pcrt) => new SelectListItem()
                         {
                             Value = pcrt.Id.ToString(),
                             Selected = pcrt.Id == selectedParentChildRelationshipTypeId,
                             Text = rt.Name
                         })
                     .ToList();
-                */
             }
 
             // default empty list

@@ -213,6 +213,7 @@ namespace Financial.Tests.WebApplication.Controllers
 
 
 
+
         [TestMethod()]
         public void Edit_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
         {
@@ -383,6 +384,22 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(id, vmResult.Id, "Id");
             Assert.AreEqual("Name", vmResult.Name, "Name");
             Assert.AreEqual(true, vmResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Details_Get_WhenProvidedSuccessMessage_ReturnViewData_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            controller.TempData["SuccessMessage"] = "Test Message";
+            int id = 1;
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Test Message", viewResult.ViewData["SuccessMessage"].ToString(), "Message");
         }
 
         [TestMethod()]
