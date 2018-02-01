@@ -20,8 +20,8 @@
             @Html.DisplayFor(modelItem => item.LinkedAssetTypeName)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id, suppliedAssetTypeId = item.SuppliedAssetTypeId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id, suppliedAssetTypeId = item.SuppliedAssetTypeId })
         </td>
     </tr>
 }

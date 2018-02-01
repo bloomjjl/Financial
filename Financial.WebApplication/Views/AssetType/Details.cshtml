@@ -4,21 +4,6 @@
     ViewBag.Title = "Details";
 }
 
-@if (ViewData["ErrorMessage"] != null)
-{
-    <div class="alert alert-warning">
-        <span class="glyphicon glyphicon-remove"></span>
-        @ViewData["ErrorMessage"].ToString()
-    </div>
-}
-else if (ViewData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        <span class="glyphicon glyphicon-ok"></span>
-        @ViewData["SuccessMessage"].ToString()
-    </div>
-}
-
 <h2>Asset Type</h2>
 
 <div>

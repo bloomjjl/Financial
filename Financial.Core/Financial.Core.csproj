@@ -105,7 +105,7 @@
     <Compile Include="RepositoryInterfaces\IRepository.cs" />
     <Compile Include="RepositoryInterfaces\ITransactionTypeRepository.cs" />
     <Compile Include="ViewModels\AssetSetting\CreateViewModel.cs" />
-    <Compile Include="ViewModels\AssetTypeRelationshipType\DisplayLinkAssetTypesViewModel.cs" />
+    <Compile Include="ViewModels\AssetTypeRelationshipType\DeleteViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DisplayParentChildRelationshipTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\CreateViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\EditViewModel.cs" />

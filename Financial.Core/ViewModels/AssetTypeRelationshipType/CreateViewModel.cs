@@ -12,11 +12,15 @@ namespace Financial.Core.ViewModels.AssetTypeRelationshipType
     {
         public CreateViewModel() { }
 
-        public CreateViewModel(Models.AssetType dtoSuppliedAssetType, List<SelectListItem> sliRelationshipLevels)
+        public CreateViewModel(Models.AssetType dtoSuppliedAssetType, List<SelectListItem> sliRelationshipLevels, List<SelectListItem> sliLinkAssetTypes,
+            string selectedRelationshipLevel, string selectedLinkedAssetType)
         {
             SuppliedAssetTypeId = dtoSuppliedAssetType.Id;
             SuppliedAssetTypeName = dtoSuppliedAssetType.Name;
             RelationshipLevels = sliRelationshipLevels;
+            SelectedRelationshipLevel = selectedRelationshipLevel;
+            LinkAssetTypes = sliLinkAssetTypes;
+            SelectedLinkedAssetTypeId = selectedLinkedAssetType;
         }
 
 

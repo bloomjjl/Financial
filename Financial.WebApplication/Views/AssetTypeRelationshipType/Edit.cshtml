@@ -1,22 +1,21 @@
-﻿@model Financial.Core.ViewModels.AssetTypeRelationshipType.CreateViewModel
+﻿@model Financial.Core.ViewModels.AssetTypeRelationshipType.EditViewModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Edit";
 }
 
 <h2>Asset Types</h2>
 
 
-@using (Html.BeginForm("Create", "AssetTypeRelationshipType", FormMethod.Post))
+@using (Html.BeginForm("Edit", "AssetTypeRelationshipType", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
-
+    
     <div class="form-horizontal">
-
-        <h4>Create Relationship</h4>
+        <h4>Edit Relationship</h4>
         <hr />
-
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
         @Html.HiddenFor(model => model.SuppliedAssetTypeId, new { id = "supplied_asset_type_id" })
 
         <div class="form-group">
@@ -36,11 +35,11 @@
             </div>
         </div>
 
-        <div id="relationship_types" style="display:none">
+        <div id="relationship_types">
             @Html.HiddenFor(model => model.SelectedParentChildRelationshipTypeId, new { id = "selected_parent_child_relationship_type" })
         </div>
 
-        <div id="link_asset_types" class="form-group" style="display:none">
+        <div id="link_asset_types" class="form-group">
             @Html.LabelFor(model => model.SelectedLinkedAssetTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownListFor(x => x.SelectedLinkedAssetTypeId, Model.LinkAssetTypes, "-- Select an Asset Type --",
@@ -51,7 +50,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Save" class="btn btn-default" />
                 @Html.ActionLink("Cancel", "Details", "AssetType", new { id = Model.SuppliedAssetTypeId }, new { @class = "btn btn-default" })
             </div>
         </div>
@@ -61,7 +60,8 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <script>
+
+<script>
         // Current View DIV
         var $relationship_types = $("#relationship_types");
         var $link_asset_types = $("#link_asset_types");
@@ -77,6 +77,14 @@
         var $select_link_asset_type = $("#select_link_asset_type");
 
         $(document).ready(function () {
+
+            console.log("Supplied Asset Type: " + $supplied_asset_type_id.val());
+            console.log("Level: " + $selected_relationship_level.val());
+            console.log("Type: " + $selected_parent_child_relationship_type.val());
+
+            showRelationshipTypes($supplied_asset_type_id.val(),
+                $selected_relationship_level.val(),
+                $selected_parent_child_relationship_type.val())
         });
 
         function updateRelationshipLevel(selectedLevel) {
@@ -94,18 +102,19 @@
             }
         }
 
-        function showRelationshipTypes(suppliedAssetTypeId, selectedLevel) {
+        function showRelationshipTypes(suppliedAssetTypeId, selectedLevel, selectedType) {
             $.ajax({
                 url: '/AssetTypeRelationshipType/DisplayParentChildRelationshipTypes',
                 type: 'GET',
                 data: {
                     suppliedAssetTypeId: suppliedAssetTypeId,
-                    selectedRelationshipLevelId: selectedLevel
-                },
+                    selectedRelationshipLevelId: selectedLevel,
+                    selectedParentChildRelationshipTypeId: selectedType
+        },
                 success: function (data) {
                     $relationship_types.html(data);
                     $relationship_types.show('fast');
-                    updateRelationshipType()
+                    updateRelationshipType(selectedType)
                 },
                 error: function (e) {
                 }
@@ -116,54 +125,11 @@
 
             $selected_parent_child_relationship_type.val(selectedType);
 
-            console.log("Value Type: " + selectedType);
-            console.log("Selected Type: " + $select_relationship_type.val());
-            console.log("Transfer Type: " + $selected_parent_child_relationship_type.val());
-
             // store value from partial view in current view
             $selected_parent_child_relationship_type.val($relationship_types.val());
             $link_asset_types.show('fast');
+        };
 
-            /*
-            if (selectedType != null && selectedType != "") {
-                // Show Link Asset Types drop down list
-                $link_asset_types.hide('fast');
-                showLinkAssetTypes($supplied_asset_type_id.val(), $selected_relationship_level.val());
-            } else {
-                // Hide drop down list
-                $link_asset_types.hide('fast');
-                $link_asset_types.val("");
-            }
-            */
-        }
-
-        /*
-        function showLinkAssetTypes(suppliedAssetTypeId, selectedLevel) {
-            $.ajax({
-                url: '/AssetTypeRelationshipType/DisplayLinkAssetTypes',
-                type: 'GET',
-                data: {
-                    suppliedAssetTypeId: suppliedAssetTypeId,
-                    selectedRelationshipLevelId: selectedLevel
-                },
-                success: function (data) {
-                    $link_asset_types.html(data);
-                    $link_asset_types.show('fast');
-                },
-                error: function (e) {
-                }
-            });
-        }
-
-        function updateLinkedAssetType(selectedLink) {
-
-            $selected_link_asset_type.val(selectedLink);
-
-            console.log("Value Link: " + selectedLink);
-            console.log("Selected Link: " + $select_link_asset_type.val())
-            console.log("Transfer Link: " + $selected_link_asset_type.val());
-        }
-        */
-    </script>
+</script>
 
 }

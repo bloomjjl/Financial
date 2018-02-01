@@ -136,6 +136,12 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ActionResult Details(int id)
         {
+            // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+
             // transfer dto to vm
             var vmDetails = UOW.AssetTypes.GetAll()
                 .Select(r => new DetailsViewModel(r))

@@ -270,7 +270,8 @@
     <Content Include="Views\ParentChildRelationshipType\Delete.cshtml" />
     <Content Include="Views\AssetTypeRelationshipType\_DisplayLinkedRelationshipTypes.cshtml" />
     <Content Include="Views\AssetTypeRelationshipType\_DisplayParentChildRelationshipTypes.cshtml" />
-    <Content Include="Views\AssetTypeRelationshipType\_DisplayLinkAssetTypes.cshtml" />
+    <Content Include="Views\AssetTypeRelationshipType\Edit.cshtml" />
+    <Content Include="Views\AssetTypeRelationshipType\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

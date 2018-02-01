@@ -83,9 +83,10 @@ namespace Financial.WebApplication.Controllers
 
             // get drop down lists
             List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels(null);
+            List<SelectListItem> sliLinkAssetTypes = GetAssetTypes(assetTypeId, null, null, null);
 
             // display view
-            return View("Create", new CreateViewModel(dtoSuppliedAssetType, sliRelationshipLevels));
+            return View("Create", new CreateViewModel(dtoSuppliedAssetType, sliRelationshipLevels, sliLinkAssetTypes, null, null));
         }
 
         [HttpPost]
@@ -171,6 +172,7 @@ namespace Financial.WebApplication.Controllers
             return PartialView("_DisplayParentChildRelationshipTypes", new DisplayParentChildRelationshipTypesViewModel(sliParentChildRelationshipTypes, selectedParentChildRelationshipTypeId.ToString()));
         }
         
+        /*
         [HttpGet]
         public ActionResult DisplayLinkAssetTypes(int suppliedAssetTypeId, string selectedRelationshipLevelId, string selectedParentChildRelationshipTypeId, int? selectedAssetTypeId)
         {
@@ -180,6 +182,7 @@ namespace Financial.WebApplication.Controllers
             // display view
             return PartialView("_DisplayLinkAssetTypes", new DisplayLinkAssetTypesViewModel(sliAssetTypes, selectedAssetTypeId.ToString()));
         }
+        */
 
         [HttpGet]
         public ViewResult Edit(int id, int suppliedAssetTypeId)
@@ -189,14 +192,20 @@ namespace Financial.WebApplication.Controllers
             var dtoAssetTypeRelationshipType = UOW.AssetTypesRelationshipTypes.Get(id);
 
             // Selected values
-            var selectedRelationshipLevel = dtoAssetTypeRelationshipType.ParentAssetTypeId == dtoSuppliedAssetType.Id ?
+            var selectedRelationshipLevelId = dtoAssetTypeRelationshipType.ParentAssetTypeId == dtoSuppliedAssetType.Id ?
                 "Parent" : "Child";
+            var selectedParentChildRelationshipTypeId = dtoAssetTypeRelationshipType.ParentChildRelationshipTypeId;
+            var selectedLinkedAssetTypeId = dtoAssetTypeRelationshipType.ParentAssetTypeId == dtoSuppliedAssetType.Id ?
+                dtoAssetTypeRelationshipType.ChildAssetTypeId : dtoAssetTypeRelationshipType.ParentAssetTypeId;
 
             // get drop down lists
-            List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels(selectedRelationshipLevel);
+            List<SelectListItem> sliRelationshipLevels = GetRelationshipLevels(selectedRelationshipLevelId);
+            List<SelectListItem> sliLinkAssetTypes = GetAssetTypes(suppliedAssetTypeId, selectedRelationshipLevelId, 
+                dtoAssetTypeRelationshipType.ParentChildRelationshipTypeId.ToString(), selectedLinkedAssetTypeId);
 
             // display view
-            return View("Edit", new EditViewModel(dtoAssetTypeRelationshipType, dtoSuppliedAssetType, sliRelationshipLevels, selectedRelationshipLevel));
+            return View("Edit", new EditViewModel(dtoAssetTypeRelationshipType, dtoSuppliedAssetType, sliRelationshipLevels, selectedRelationshipLevelId,
+                selectedParentChildRelationshipTypeId.ToString(), sliLinkAssetTypes, selectedLinkedAssetTypeId.ToString()));
         }
 
         [HttpPost]
@@ -264,6 +273,48 @@ namespace Financial.WebApplication.Controllers
             // display view with message
             TempData["SuccessMessage"] = "Parent-Child link updated.";
             return RedirectToAction("Details", "AssetType", new { id = vmEdit.SuppliedAssetTypeId });
+        }
+
+        [HttpGet]
+        public ViewResult Delete(int id, int suppliedAssetTypeId)
+        {
+            // transfer values to dto
+            var dtoAssetTypeRelationshipType = UOW.AssetTypesRelationshipTypes.Get(id);
+            var dtoSuppliedAssetType = UOW.AssetTypes.Get(suppliedAssetTypeId);
+            var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(dtoAssetTypeRelationshipType.ParentChildRelationshipTypeId);
+            var dtoLinkedAssetType = new AssetType();
+            var dtoRelationshipType = new RelationshipType();
+
+            // transfer Parent or Child info to dto
+            if(dtoAssetTypeRelationshipType.ParentAssetTypeId == dtoSuppliedAssetType.Id)
+            {
+                dtoLinkedAssetType = UOW.AssetTypes.Get(dtoAssetTypeRelationshipType.ChildAssetTypeId);
+                dtoRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+            }
+            else if (dtoAssetTypeRelationshipType.ChildAssetTypeId == dtoSuppliedAssetType.Id)
+            {
+                dtoLinkedAssetType = UOW.AssetTypes.Get(dtoAssetTypeRelationshipType.ParentAssetTypeId);
+                dtoRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+            }
+
+            // display view
+            return View("Delete", new DeleteViewModel(dtoAssetTypeRelationshipType, dtoSuppliedAssetType, dtoLinkedAssetType, dtoRelationshipType));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(DeleteViewModel vmDelete)
+        {
+            // transfer vm to dto
+            var dtoAssetTypeRelationshipType = UOW.AssetTypesRelationshipTypes.Get(vmDelete.Id);
+            dtoAssetTypeRelationshipType.IsActive = false;
+
+            // update db
+            UOW.CommitTrans();
+
+            // display view with message
+            TempData["SuccessMessage"] = "Relationship deleted.";
+            return RedirectToAction("Details", "AssetType", new { id = vmDelete.SuppliedAssetTypeId });
         }
 
         private List<SelectListItem> GetAssetTypes(int suppliedAssetTypeId, string selectedRelationshipLevelId, string selectedParentChildRelationshipTypeId, int? selectedAssetTypeId)
