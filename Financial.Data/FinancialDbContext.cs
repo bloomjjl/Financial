@@ -23,6 +23,8 @@ namespace Financial.Data
         public DbSet<ParentChildRelationshipType> ParentChildRelationshipTypes { get; set; }
         public DbSet<RelationshipType> RelationshipTypes { get; set; }
         public DbSet<SettingType> SettingTypes { get; set; }
+        public DbSet<TransactionCategory> TransactionCategories { get; set; }
+        public DbSet<TransactionDescription> TransactionDescriptions { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
     }
 }

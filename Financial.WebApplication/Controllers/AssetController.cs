@@ -10,36 +10,47 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class AssetController : Controller
+    public class AssetController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
-
         public AssetController()
+            : base()
         {
-            _unitOfWork = new UnitOfWork();
         }
 
         public AssetController(IUnitOfWork unitOfWork)
+            : base(unitOfWork)
         {
-            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
-        public ActionResult Index()
+        public ViewResult Index()
         {
-            return View();
+            // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+            }
+
+            // transfer dto to vm
+            var vmIndex = UOW.Assets.FindAll(r => r.IsActive)
+                .Join(UOW.AssetTypes.FindAll(r => r.IsActive),
+                    a => a.AssetTypeId, at => at.Id,
+                    (a, at) => new IndexViewModel(a, at))
+                .ToList();
+
+            // display view
+            return View("Index", vmIndex);
         }
 
         [HttpGet]
         public ViewResult Create()
-        {
-            // transfer db 
-            var dbAssetTypes = _unitOfWork.AssetTypes.GetAll()
-                .Where(r => r.IsActive)
-                .ToList();
-            
-            // transfer db to sli
-            var sliAssetTypes = dbAssetTypes
+        {            
+            // transfer dto to sli
+            var sliAssetTypes = UOW.AssetTypes.FindAll(r => r.IsActive)
                 .Select(r => new SelectListItem()
                 {
                     Value = r.Id.ToString(),
@@ -56,20 +67,19 @@ namespace Financial.WebApplication.Controllers
         public ActionResult Create(CreateViewModel vmCreate)
         {
             // transfer vm to dto
-            int assetTypeId = 0;
-            int.TryParse(vmCreate.SelectedAssetTypeId, out assetTypeId);
-            _unitOfWork.Assets.Add(new Asset()
+            UOW.Assets.Add(new Asset()
             {
-                AssetTypeId = assetTypeId,
+                AssetTypeId = GetIntegerFromString(vmCreate.SelectedAssetTypeId),
                 Name = vmCreate.AssetName,
                 IsActive = true
             });
 
             // update db
-            _unitOfWork.CommitTrans();
+            UOW.CommitTrans();
 
             // display view
-            return View();
+            TempData["SuccessMessage"] = "Asset Created";
+            return RedirectToAction("Index", "Asset");
         }
     }
 }

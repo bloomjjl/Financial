@@ -17,15 +17,19 @@ namespace Financial.Core.Models
         public int AssetId { get; set; }
         [Required]
         public int TransactionTypeId { get; set; }
+        [Required]
+        public int TransactionCategoryId { get; set; }
+        [Required]
+        public int TransactionDescriptionId { get; set; }
         [Display(Name = "Check Number")]
         public string CheckNumber { get; set; }
         [Required]
-        [Display(Name = "Transaction Date")]
+        [Display(Name = "Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd hh:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime TransactionDate { get; set; }
         [Required]
-        [Display(Name = "Amount")]
-        public decimal TransactionAmount { get; set; }
+        public decimal Amount { get; set; }
+        public string Note { get; set; }
     }
 }

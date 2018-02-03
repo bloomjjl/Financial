@@ -90,6 +90,8 @@
     <Compile Include="Models\ParentChildRelationshipType.cs" />
     <Compile Include="Models\SettingType.cs" />
     <Compile Include="Models\RelationshipType.cs" />
+    <Compile Include="Models\TransactionCategory.cs" />
+    <Compile Include="Models\TransactionDescription.cs" />
     <Compile Include="Models\TransactionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepositoryInterfaces\IAssetSettingRepository.cs" />
@@ -103,6 +105,8 @@
     <Compile Include="RepositoryInterfaces\ISettingTypeRepository.cs" />
     <Compile Include="RepositoryInterfaces\IRelationshipTypeRepository.cs" />
     <Compile Include="RepositoryInterfaces\IRepository.cs" />
+    <Compile Include="RepositoryInterfaces\ITransactionCategoryRepository.cs" />
+    <Compile Include="RepositoryInterfaces\ITransactionDescriptionRepository.cs" />
     <Compile Include="RepositoryInterfaces\ITransactionTypeRepository.cs" />
     <Compile Include="ViewModels\AssetSetting\CreateViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DeleteViewModel.cs" />
@@ -123,6 +127,7 @@
     <Compile Include="ViewModels\AssetType\EditViewModel.cs" />
     <Compile Include="ViewModels\AssetType\IndexViewModel.cs" />
     <Compile Include="ViewModels\Asset\CreateViewModel.cs" />
+    <Compile Include="ViewModels\Asset\IndexViewModel.cs" />
     <Compile Include="ViewModels\ParentChildRelationshipType\CreateViewModel.cs" />
     <Compile Include="ViewModels\ParentChildRelationshipType\DeleteViewModel.cs" />
     <Compile Include="ViewModels\ParentChildRelationshipType\EditViewModel.cs" />

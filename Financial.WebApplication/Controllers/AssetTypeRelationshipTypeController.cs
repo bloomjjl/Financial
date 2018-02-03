@@ -172,18 +172,6 @@ namespace Financial.WebApplication.Controllers
             return PartialView("_DisplayParentChildRelationshipTypes", new DisplayParentChildRelationshipTypesViewModel(sliParentChildRelationshipTypes, selectedParentChildRelationshipTypeId.ToString()));
         }
         
-        /*
-        [HttpGet]
-        public ActionResult DisplayLinkAssetTypes(int suppliedAssetTypeId, string selectedRelationshipLevelId, string selectedParentChildRelationshipTypeId, int? selectedAssetTypeId)
-        {
-            // get filtered list to display
-            List<SelectListItem> sliAssetTypes = GetAssetTypes(suppliedAssetTypeId, selectedRelationshipLevelId, selectedParentChildRelationshipTypeId, selectedAssetTypeId);
-
-            // display view
-            return PartialView("_DisplayLinkAssetTypes", new DisplayLinkAssetTypesViewModel(sliAssetTypes, selectedAssetTypeId.ToString()));
-        }
-        */
-
         [HttpGet]
         public ViewResult Edit(int id, int suppliedAssetTypeId)
         {

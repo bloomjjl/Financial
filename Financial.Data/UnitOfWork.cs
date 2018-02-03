@@ -27,6 +27,8 @@ namespace Financial.Data
             ParentChildRelationshipTypes = new ParentChildRelationshipTypeRepository(_context);
             RelationshipTypes = new RelationshipTypeRepository(_context);
             SettingTypes = new SettingTypeRepository(_context);
+            TransactionCategories = new TransactionCategoryRepository(_context);
+            TransactionDescriptions = new TransactionDescriptionRepository(_context);
             TransactionTypes = new TransactionTypeRepository(_context);
         }
 
@@ -43,6 +45,8 @@ namespace Financial.Data
             ParentChildRelationshipTypes = new ParentChildRelationshipTypeRepository(_context);
             RelationshipTypes = new RelationshipTypeRepository(_context);
             SettingTypes = new SettingTypeRepository(_context);
+            TransactionCategories = new TransactionCategoryRepository(_context);
+            TransactionDescriptions = new TransactionDescriptionRepository(_context);
             TransactionTypes = new TransactionTypeRepository(_context);
         }
 
@@ -56,6 +60,8 @@ namespace Financial.Data
         public IParentChildRelationshipTypeRepository ParentChildRelationshipTypes { get; set; }
         public IRelationshipTypeRepository RelationshipTypes { get; private set; }
         public ISettingTypeRepository SettingTypes { get; private set; }
+        public ITransactionCategoryRepository TransactionCategories { get; private set; }
+        public ITransactionDescriptionRepository TransactionDescriptions { get; private set; }
         public ITransactionTypeRepository TransactionTypes { get; private set; }
 
         public void BeginTrans()

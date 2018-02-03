@@ -272,11 +272,12 @@
     <Content Include="Views\AssetTypeRelationshipType\_DisplayParentChildRelationshipTypes.cshtml" />
     <Content Include="Views\AssetTypeRelationshipType\Edit.cshtml" />
     <Content Include="Views\AssetTypeRelationshipType\Delete.cshtml" />
+    <Content Include="Views\Asset\Index.cshtml" />
+    <Content Include="Views\Asset\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\AccountType\" />
-    <Folder Include="Views\Asset\" />
     <Folder Include="Views\Base\" />
   </ItemGroup>
   <ItemGroup>

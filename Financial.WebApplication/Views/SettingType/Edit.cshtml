@@ -6,14 +6,6 @@
 
 <h2>Setting Type</h2>
 
-@if (ViewData["ErrorMessage"] != null)
-{
-    <div class="alert alert-warning">
-        <span class="glyphicon glyphicon-remove"></span>
-        @ViewData["ErrorMessage"].ToString()
-    </div>
-}
-
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()

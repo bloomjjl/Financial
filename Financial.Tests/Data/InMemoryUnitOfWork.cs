@@ -28,6 +28,8 @@ namespace Financial.Tests.Data
         public IParentChildRelationshipTypeRepository ParentChildRelationshipTypes { get; set; }
         public IRelationshipTypeRepository RelationshipTypes { get; set; }
         public ISettingTypeRepository SettingTypes { get; set; }
+        public ITransactionCategoryRepository TransactionCategories { get; set; }
+        public ITransactionDescriptionRepository TransactionDescriptions { get; set; }
         public ITransactionTypeRepository TransactionTypes { get; set; }
 
         public void BeginTrans()

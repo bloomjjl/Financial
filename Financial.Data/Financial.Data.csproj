@@ -91,6 +91,8 @@
     <Compile Include="Repositories\SettingTypeRepository.cs" />
     <Compile Include="Repositories\RelationshipTypeRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />
+    <Compile Include="Repositories\TransactionCategoryRepository.cs" />
+    <Compile Include="Repositories\TransactionDescriptionRepository.cs" />
     <Compile Include="Repositories\TransactionTypeRepository.cs" />
     <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
