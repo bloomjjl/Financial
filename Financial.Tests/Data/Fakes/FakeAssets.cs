@@ -11,11 +11,11 @@ namespace Financial.Tests.Data.Fakes
     {
         public static IEnumerable<Asset> InitialFakeAssets()
         {
-            yield return new Asset() { Id = 1, AssetTypeId = 2, Name = "AssetTypeName1", VersionExplanation = "Version 1", CreateDate = DateTime.Now, IsActive = true };
-            yield return new Asset() { Id = 2, AssetTypeId = 1, Name = "AssetTypeName2", VersionExplanation = "Version 1", CreateDate = DateTime.Now, IsActive = true };
-            yield return new Asset() { Id = 3, AssetTypeId = 2, Name = "AssetTypeName3", VersionExplanation = "Version 1", CreateDate = DateTime.Now, IsActive = false };
-            yield return new Asset() { Id = 4, AssetTypeId = 2, Name = "AssetTypeName4", VersionExplanation = "Version 1", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, IsActive = true };
-            yield return new Asset() { Id = 5, AssetTypeId = 2, Name = "AssetTypeName5", VersionExplanation = "Version 1", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, IsActive = true };
+            yield return new Asset() { Id = 1, AssetTypeId = 2, Name = "AssetTypeName1", IsActive = true };
+            yield return new Asset() { Id = 2, AssetTypeId = 1, Name = "AssetTypeName2", IsActive = true };
+            yield return new Asset() { Id = 3, AssetTypeId = 2, Name = "AssetTypeName3", IsActive = false };
+            yield return new Asset() { Id = 4, AssetTypeId = 2, Name = "AssetTypeName4", IsActive = true };
+            yield return new Asset() { Id = 5, AssetTypeId = 2, Name = "AssetTypeName5", IsActive = true };
         }
     }
 }

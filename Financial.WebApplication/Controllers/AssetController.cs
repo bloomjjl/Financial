@@ -48,16 +48,10 @@ namespace Financial.WebApplication.Controllers
 
         [HttpGet]
         public ViewResult Create()
-        {            
+        {
             // transfer dto to sli
-            var sliAssetTypes = UOW.AssetTypes.FindAll(r => r.IsActive)
-                .Select(r => new SelectListItem()
-                {
-                    Value = r.Id.ToString(),
-                    Text = r.Name
-                })
-                .ToList();
-            
+            var sliAssetTypes = GetAssetTypesDropDownList(null);
+
             // display view
             return View("Create", new CreateViewModel(sliAssetTypes));
         }
@@ -67,19 +61,54 @@ namespace Financial.WebApplication.Controllers
         public ActionResult Create(CreateViewModel vmCreate)
         {
             // transfer vm to dto
-            UOW.Assets.Add(new Asset()
+            var dtoAsset = new Asset()
             {
                 AssetTypeId = GetIntegerFromString(vmCreate.SelectedAssetTypeId),
                 Name = vmCreate.AssetName,
                 IsActive = true
-            });
+            };
+            UOW.Assets.Add(dtoAsset);
 
             // update db
             UOW.CommitTrans();
 
             // display view
             TempData["SuccessMessage"] = "Asset Created";
-            return RedirectToAction("Index", "Asset");
+            return RedirectToAction("Create", "AssetSetting", new { assetId = dtoAsset.Id });
+        }
+
+        [HttpGet]
+        public ViewResult Edit(int id)
+        {
+            // transfer id to dto
+            var dtoAsset = UOW.Assets.Get(id);
+            var sliAssetTypes = GetAssetTypesDropDownList(dtoAsset.AssetTypeId);
+
+            // display view
+            return View("Edit", new EditViewModel(dtoAsset, sliAssetTypes));
+        }
+
+        [HttpGet]
+        public ViewResult Details(int id)
+        {
+            // transfer id to vm
+            var dtoAsset = UOW.Assets.Get(id);
+            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+
+            // display view with message
+            return View("Details", new DetailsViewModel(dtoAsset, dtoAssetType));
+        }
+
+        private List<SelectListItem> GetAssetTypesDropDownList(int? selectedId)
+        {
+            return UOW.AssetTypes.FindAll(r => r.IsActive)
+                .Select(r => new SelectListItem()
+                {
+                    Value = r.Id.ToString(),
+                    Selected = r.Id == selectedId,
+                    Text = r.Name
+                })
+                .ToList();
         }
     }
 }

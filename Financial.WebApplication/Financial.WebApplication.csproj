@@ -274,6 +274,7 @@
     <Content Include="Views\AssetTypeRelationshipType\Delete.cshtml" />
     <Content Include="Views\Asset\Index.cshtml" />
     <Content Include="Views\Asset\Create.cshtml" />
+    <Content Include="Views\AssetSetting\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

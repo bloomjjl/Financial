@@ -1,4 +1,6 @@
 ﻿using Financial.Core;
+using Financial.Core.Models;
+using Financial.Core.ViewModels.AssetSetting;
 using Financial.Data;
 using System;
 using System.Collections.Generic;
@@ -8,18 +10,16 @@ using System.Web.Mvc;
 
 namespace Financial.WebApplication.Controllers
 {
-    public class AssetSettingController : Controller
+    public class AssetSettingController : BaseController
     {
-        private IUnitOfWork _unitOfWork;
-
         public AssetSettingController()
+            : base()
         {
-            _unitOfWork = new UnitOfWork();
         }
 
         public AssetSettingController(IUnitOfWork unitOfWork)
+            : base(unitOfWork)
         {
-            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -29,9 +29,70 @@ namespace Financial.WebApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create()
+        public ActionResult Create(int assetId)
         {
-            return View("Create");
+            // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+
+            // transfer id to dto
+            var dtoAsset = UOW.Assets.Get(assetId);
+            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+
+            // transfer dto to vm
+            var vmCreate = UOW.AssetTypesSettingTypes.FindAll(r => r.IsActive)
+                .Where(r => r.AssetTypeId == dtoAsset.AssetTypeId)
+                .Join(UOW.SettingTypes.FindAll(r => r.IsActive),
+                    atst => atst.SettingTypeId, st => st.Id,
+                    (atst, st) => new CreateViewModel(dtoAsset, st))
+                .ToList();
+
+            // display view
+            return View("Create", new CreateLinkedSettingTypesViewModel(dtoAsset, dtoAssetType, vmCreate));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(CreateLinkedSettingTypesViewModel vmCreate)
+        {
+            // transfer vm to dto
+            foreach(var vm in vmCreate.CreateViewModels)
+            {
+                UOW.AssetSettings.Add(new AssetSetting()
+                {
+                    AssetId = vm.AssetId,
+                    SettingTypeId = vm.SettingTypeId,
+                    Value = vm.Value,
+                    IsActive = true
+                });
+            }
+
+            // update db
+            UOW.CommitTrans();
+
+            // display view with message
+            TempData["SuccessMessage"] = "Records created";
+            return RedirectToAction("Details", "Asset", new { id = vmCreate.AssetId });
+        }
+
+        [HttpGet]
+        public ActionResult Edit(int assetId)
+        {
+            // transfer id to dto
+            var dtoAsset = UOW.Assets.Get(assetId);
+
+            // transfer dto to vm
+            var vmEdit = UOW.AssetSettings.FindAll(r => r.IsActive)
+                .Where(r => r.AssetId == dtoAsset.Id)
+                .Join(UOW.SettingTypes.FindAll(r => r.IsActive),
+                    ast => ast.SettingTypeId, st => st.Id,
+                    (ast, st) => new EditViewModel(ast, dtoAsset, st))
+                .ToList();
+
+            // display view
+            return View("Edit", new EditLinkedSettingTypesViewModel(dtoAsset, vmEdit));
         }
     }
 }

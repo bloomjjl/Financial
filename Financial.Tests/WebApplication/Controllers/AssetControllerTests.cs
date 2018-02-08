@@ -156,7 +156,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var controller = new AssetController(_unitOfWork);
-            CreateViewModel vmExpected = new CreateViewModel()
+            var vmExpected = new CreateViewModel()
             {
                 SelectedAssetTypeId = "20",
                 AssetName = "New Name"
@@ -184,7 +184,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var controller = new AssetController(_unitOfWork);
-            CreateViewModel vmExpected = new CreateViewModel()
+            var vmExpected = new CreateViewModel()
             {
                 SelectedAssetTypeId = "20",
                 AssetName = "New Name"
@@ -197,9 +197,129 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
             var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Route Action");
-            Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual("Create", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("AssetSetting", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual(newId, routeResult.RouteValues["assetId"], "Asset Id");
             Assert.AreEqual("Asset Created", controller.TempData["SuccessMessage"].ToString(), "Message");
+        }
+
+        // Create_Post_WhenNameIsDuplicated_ReturnRouteValues_Test
+        // do not duplicated Asset.Name & AssetType.Id
+
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            int id = 1;
+
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(EditViewModel), "View Model");
+        }
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnValuesFromDatabase_Test()
+        {
+            // Arrange
+            var _dataAssets = new List<Asset>() {
+                new Asset() { Id = 10, AssetTypeId = 20, Name = "Asset", IsActive = true } };
+            _unitOfWork.Assets = new InMemoryAssetRepository(_dataAssets);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 20, Name = "AssetType", IsActive = true }}; 
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetController(_unitOfWork);
+            int id = 10;
+            var expectedName = "Asset";
+            var expectedAssetTypeId = "20";
+
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(id, vmResult.Id, "Asset Id");
+            Assert.AreEqual(expectedName, vmResult.Name, "Asset Name");
+            Assert.AreEqual(expectedAssetTypeId, vmResult.SelectedAssetTypeId, "AssetType Id");
+        }
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedIdIsValid_ReturnActiveAssetTypesFromDatabase_Test()
+        {
+            // Arrange
+            var _dataAssets = new List<Asset>() {
+                new Asset() { Id = 10, AssetTypeId = 20, Name = "Asset", IsActive = true } };
+            _unitOfWork.Assets = new InMemoryAssetRepository(_dataAssets);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 20, Name = "AssetType 1", IsActive = true }, // count: Selected
+                new AssetType() { Id = 21, Name = "AssetType 2", IsActive = false }, // NOT active
+                new AssetType() { Id = 22, Name = "AssetType 3", IsActive = true }}; // count
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetController(_unitOfWork);
+            int id = 10;
+            int count = 2;
+            var expectedAssetTypeId = "20";
+
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as EditViewModel;
+            Assert.AreEqual(count, vmResult.AssetTypes.Count(), "Count");
+            Assert.AreEqual(expectedAssetTypeId, vmResult.SelectedAssetTypeId, "Selected AssetType Id");
+        }
+
+
+
+        [TestMethod()]
+        public void Details_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            int id = 1;
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Details", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(DetailsViewModel), "View Model");
+        }
+
+        [TestMethod()]
+        public void Details_Get_WhenProvidedAssetIdIsValid_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            var _dataAssets = new List<Asset>() {
+                new Asset() { Id = 10, AssetTypeId = 20, Name = "Asset", IsActive = true } };
+            _unitOfWork.Assets = new InMemoryAssetRepository(_dataAssets);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetController(_unitOfWork);
+            int id = 10;
+            var expectedAssetName = "Asset";
+            var expectedAssetTypeName = "Asset Type";
+
+            // Act
+            var result = controller.Details(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as DetailsViewModel;
+            Assert.AreEqual(id, vmResult.Id, "Asset Id");
+            Assert.AreEqual(expectedAssetName, vmResult.Name, "Asset Name");
+            Assert.AreEqual(expectedAssetTypeName, vmResult.AssetTypeName, "AssetType Name");
         }
 
     }

@@ -19,7 +19,6 @@ namespace Financial.Core.Models
         [Display(Name = "SettingType ID")]
         [Column("AttributeTypeId")]
         public int SettingTypeId { get; set; }
-        [Required]
         public string Value { get; set; }
     }
 }
