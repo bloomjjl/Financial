@@ -36,10 +36,13 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer dto to vm
-            var vmIndex = UOW.Assets.FindAll(r => r.IsActive)
-                .Join(UOW.AssetTypes.FindAll(r => r.IsActive),
+            var vmIndex = UOW.Assets.GetAll()
+                .Where(r => r.IsActive)
+                .Join(UOW.AssetTypes.GetAll(),
                     a => a.AssetTypeId, at => at.Id,
-                    (a, at) => new IndexViewModel(a, at))
+                    (a, at) => new { a, at })
+                .Where(j => j.at.IsActive)
+                .Select(vm => new IndexViewModel(vm.a, vm.at))
                 .ToList();
 
             // display view
@@ -88,6 +91,23 @@ namespace Financial.WebApplication.Controllers
             return View("Edit", new EditViewModel(dtoAsset, sliAssetTypes));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(EditViewModel vmEdit)
+        {
+            // transfer vm to dto
+            var dtoAsset = UOW.Assets.Get(vmEdit.Id);
+            dtoAsset.Name = vmEdit.Name;
+            dtoAsset.AssetTypeId = GetIntegerFromString(vmEdit.SelectedAssetTypeId);
+
+            // update db
+            UOW.CommitTrans();
+
+            // display view with message
+            TempData["SuccessMessage"] = "Record updated.";
+            return RedirectToAction("Details", "Asset", new { id = vmEdit.Id });
+        } 
+
         [HttpGet]
         public ViewResult Details(int id)
         {
@@ -97,6 +117,33 @@ namespace Financial.WebApplication.Controllers
 
             // display view with message
             return View("Details", new DetailsViewModel(dtoAsset, dtoAssetType));
+        }
+
+        [HttpGet]
+        public ViewResult Delete(int id)
+        {
+            // transfer id to dto
+            var dtoAsset = UOW.Assets.Get(id);
+            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+
+            // display view
+            return View("Delete", new DeleteViewModel(dtoAsset, dtoAssetType));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(DeleteViewModel vmDelete)
+        {
+            // transfer vm to dto
+            var dtoAsset = UOW.Assets.Get(vmDelete.Id);
+            dtoAsset.IsActive = false;
+
+            // update db
+            UOW.CommitTrans();
+
+            // display view with message
+            TempData["SuccessMessage"] = "Record Deleted";
+            return RedirectToAction("Index", "Asset");
         }
 
         private List<SelectListItem> GetAssetTypesDropDownList(int? selectedId)

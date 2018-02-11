@@ -1,0 +1,52 @@
+﻿@model Financial.Core.ViewModels.Asset.DetailsViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Asset</h2>
+
+<div>
+    <h4>Details</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AssetTypeName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AssetTypeName)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+<div id="settings">
+    <hr />
+    <h4>Settings</h4>
+    <hr />
+
+    @{Html.RenderAction("Index", "AssetSetting", new { assetId = Model.Id });}
+    <p>
+        @Html.ActionLink("Edit", "Edit", "AssetSetting", new { assetId = Model.Id }, null)
+    </p>
+</div>
+
+<div id="transactions">
+    <hr />
+    <h4>Transactions</h4>
+    <hr />
+    <p>Transactions go here...</p>
+</div>

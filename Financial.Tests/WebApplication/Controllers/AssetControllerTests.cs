@@ -44,7 +44,7 @@ namespace Financial.Tests.WebApplication.Controllers
         }
 
         [TestMethod()]
-        public void Index_Get_WhenProvidedNoInputValues_ReturnAllValuesFromDatabase_Test()
+        public void Index_Get_WhenProvidedNoInputValues_ReturnActiveValuesFromDatabase_Test()
         {
             // Arrange
             var _dataAssets = new List<Asset>() {
@@ -277,6 +277,63 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedAssetTypeId, vmResult.SelectedAssetTypeId, "Selected AssetType Id");
         }
 
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
+        {
+            // Arrange
+            var _dataAssets = new List<Asset>() {
+                new Asset() { Id = 10, AssetTypeId = 20, Name = "Asset", IsActive = true } };
+            _unitOfWork.Assets = new InMemoryAssetRepository(_dataAssets);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 20, Name = "AssetType 1", IsActive = true }, 
+                new AssetType() { Id = 21, Name = "AssetType 2", IsActive = true }}; 
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetController(_unitOfWork);
+            var vmExpected = new EditViewModel()
+            {
+                Id = 10,
+                Name = "New Name", // updated
+                SelectedAssetTypeId = "21" // udpated
+            };
+
+            // Act
+            controller.Edit(vmExpected);
+
+            // Assert
+            var dtoResult = _dataAssets.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
+            Assert.IsNotNull(dtoResult, "record found");
+            Assert.AreEqual(vmExpected.Name, dtoResult.Name, "Asset Name");
+            Assert.AreEqual(vmExpected.SelectedAssetTypeId, dtoResult.AssetTypeId.ToString(), "AssetType Id");
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            var vmExpected = new EditViewModel()
+            {
+                Id = 1,
+                Name = "Asset Name", 
+                SelectedAssetTypeId = "2" 
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual(vmExpected.Id, routeResult.RouteValues["id"], "Route Id");
+            Assert.AreEqual("Record updated.", controller.TempData["SuccessMessage"], "Message");
+        }
+
+        // Edit_Post_WhenAssetTypeChanged_ReturnRouteValues_Test
+        // update AssetSetting when AssetType has changed
+        // old values might not be valid after change
 
 
         [TestMethod()]
@@ -320,6 +377,92 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(id, vmResult.Id, "Asset Id");
             Assert.AreEqual(expectedAssetName, vmResult.Name, "Asset Name");
             Assert.AreEqual(expectedAssetTypeName, vmResult.AssetTypeName, "AssetType Name");
+        }
+
+
+
+        [TestMethod()]
+        public void Delete_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            int id = 1;
+
+            // Act
+            var result = controller.Delete(id);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Delete", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(result.ViewData.Model, typeof(DeleteViewModel), "View Model");
+        }
+
+        [TestMethod()]
+        public void Delete_Get_WhenProvidedAssetIdIsValid_ReturnAllValuesFromDatabase_Test()
+        {
+            // Arrange
+            var _dataAssets = new List<Asset>() {
+                new Asset() { Id = 10, AssetTypeId = 20, Name = "Asset", IsActive = true } };
+            _unitOfWork.Assets = new InMemoryAssetRepository(_dataAssets);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetController(_unitOfWork);
+            int id = 10;
+            var expectedAssetName = "Asset";
+            var expectedAssetTypeName = "Asset Type";
+
+            // Act
+            var result = controller.Delete(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as DeleteViewModel;
+            Assert.AreEqual(id, vmResult.Id, "Asset Id");
+            Assert.AreEqual(expectedAssetName, vmResult.AssetName, "Asset Name");
+            Assert.AreEqual(expectedAssetTypeName, vmResult.AssetTypeName, "AssetType Name");
+        }
+
+        [TestMethod()]
+        public void Delete_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            var vmExpected = new DeleteViewModel()
+            {
+                Id = 2
+            };
+
+            // Act
+            var result = controller.Delete(vmExpected);
+
+            // Assert
+            Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
+            var dtoResult = _dataAssets.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.IsNotNull(dtoResult, "Record found");
+            Assert.IsFalse(dtoResult.IsActive, "Record IsActive");
+        }
+
+        [TestMethod()]
+        public void Delete_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            var vmExpected = new DeleteViewModel()
+            {
+                Id = 1
+            };
+
+            // Act
+            var result = controller.Delete(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual("Record Deleted", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
 
     }

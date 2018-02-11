@@ -112,6 +112,7 @@
     <Compile Include="ViewModels\AssetSetting\CreateViewModel.cs" />
     <Compile Include="ViewModels\AssetSetting\EditLinkedSettingTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetSetting\EditViewModel.cs" />
+    <Compile Include="ViewModels\AssetSetting\IndexViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DeleteViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DisplayParentChildRelationshipTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\CreateViewModel.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="ViewModels\AssetType\EditViewModel.cs" />
     <Compile Include="ViewModels\AssetType\IndexViewModel.cs" />
     <Compile Include="ViewModels\Asset\CreateViewModel.cs" />
+    <Compile Include="ViewModels\Asset\DeleteViewModel.cs" />
     <Compile Include="ViewModels\Asset\DetailsViewModel.cs" />
     <Compile Include="ViewModels\Asset\EditViewModel.cs" />
     <Compile Include="ViewModels\Asset\IndexViewModel.cs" />

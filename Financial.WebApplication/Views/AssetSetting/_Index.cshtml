@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Financial.Core.ViewModels.AssetSetting.IndexViewModel>
+
+<dl class="dl-horizontal">
+@foreach (var item in Model)
+{
+    <dt>
+        @Html.DisplayFor(modelItem => item.SettingTypeName)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(modelItem => item.AssetSettingValue)
+    </dd>
+}
+</dl>

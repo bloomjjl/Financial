@@ -275,6 +275,10 @@
     <Content Include="Views\Asset\Index.cshtml" />
     <Content Include="Views\Asset\Create.cshtml" />
     <Content Include="Views\AssetSetting\Edit.cshtml" />
+    <Content Include="Views\Asset\Edit.cshtml" />
+    <Content Include="Views\Asset\Details.cshtml" />
+    <Content Include="Views\Asset\Delete.cshtml" />
+    <Content Include="Views\AssetSetting\_Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
