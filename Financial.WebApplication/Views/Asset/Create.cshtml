@@ -29,7 +29,7 @@
         <div id="link_asset_types" class="form-group">
             @Html.LabelFor(model => model.SelectedAssetTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(x => x.SelectedAssetTypeId, Model.AssetTypes, "-- Select an Asset Type --", new { @class = "form-control" })
+                @Html.DropDownListFor(model => model.SelectedAssetTypeId, Model.AssetTypes, "-- Select an Asset Type --", new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.SelectedAssetTypeId, "", new { @class = "text-danger" })
             </div>
         </div>

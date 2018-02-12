@@ -48,5 +48,8 @@
     <hr />
     <h4>Transactions</h4>
     <hr />
-    <p>Transactions go here...</p>
+    <p>
+        @Html.ActionLink("Create New", "Create", "AssetTransaction", new { assetId = Model.Id }, null)
+    </p>
+    @{Html.RenderAction("Index", "AssetTransaction", new { assetId = Model.Id });}
 </div>

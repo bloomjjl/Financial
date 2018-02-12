@@ -25,6 +25,7 @@ namespace Financial.Core.Models
         public string CheckNumber { get; set; }
         [Required]
         [Display(Name = "Date")]
+        [Column("Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd hh:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime TransactionDate { get; set; }

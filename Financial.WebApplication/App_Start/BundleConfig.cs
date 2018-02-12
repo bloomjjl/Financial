@@ -8,6 +8,12 @@ namespace Financial.WebApplication
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+            bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
+                         "~/Scripts/jquery-ui-{version}.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/jquerydt").Include(
+                        "~/Scripts/jquery-ui-timepicker-addon.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
@@ -25,6 +31,7 @@ namespace Financial.WebApplication
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/jquery-ui-timepicker-addon.css",
                       "~/Content/site.css"));
         }
     }
