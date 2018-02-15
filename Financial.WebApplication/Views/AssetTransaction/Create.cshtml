@@ -111,8 +111,6 @@
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/jqueryui")
     @Scripts.Render("~/bundles/jquerydt")
-
-    <script>
         $(function () {
             $("#datepicker").datepicker();
         });
@@ -150,7 +148,7 @@
             selectedCategoriess.innerHTML += "<br />";
 
             // store selected values in model
-            $("#category_list_selected").val(arrayCategories);
+            $("#category_list_selected").val(JSON.stringify(arrayCategories));
         });
     </script>
 }

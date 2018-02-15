@@ -1,5 +1,6 @@
 ﻿using Financial.Core;
 using Financial.Core.ViewModels.AssetTransaction;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +67,9 @@ namespace Financial.WebApplication.Controllers
                 Note = vmCreate.Note,
                 IsActive = true
             });
+
+            var selectedItems = JsonConvert.DeserializeObject(vmCreate.TransactionCategoriesSelected, typeof(List<int>));
+            var blank1 = "";
 
             return RedirectToAction("Create", new { assetId = vmCreate.AssetId });
 
