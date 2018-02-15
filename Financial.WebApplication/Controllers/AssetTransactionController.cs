@@ -50,6 +50,53 @@ namespace Financial.WebApplication.Controllers
             return View("Create", new CreateViewModel(dtoAsset, dtoAssetType, sliTransactionTypes, sliTransactionCategories, sliTransactionDescriptions));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(CreateViewModel vmCreate)
+        {
+            // transfer vm to dto
+            UOW.AssetTransactions.Add(new Core.Models.AssetTransaction() {
+                AssetId = vmCreate.AssetId,
+                TransactionTypeId = GetIntegerFromString(vmCreate.SelectedTransactionTypeId),
+                TransactionCategoryId = GetIntegerFromString(vmCreate.SelectedTransactionCategoryId),
+                TransactionDescriptionId = GetIntegerFromString(vmCreate.SelectedTransactionDescriptionId),
+                CheckNumber = vmCreate.CheckNumber,
+                TransactionDate = vmCreate.Date,
+                Amount = vmCreate.Amount,
+                Note = vmCreate.Note,
+                IsActive = true
+            });
+
+            return RedirectToAction("Create", new { assetId = vmCreate.AssetId });
+
+            // update db
+            UOW.CommitTrans();
+
+            // display view with message
+            TempData["SuccessMessage"] = "Record created";
+            return RedirectToAction("Details", "Asset", new { Id = vmCreate.AssetId });
+        }
+
+        [HttpGet]
+        //public List<SelectListItem> AddMultipleSelectedIndex(List<SelectListItem> sliProvided, string selectedValue)
+        public string AddMultipleSelectedIndex(string selectedValues)
+        {
+            /*
+            for (int i = 0; i < sliProvided.Count; i++)
+            {
+                if(sliProvided[i].Value == selectedValue)
+                {
+                    sliProvided[i].Selected = true;
+                }
+            }
+
+            return sliProvided;
+            */
+            //selectedValues.Add(addValue);
+
+            return selectedValues;
+        }
+
         private List<SelectListItem> GetSelectListOfTransactionDescriptions(string selectedValue)
         {
             return UOW.TransactionDescriptions.GetAll()

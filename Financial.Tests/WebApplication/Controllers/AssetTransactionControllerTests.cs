@@ -109,7 +109,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.Model as CreateViewModel;
-            Assert.AreEqual(assetId, vmResult.Id, "Asset Id");
+            Assert.AreEqual(assetId, vmResult.AssetId, "Asset Id");
             Assert.AreEqual("Asset", vmResult.AssetName, "Asset Name");
             Assert.AreEqual("AssetType", vmResult.AssetTypeName, "AssetType Name");
         }
@@ -183,6 +183,70 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedCount, vmResult.TransactionDescriptions.Count(), "Count");
         }
 
+        [TestMethod()]
+        public void Create_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
+        {
+            // Arrange
+            var _dataAssetTransactions = new List<AssetTransaction>(); // clear records
+            _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
+            var controller = new AssetTransactionController(_unitOfWork);
+            var vmExpected = new CreateViewModel()
+            {
+                AssetId = 6,
+                CheckNumber = "123",
+                SelectedTransactionTypeId = "1",
+                SelectedTransactionCategoryId = "2",
+                SelectedTransactionDescriptionId = "4",
+                Date = DateTime.Now,
+                Amount = 9.99M,
+                Note = "this is a note"
+            };
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
+            var dtoResult = _dataAssetTransactions.FirstOrDefault(r => r.AssetId == vmExpected.AssetId);
+            Assert.AreEqual(vmExpected.CheckNumber, dtoResult.CheckNumber, "CheckNumber");
+            Assert.AreEqual(vmExpected.SelectedTransactionTypeId, dtoResult.TransactionTypeId.ToString(), "Type ID");
+            Assert.AreEqual(vmExpected.SelectedTransactionCategoryId, dtoResult.TransactionCategoryId.ToString(), "Category ID");
+            Assert.AreEqual(vmExpected.SelectedTransactionDescriptionId, dtoResult.TransactionDescriptionId.ToString(), "Description ID");
+            Assert.IsNotNull(dtoResult.TransactionDate, "Date Found");
+            Assert.AreNotEqual(new DateTime(), dtoResult.TransactionDate, "Date Valid");
+            Assert.AreEqual(vmExpected.Amount, dtoResult.Amount, "Amount");
+            Assert.AreEqual(vmExpected.Note, dtoResult.Note, "Note");
+            Assert.IsTrue(dtoResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Create_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var _dataAssetTransactions = new List<AssetTransaction>(); // clear records
+            _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
+            var controller = new AssetTransactionController(_unitOfWork);
+            var vmExpected = new CreateViewModel()
+            {
+                AssetId = 1,
+                SelectedTransactionTypeId = "2",
+                SelectedTransactionCategoryId = "4",
+                SelectedTransactionDescriptionId = "5",
+                Date = DateTime.Now,
+                Amount = 20.99M
+            };
+
+            // Act
+            var result = controller.Create(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual(vmExpected.AssetId, routeResult.RouteValues["id"], "Route Id");
+            Assert.AreEqual("Record created", controller.TempData["SuccessMessage"].ToString(), "Message");
+        }
 
     }
 }
