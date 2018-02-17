@@ -18,7 +18,7 @@ namespace Financial.Core.ViewModels.AssetTransaction
             AssetId = dtoAsset.Id;
             AssetName = dtoAsset.Name;
             AssetTypeName = dtoAssetType.Name;
-            Date = date;
+            Date = date.ToString("MM/dd/yyyy");
             TransactionTypes = sliTransactionTypes;
             TransactionCategories = sliTransactionCategories;
             TransactionDescriptions = sliTransactionDescriptions;
@@ -33,7 +33,7 @@ namespace Financial.Core.ViewModels.AssetTransaction
         public string CheckNumber { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }

@@ -62,7 +62,7 @@ namespace Financial.WebApplication.Controllers
                 TransactionCategoryId = GetIntegerFromString(vmCreate.SelectedTransactionCategoryId),
                 TransactionDescriptionId = GetIntegerFromString(vmCreate.SelectedTransactionDescriptionId),
                 CheckNumber = vmCreate.CheckNumber,
-                TransactionDate = vmCreate.Date,
+                TransactionDate = Convert.ToDateTime(vmCreate.Date),
                 Amount = vmCreate.Amount,
                 Note = vmCreate.Note,
                 IsActive = true
@@ -84,10 +84,10 @@ namespace Financial.WebApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult Edit(int Id)
+        public ActionResult Edit(int id)
         {
             // transfer id to dto 
-            var dtoAssetTransaction = UOW.AssetTransactions.Get(Id);
+            var dtoAssetTransaction = UOW.AssetTransactions.Get(id);
             var dtoAsset = UOW.Assets.Get(dtoAssetTransaction.AssetId);
             var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 
@@ -110,7 +110,7 @@ namespace Financial.WebApplication.Controllers
             dtoAssetTransaction.TransactionCategoryId = GetIntegerFromString(vmEdit.SelectedTransactionCategoryId);
             dtoAssetTransaction.TransactionDescriptionId = GetIntegerFromString(vmEdit.SelectedTransactionDescriptionId);
             dtoAssetTransaction.CheckNumber = vmEdit.CheckNumber;
-            dtoAssetTransaction.TransactionDate = vmEdit.Date;
+            dtoAssetTransaction.TransactionDate = Convert.ToDateTime(vmEdit.Date);
             dtoAssetTransaction.Amount = vmEdit.Amount;
             dtoAssetTransaction.Note = vmEdit.Note;
 
@@ -119,7 +119,7 @@ namespace Financial.WebApplication.Controllers
 
             // display view with message
             TempData["SuccessMessage"] = "Record updated";
-            return RedirectToAction("Details", "Asset", new { id = vmEdit.Id });
+            return RedirectToAction("Details", "Asset", new { id = vmEdit.AssetId });
         }
 
         [HttpGet]

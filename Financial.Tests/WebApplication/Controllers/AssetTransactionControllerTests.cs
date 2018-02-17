@@ -197,7 +197,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SelectedTransactionTypeId = "1",
                 SelectedTransactionCategoryId = "2",
                 SelectedTransactionDescriptionId = "4",
-                Date = DateTime.Now,
+                Date = DateTime.Now.ToShortDateString(),
                 Amount = 9.99M,
                 Note = "this is a note"
             };
@@ -232,7 +232,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SelectedTransactionTypeId = "2",
                 SelectedTransactionCategoryId = "4",
                 SelectedTransactionDescriptionId = "5",
-                Date = DateTime.Now,
+                Date = DateTime.Now.ToShortDateString(),
                 Amount = 20.99M
             };
 
@@ -251,14 +251,14 @@ namespace Financial.Tests.WebApplication.Controllers
 
 
         [TestMethod()]
-        public void Edit_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
+        public void Edit_Get_WhenProvidedAssetTransactionIdIsValid_ReturnRouteValues_Test()
         {
             // Arrange
             var controller = _controller;
-            int assetId = 1;
+            int id = 1;
 
             // Act
-            var result = controller.Edit(assetId);
+            var result = controller.Edit(id);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
@@ -292,17 +292,17 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             var viewResult = result as ViewResult;
             var vmResult = viewResult.Model as EditViewModel;
-            Assert.AreEqual(id, vmResult.Id, "Id");
+            Assert.AreEqual(id, vmResult.Id, "AssetTransaction Id");
+            Assert.AreEqual(20, vmResult.AssetId, "Asset Id");
             Assert.AreEqual("Asset", vmResult.AssetName, "Asset Name");
             Assert.AreEqual("AssetType", vmResult.AssetTypeName, "AssetType Name");
             Assert.AreEqual("1", vmResult.SelectedTransactionTypeId, "Selected TransactionType Id");
             Assert.AreEqual("2", vmResult.SelectedTransactionCategoryId, "Selected TransactionCategory Id");
             Assert.AreEqual("4", vmResult.SelectedTransactionDescriptionId, "Selected TransactionDescription Id");
-            Assert.AreEqual(date, vmResult.Date, "TransactionDate");
+            Assert.AreEqual(date.ToString("MM/dd/yyyy"), vmResult.Date, "TransactionDate");
             Assert.AreEqual("1234", vmResult.CheckNumber, "CheckNumber");
             Assert.AreEqual(199.99M, vmResult.Amount, "Ammount");
             Assert.AreEqual("Test Note", vmResult.Note, "Note");
-            Assert.IsTrue(vmResult.IsActive, "IsActive");
         }
 
         [TestMethod()]
@@ -324,7 +324,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SelectedTransactionTypeId = "2", // updated
                 SelectedTransactionCategoryId = "4", // updated
                 SelectedTransactionDescriptionId = "1", // updated
-                Date = date.AddMonths(2), // updated
+                Date = date.AddMonths(2).ToString("MM/dd/yyyy"), // updated
                 Amount = 9.99M, // updated
                 Note = "this is a note" // updated
             };
@@ -335,11 +335,12 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
             var dtoResult = _dataAssetTransactions.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.AssetId, dtoResult.AssetId, "Asset Id");
             Assert.AreEqual(vmExpected.CheckNumber, dtoResult.CheckNumber, "CheckNumber");
             Assert.AreEqual(vmExpected.SelectedTransactionTypeId, dtoResult.TransactionTypeId.ToString(), "Type ID");
             Assert.AreEqual(vmExpected.SelectedTransactionCategoryId, dtoResult.TransactionCategoryId.ToString(), "Category ID");
             Assert.AreEqual(vmExpected.SelectedTransactionDescriptionId, dtoResult.TransactionDescriptionId.ToString(), "Description ID");
-            Assert.AreEqual(vmExpected.Date, dtoResult.TransactionDate, "Date");
+            Assert.AreEqual(vmExpected.Date, dtoResult.TransactionDate.ToString("MM/dd/yyyy"), "Date");
             Assert.AreEqual(vmExpected.Amount, dtoResult.Amount, "Amount");
             Assert.AreEqual(vmExpected.Note, dtoResult.Note, "Note");
             Assert.IsTrue(dtoResult.IsActive, "IsActive");
@@ -349,14 +350,21 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            var controller = _controller;
+            var date = DateTime.Now;
+            var _dataAssetTransactions = new List<AssetTransaction>() {
+                new AssetTransaction() {
+                    Id = 10, AssetId = 5, TransactionTypeId = 1, TransactionCategoryId = 2, TransactionDescriptionId = 4,
+                    CheckNumber = "1234", TransactionDate = date, Amount = 199.99M, Note = "Test Note", IsActive = true }};
+            _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
+            var controller = new AssetTransactionController(_unitOfWork);
             var vmExpected = new EditViewModel()
             {
-                Id = 1,
+                Id = 10,
+                AssetId = 1,
                 SelectedTransactionTypeId = "2",
                 SelectedTransactionCategoryId = "4",
                 SelectedTransactionDescriptionId = "5",
-                Date = DateTime.Now,
+                Date = DateTime.Now.ToString("MM/dd/yyyy"),
                 Amount = 20.99M,
             };
 
@@ -368,7 +376,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var routeResult = result as RedirectToRouteResult;
             Assert.AreEqual("Details", routeResult.RouteValues["action"], "Route Action");
             Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
-            Assert.AreEqual(vmExpected.Id, routeResult.RouteValues["id"], "Route Id");
+            Assert.AreEqual(vmExpected.AssetId, routeResult.RouteValues["id"], "Route Id");
             Assert.AreEqual("Record updated", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
 

@@ -19,7 +19,7 @@ namespace Financial.Core.ViewModels.AssetTransaction
             AssetId = dtoAsset.Id;
             AssetName = dtoAsset.Name;
             AssetTypeName = dtoAssetType.Name;
-            Date = dtoAssetTransaction.TransactionDate;
+            Date = dtoAssetTransaction.TransactionDate.ToString("MM/dd/yyyy");
             CheckNumber = dtoAssetTransaction.CheckNumber;
             Amount = dtoAssetTransaction.Amount;
             Note = dtoAssetTransaction.Note;
@@ -29,7 +29,6 @@ namespace Financial.Core.ViewModels.AssetTransaction
             SelectedTransactionCategoryId = dtoAssetTransaction.TransactionCategoryId.ToString();
             TransactionDescriptions = sliTransactionDescriptions;
             SelectedTransactionDescriptionId = dtoAssetTransaction.TransactionDescriptionId.ToString();
-            IsActive = dtoAssetTransaction.IsActive;
         }
 
 
@@ -43,7 +42,7 @@ namespace Financial.Core.ViewModels.AssetTransaction
         public string CheckNumber { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }
@@ -59,7 +58,5 @@ namespace Financial.Core.ViewModels.AssetTransaction
         [Display(Name = "Description")]
         public string SelectedTransactionDescriptionId { get; set; }
         public IEnumerable<SelectListItem> TransactionDescriptions { get; set; }
-        [Display(Name = "Active")]
-        public bool IsActive { get; set; }
     }
 }
