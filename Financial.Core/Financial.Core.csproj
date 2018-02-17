@@ -114,6 +114,7 @@
     <Compile Include="ViewModels\AssetSetting\EditViewModel.cs" />
     <Compile Include="ViewModels\AssetSetting\IndexViewModel.cs" />
     <Compile Include="ViewModels\AssetTransaction\CreateViewModel.cs" />
+    <Compile Include="ViewModels\AssetTransaction\EditViewModel.cs" />
     <Compile Include="ViewModels\AssetTransaction\IndexViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DeleteViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DisplayParentChildRelationshipTypesViewModel.cs" />

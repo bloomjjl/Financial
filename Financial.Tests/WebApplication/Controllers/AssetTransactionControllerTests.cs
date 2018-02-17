@@ -192,7 +192,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var controller = new AssetTransactionController(_unitOfWork);
             var vmExpected = new CreateViewModel()
             {
-                AssetId = 6,
+                AssetId = 5,
                 CheckNumber = "123",
                 SelectedTransactionTypeId = "1",
                 SelectedTransactionCategoryId = "2",
@@ -246,6 +246,130 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
             Assert.AreEqual(vmExpected.AssetId, routeResult.RouteValues["id"], "Route Id");
             Assert.AreEqual("Record created", controller.TempData["SuccessMessage"].ToString(), "Message");
+        }
+
+
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            int assetId = 1;
+
+            // Act
+            var result = controller.Edit(assetId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Edit", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(viewResult.Model, typeof(EditViewModel), "View Model");
+        }
+
+        [TestMethod()]
+        public void Edit_Get_WhenProvidedAssetIdIsValid_ReturnValuesFromDatabase_Test()
+        {
+            // Arrange
+            var date = DateTime.Now;
+            var _dataAssetTransactions = new List<AssetTransaction>() {
+                new AssetTransaction() {
+                    Id = 10, AssetId = 20, TransactionTypeId = 1, TransactionCategoryId = 2, TransactionDescriptionId = 4,
+                    CheckNumber = "1234", TransactionDate = date, Amount = 199.99M, Note = "Test Note", IsActive = true }}; 
+            _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
+            var _dataAssets = new List<Asset>() {
+                new Asset() { Id = 20, AssetTypeId = 30, Name = "Asset", IsActive = true } }; // NOT active
+            _unitOfWork.Assets = new InMemoryAssetRepository(_dataAssets);
+            var _dataAssetTypes = new List<AssetType>() {
+                new AssetType() { Id = 30, Name = "AssetType", IsActive = true } }; // NOT active
+            _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
+            var controller = new AssetTransactionController(_unitOfWork);
+            int id = 10;
+
+            // Act
+            var result = controller.Edit(id);
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.Model as EditViewModel;
+            Assert.AreEqual(id, vmResult.Id, "Id");
+            Assert.AreEqual("Asset", vmResult.AssetName, "Asset Name");
+            Assert.AreEqual("AssetType", vmResult.AssetTypeName, "AssetType Name");
+            Assert.AreEqual("1", vmResult.SelectedTransactionTypeId, "Selected TransactionType Id");
+            Assert.AreEqual("2", vmResult.SelectedTransactionCategoryId, "Selected TransactionCategory Id");
+            Assert.AreEqual("4", vmResult.SelectedTransactionDescriptionId, "Selected TransactionDescription Id");
+            Assert.AreEqual(date, vmResult.Date, "TransactionDate");
+            Assert.AreEqual("1234", vmResult.CheckNumber, "CheckNumber");
+            Assert.AreEqual(199.99M, vmResult.Amount, "Ammount");
+            Assert.AreEqual("Test Note", vmResult.Note, "Note");
+            Assert.IsTrue(vmResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
+        {
+            // Arrange
+            var date = DateTime.Now;
+            var _dataAssetTransactions = new List<AssetTransaction>() {
+                new AssetTransaction() {
+                    Id = 10, AssetId = 5, TransactionTypeId = 1, TransactionCategoryId = 2, TransactionDescriptionId = 4,
+                    CheckNumber = "1234", TransactionDate = date, Amount = 199.99M, Note = "Test Note", IsActive = true }};
+            _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
+            var controller = new AssetTransactionController(_unitOfWork);
+            var vmExpected = new EditViewModel()
+            {
+                Id = 10,
+                AssetId = 5,
+                CheckNumber = "123", // updated
+                SelectedTransactionTypeId = "2", // updated
+                SelectedTransactionCategoryId = "4", // updated
+                SelectedTransactionDescriptionId = "1", // updated
+                Date = date.AddMonths(2), // updated
+                Amount = 9.99M, // updated
+                Note = "this is a note" // updated
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert
+            Assert.IsTrue(_unitOfWork.Committed, "Transaction Committed");
+            var dtoResult = _dataAssetTransactions.FirstOrDefault(r => r.Id == vmExpected.Id);
+            Assert.AreEqual(vmExpected.CheckNumber, dtoResult.CheckNumber, "CheckNumber");
+            Assert.AreEqual(vmExpected.SelectedTransactionTypeId, dtoResult.TransactionTypeId.ToString(), "Type ID");
+            Assert.AreEqual(vmExpected.SelectedTransactionCategoryId, dtoResult.TransactionCategoryId.ToString(), "Category ID");
+            Assert.AreEqual(vmExpected.SelectedTransactionDescriptionId, dtoResult.TransactionDescriptionId.ToString(), "Description ID");
+            Assert.AreEqual(vmExpected.Date, dtoResult.TransactionDate, "Date");
+            Assert.AreEqual(vmExpected.Amount, dtoResult.Amount, "Amount");
+            Assert.AreEqual(vmExpected.Note, dtoResult.Note, "Note");
+            Assert.IsTrue(dtoResult.IsActive, "IsActive");
+        }
+
+        [TestMethod()]
+        public void Edit_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            var vmExpected = new EditViewModel()
+            {
+                Id = 1,
+                SelectedTransactionTypeId = "2",
+                SelectedTransactionCategoryId = "4",
+                SelectedTransactionDescriptionId = "5",
+                Date = DateTime.Now,
+                Amount = 20.99M,
+            };
+
+            // Act
+            var result = controller.Edit(vmExpected);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Details", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
+            Assert.AreEqual(vmExpected.Id, routeResult.RouteValues["id"], "Route Id");
+            Assert.AreEqual("Record updated", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
 
     }

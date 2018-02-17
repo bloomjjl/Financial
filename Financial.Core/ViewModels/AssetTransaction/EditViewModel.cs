@@ -8,22 +8,32 @@ using System.Web.Mvc;
 
 namespace Financial.Core.ViewModels.AssetTransaction
 {
-    public class CreateViewModel
+    public class EditViewModel
     {
-        public CreateViewModel() { }
+        public EditViewModel() { }
 
-        public CreateViewModel(Models.Asset dtoAsset, Models.AssetType dtoAssetType, DateTime date,
+        public EditViewModel(Models.AssetTransaction dtoAssetTransaction, Models.Asset dtoAsset, Models.AssetType dtoAssetType,
             List<SelectListItem> sliTransactionTypes, List<SelectListItem> sliTransactionCategories, List<SelectListItem> sliTransactionDescriptions)
         {
+            Id = dtoAssetTransaction.Id;
             AssetId = dtoAsset.Id;
             AssetName = dtoAsset.Name;
             AssetTypeName = dtoAssetType.Name;
-            Date = date;
+            Date = dtoAssetTransaction.TransactionDate;
+            CheckNumber = dtoAssetTransaction.CheckNumber;
+            Amount = dtoAssetTransaction.Amount;
+            Note = dtoAssetTransaction.Note;
             TransactionTypes = sliTransactionTypes;
+            SelectedTransactionTypeId = dtoAssetTransaction.TransactionTypeId.ToString();
             TransactionCategories = sliTransactionCategories;
+            SelectedTransactionCategoryId = dtoAssetTransaction.TransactionCategoryId.ToString();
             TransactionDescriptions = sliTransactionDescriptions;
+            SelectedTransactionDescriptionId = dtoAssetTransaction.TransactionDescriptionId.ToString();
+            IsActive = dtoAssetTransaction.IsActive;
         }
 
+
+        public int Id { get; set; }
         public int AssetId { get; set; }
         [Display(Name = "Asset Name")]
         public string AssetName { get; set; }
@@ -49,5 +59,7 @@ namespace Financial.Core.ViewModels.AssetTransaction
         [Display(Name = "Description")]
         public string SelectedTransactionDescriptionId { get; set; }
         public IEnumerable<SelectListItem> TransactionDescriptions { get; set; }
+        [Display(Name = "Active")]
+        public bool IsActive { get; set; }
     }
 }

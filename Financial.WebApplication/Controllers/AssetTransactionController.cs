@@ -38,7 +38,7 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Create(int assetId)
         {
-            // transfer dto to vm
+            // transfer id to dto 
             var dtoAsset = UOW.Assets.Get(assetId);
             var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 
@@ -48,7 +48,7 @@ namespace Financial.WebApplication.Controllers
             var sliTransactionDescriptions = GetSelectListOfTransactionDescriptions(null);
 
             // display view
-            return View("Create", new CreateViewModel(dtoAsset, dtoAssetType, sliTransactionTypes, sliTransactionCategories, sliTransactionDescriptions));
+            return View("Create", new CreateViewModel(dtoAsset, dtoAssetType, DateTime.Now, sliTransactionTypes, sliTransactionCategories, sliTransactionDescriptions));
         }
 
         [HttpPost]
@@ -68,10 +68,12 @@ namespace Financial.WebApplication.Controllers
                 IsActive = true
             });
 
+            /*
             var selectedItems = JsonConvert.DeserializeObject(vmCreate.TransactionCategoriesSelected, typeof(List<int>));
             var blank1 = "";
-
+            
             return RedirectToAction("Create", new { assetId = vmCreate.AssetId });
+            */
 
             // update db
             UOW.CommitTrans();
@@ -79,6 +81,45 @@ namespace Financial.WebApplication.Controllers
             // display view with message
             TempData["SuccessMessage"] = "Record created";
             return RedirectToAction("Details", "Asset", new { Id = vmCreate.AssetId });
+        }
+
+        [HttpGet]
+        public ActionResult Edit(int Id)
+        {
+            // transfer id to dto 
+            var dtoAssetTransaction = UOW.AssetTransactions.Get(Id);
+            var dtoAsset = UOW.Assets.Get(dtoAssetTransaction.AssetId);
+            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+
+            // transfer dto to sli
+            var sliTransactionTypes = GetSelectListOfTransactionTypes(dtoAssetTransaction.TransactionTypeId.ToString());
+            var sliTransactionCategories = GetSelectListOfTransactionCategories(dtoAssetTransaction.TransactionCategoryId.ToString());
+            var sliTransactionDescriptions = GetSelectListOfTransactionDescriptions(dtoAssetTransaction.TransactionDescriptionId.ToString());
+
+            // display view
+            return View("Edit", new EditViewModel(dtoAssetTransaction, dtoAsset, dtoAssetType, sliTransactionTypes, sliTransactionCategories, sliTransactionDescriptions));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(EditViewModel vmEdit)
+        {
+            // transfer vm to dto
+            var dtoAssetTransaction = UOW.AssetTransactions.Get(vmEdit.Id);
+            dtoAssetTransaction.TransactionTypeId = GetIntegerFromString(vmEdit.SelectedTransactionTypeId);
+            dtoAssetTransaction.TransactionCategoryId = GetIntegerFromString(vmEdit.SelectedTransactionCategoryId);
+            dtoAssetTransaction.TransactionDescriptionId = GetIntegerFromString(vmEdit.SelectedTransactionDescriptionId);
+            dtoAssetTransaction.CheckNumber = vmEdit.CheckNumber;
+            dtoAssetTransaction.TransactionDate = vmEdit.Date;
+            dtoAssetTransaction.Amount = vmEdit.Amount;
+            dtoAssetTransaction.Note = vmEdit.Note;
+
+            // update db
+            UOW.CommitTrans();
+
+            // display view with message
+            TempData["SuccessMessage"] = "Record updated";
+            return RedirectToAction("Details", "Asset", new { id = vmEdit.Id });
         }
 
         [HttpGet]
