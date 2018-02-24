@@ -18,7 +18,7 @@ namespace Financial.Core.ViewModels.AssetTransaction
             AssetId = dtoAsset.Id;
             AssetName = dtoAsset.Name;
             AssetTypeName = dtoAssetType.Name;
-            Date = date.ToString("MM/dd/yyyy");
+            DueDate = date.ToString("MM/dd/yyyy");
             TransactionTypes = sliTransactionTypes;
             TransactionCategories = sliTransactionCategories;
             TransactionDescriptions = sliTransactionDescriptions;
@@ -32,8 +32,12 @@ namespace Financial.Core.ViewModels.AssetTransaction
         [Display(Name = "Check Number")]
         public string CheckNumber { get; set; }
         [Required]
+        [Display(Name = "Due")]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string Date { get; set; }
+        public string DueDate { get; set; }
+        [Display(Name = "Cleared")]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
+        public string ClearDate { get; set; }
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }

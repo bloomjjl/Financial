@@ -178,13 +178,35 @@ namespace Financial.WebApplication.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult EditLinkedSettingTypes(EditLinkedSettingTypesViewModel vmEditLinkedSettingTypes)
+        public ActionResult EditLinkedSettingTypes(EditLinkedSettingTypesViewModel vmEditLinks)
         {
-            // transfer vm to dto
-            foreach(var vmEdit in vmEditLinkedSettingTypes.EditViewModels)
+            if(!ModelState.IsValid)
             {
+                return View("EditLinkedSettingTypes", vmEditLinks);
+            }
+
+            // transfer vm to dto
+            foreach (var vmEdit in vmEditLinks.EditViewModels)
+            {
+                // transfer dto for vm
                 var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.Get(vmEdit.Id);
-                dtoAssetTypeSettingType.IsActive = vmEdit.IsActive;
+
+                // validate dto
+                if(dtoAssetTypeSettingType == null || vmEdit.Id == 0)
+                {
+                    // create new dto
+                    UOW.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
+                    {
+                        AssetTypeId = vmEditLinks.AssetTypeId,
+                        SettingTypeId = vmEdit.SettingTypeId,
+                        IsActive = vmEdit.IsActive
+                    });
+                }
+                else
+                {
+                    // update dto
+                    dtoAssetTypeSettingType.IsActive = vmEdit.IsActive;
+                }
             }
 
             // complete db update
@@ -192,7 +214,7 @@ namespace Financial.WebApplication.Controllers
 
             // display view with message
             TempData["SuccessMessage"] = "Linked setting types updated.";
-            return RedirectToAction("Details", "AssetType", new { id = vmEditLinkedSettingTypes.AssetTypeId });
+            return RedirectToAction("Details", "AssetType", new { id = vmEditLinks.AssetTypeId });
         }
 
         [HttpGet]

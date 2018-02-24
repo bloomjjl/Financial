@@ -24,11 +24,15 @@ namespace Financial.Core.Models
         [Display(Name = "Check Number")]
         public string CheckNumber { get; set; }
         [Required]
-        [Display(Name = "Date")]
-        [Column("Date")]
+        [Display(Name = "Due")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd hh:mm tt}", ApplyFormatInEditMode = true)]
-        public DateTime TransactionDate { get; set; }
+        public DateTime DueDate { get; set; }
+        [Required]
+        [Display(Name = "Cleared")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd hh:mm tt}", ApplyFormatInEditMode = true)]
+        public DateTime ClearDate { get; set; }
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }

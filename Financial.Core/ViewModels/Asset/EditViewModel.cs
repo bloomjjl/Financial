@@ -24,7 +24,7 @@ namespace Financial.Core.ViewModels.Asset
         public int Id { get; set; }
         public string Name { get; set; }
         [Required]
-        [Display(Name = "Asset Type")]
+        [Display(Name = "Type")]
         public string SelectedAssetTypeId { get; set; }
         public IEnumerable<SelectListItem> AssetTypes { get; set; }
     }

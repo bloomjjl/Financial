@@ -21,7 +21,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.AssetName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.LabelFor(model => model.AssetName, new { @class = "control-label text-muted" })
+                @Html.Label(Model.AssetName, new { @class = "control-label text-muted" })
                 @Html.ValidationMessageFor(model => model.AssetName, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -29,8 +29,14 @@
         <div class="form-group">
             @Html.LabelFor(model => model.AssetTypeName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.LabelFor(model => model.AssetTypeName, new { @class = "control-label text-muted" })
+                @Html.Label(Model.AssetTypeName, new { @class = "control-label text-muted" })
                 @Html.ValidationMessageFor(model => model.AssetTypeName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                @Html.ActionLink("Change", "SelectAssetToCreate", "AssetTransaction", null, new { @class = "btn btn-default" })
             </div>
         </div>
 
@@ -58,23 +64,24 @@
             @Html.LabelFor(model => model.SelectedTransactionCategoryId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownListFor(model => model.SelectedTransactionCategoryId, Model.TransactionCategories, "-- Select a Category --", new { @class = "form-control" })
+                @Html.ActionLink("Create New Category", "Create", "TransactionCategory", null, null)
                 @Html.ValidationMessageFor(model => model.SelectedTransactionCategoryId, "", new { @class = "text-danger" })
             </div>
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.SelectedTransactionDescriptionId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div id="date_group" class="form-group">
+            @Html.LabelFor(model => model.DueDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.SelectedTransactionDescriptionId, Model.TransactionDescriptions, "-- Select a Description --", new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.SelectedTransactionDescriptionId, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.DueDate, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div id="date_group" class="form-group">
-            @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.ClearDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { id = "datepicker", @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.ClearDate, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                @Html.ValidationMessageFor(model => model.ClearDate, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -111,7 +118,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         $(function () {
-            $("#datepicker").datepicker();
+            $(".datepicker").datepicker();
         });
 
         /*

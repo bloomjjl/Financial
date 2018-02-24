@@ -13,13 +13,14 @@ namespace Financial.Core.ViewModels.AssetTransaction
         public EditViewModel() { }
 
         public EditViewModel(Models.AssetTransaction dtoAssetTransaction, Models.Asset dtoAsset, Models.AssetType dtoAssetType,
-            List<SelectListItem> sliTransactionTypes, List<SelectListItem> sliTransactionCategories, List<SelectListItem> sliTransactionDescriptions)
+            List<SelectListItem> sliTransactionTypes, List<SelectListItem> sliTransactionCategories)
         {
             Id = dtoAssetTransaction.Id;
             AssetId = dtoAsset.Id;
             AssetName = dtoAsset.Name;
             AssetTypeName = dtoAssetType.Name;
-            Date = dtoAssetTransaction.TransactionDate.ToString("MM/dd/yyyy");
+            DueDate = dtoAssetTransaction.DueDate.ToString("MM/dd/yyyy");
+            ClearDate = dtoAssetTransaction.ClearDate.ToString("MM/dd/yyyy");
             CheckNumber = dtoAssetTransaction.CheckNumber;
             Amount = dtoAssetTransaction.Amount;
             Note = dtoAssetTransaction.Note;
@@ -27,8 +28,6 @@ namespace Financial.Core.ViewModels.AssetTransaction
             SelectedTransactionTypeId = dtoAssetTransaction.TransactionTypeId.ToString();
             TransactionCategories = sliTransactionCategories;
             SelectedTransactionCategoryId = dtoAssetTransaction.TransactionCategoryId.ToString();
-            TransactionDescriptions = sliTransactionDescriptions;
-            SelectedTransactionDescriptionId = dtoAssetTransaction.TransactionDescriptionId.ToString();
         }
 
 
@@ -41,8 +40,12 @@ namespace Financial.Core.ViewModels.AssetTransaction
         [Display(Name = "Check Number")]
         public string CheckNumber { get; set; }
         [Required]
+        [Display(Name = "Due")]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string Date { get; set; }
+        public string DueDate { get; set; }
+        [Display(Name = "Cleared")]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
+        public string ClearDate { get; set; }
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }
@@ -54,9 +57,5 @@ namespace Financial.Core.ViewModels.AssetTransaction
         [Display(Name = "Category")]
         public string SelectedTransactionCategoryId { get; set; }
         public IEnumerable<SelectListItem> TransactionCategories { get; set; }
-        [Required]
-        [Display(Name = "Description")]
-        public string SelectedTransactionDescriptionId { get; set; }
-        public IEnumerable<SelectListItem> TransactionDescriptions { get; set; }
     }
 }

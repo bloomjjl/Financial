@@ -1,0 +1,69 @@
+﻿@model IEnumerable<Financial.Core.ViewModels.AssetTransaction.IndexViewModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Transactions</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.DueDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ClearDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AssetName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Income)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Expense)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Total)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.DueDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ClearDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AssetName)
+        </td>
+        <td>
+            @if (item.TransactionType == "Income")
+            {
+                @Html.DisplayFor(modelItem => item.Amount)
+            }
+        </td>
+        <td>
+            @if (item.TransactionType == "Expense")
+            {
+                @Html.DisplayFor(modelItem => item.Amount)
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Total)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", "AssetTransaction", new { id = item.Id }, null) |
+            @Html.ActionLink("Details", "Details", "Asset", new { id = item.AssetId }, null) |
+            @Html.ActionLink("Delete", "Delete", "AssetTransaction", new { id = item.Id }, null)
+        </td>
+    </tr>
+}
+
+</table>

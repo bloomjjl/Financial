@@ -51,5 +51,5 @@
     <p>
         @Html.ActionLink("Create New", "Create", "AssetTransaction", new { assetId = Model.Id }, null)
     </p>
-    @{Html.RenderAction("Index", "AssetTransaction", new { assetId = Model.Id });}
+    @{Html.RenderAction("DisplayForAsset", "AssetTransaction", new { assetId = Model.Id });}
 </div>

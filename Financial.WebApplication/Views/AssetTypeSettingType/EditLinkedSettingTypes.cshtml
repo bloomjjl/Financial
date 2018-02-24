@@ -16,6 +16,7 @@
         <hr />
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.AssetTypeName)
 
         <div class="form-group">
             @Html.LabelFor(model => model.AssetTypeName, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -29,13 +30,14 @@
         <h4>Setting Types</h4>
         <hr />
 
-        @for(int i = 0; i < Model.EditViewModels.Count(); i++)
+        @for (int i = 0; i < Model.EditViewModels.Count(); i++)
         {
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
                     @Html.HiddenFor(modelItem => Model.EditViewModels[i].Id)
+                    @Html.HiddenFor(modelItem => Model.EditViewModels[i].SettingTypeId)
                     @Html.CheckBoxFor(modelItem => Model.EditViewModels[i].IsActive, htmlAttributes: new { @class = "control-checkbox" })
-                    @Html.Label(Model.EditViewModels[i].SettingTypeName, new { htmlAttributes = new { @class = "control-label" } })
+                    @Html.Label(Model.EditViewModels[i].SettingTypeName, new { @class = "control-label" })
                 </div>
             </div>
         }
@@ -43,7 +45,7 @@
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Save" class="btn btn-default" />
-                @Html.ActionLink("Cancel", "Details", "AssetType", new{ id = Model.AssetTypeId }, new { @class = "btn btn-default" })
+                @Html.ActionLink("Cancel", "Details", "AssetType", new { id = Model.AssetTypeId }, new { @class = "btn btn-default" })
             </div>
         </div>
     </div>

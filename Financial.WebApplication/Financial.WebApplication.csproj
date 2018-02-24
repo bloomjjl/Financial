@@ -180,6 +180,7 @@
     <Compile Include="Controllers\ParentChildRelationshipTypeController.cs" />
     <Compile Include="Controllers\RelationshipTypeController.cs" />
     <Compile Include="Controllers\SettingTypeController.cs" />
+    <Compile Include="Controllers\TransactionCategoryController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -375,9 +376,12 @@
     <Content Include="Views\Asset\Details.cshtml" />
     <Content Include="Views\Asset\Delete.cshtml" />
     <Content Include="Views\AssetSetting\_Index.cshtml" />
-    <Content Include="Views\AssetTransaction\_Index.cshtml" />
+    <Content Include="Views\AssetTransaction\_DisplayForAsset.cshtml" />
     <Content Include="Views\AssetTransaction\Create.cshtml" />
     <Content Include="Views\AssetTransaction\Edit.cshtml" />
+    <Content Include="Views\AssetTransaction\Index.cshtml" />
+    <Content Include="Views\AssetTransaction\SelectAssetToCreate.cshtml" />
+    <Content Include="Views\TransactionCategory\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

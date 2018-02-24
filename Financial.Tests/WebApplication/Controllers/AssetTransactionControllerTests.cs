@@ -31,15 +31,14 @@ namespace Financial.Tests.WebApplication.Controllers
         {
             // Arrange
             var controller = _controller;
-            int assetId = 1;
 
             // Act
-            var result = controller.Index(assetId);
+            var result = controller.Index();
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(PartialViewResult), "View Result");
-            var viewResult = result as PartialViewResult;
-            Assert.AreEqual("_Index", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
+            var viewResult = result as ViewResult;
+            Assert.AreEqual("Index", viewResult.ViewName, "View Name");
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<IndexViewModel>), "View Model");
         }
 
@@ -49,10 +48,66 @@ namespace Financial.Tests.WebApplication.Controllers
             // Arrange
             var _dataAssetTransactions = new List<AssetTransaction>() {
                 new AssetTransaction() {
-                    Id = 10, AssetId = 1, TransactionDate = new DateTime(2018, 1, 15), Amount = 111.11M,  
+                    Id = 10, AssetId = 20, DueDate = new DateTime(2018, 1, 15), Amount = 111.11M,
+                    TransactionTypeId = 30, TransactionCategoryId = 4, TransactionDescriptionId = 5, IsActive = true }, // count
+                new AssetTransaction() {
+                    Id = 11, AssetId = 20, DueDate = new DateTime(2018, 2, 16), Amount = 222.22M, 
+                    TransactionTypeId = 30, TransactionCategoryId = 4, TransactionDescriptionId = 5, IsActive = false } }; // NOT active
+            _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
+            var _dataAssets = new List<Asset>() {
+                new Asset() { Id = 20, AssetTypeId = 1, Name = "Asset 1", IsActive = true }
+            };
+            _unitOfWork.Assets = new InMemoryAssetRepository(_dataAssets);
+            var _dataTransactionTypes = new List<TransactionType>() {
+                new TransactionType() { Id = 30, Name = "Income", IsActive = true } };
+            _unitOfWork.TransactionTypes = new InMemoryTransactionTypeRepository(_dataTransactionTypes);
+            var controller = new AssetTransactionController(_unitOfWork);
+            int expectedCount = 1;
+
+            // Act
+            var result = controller.Index();
+
+            // Assert
+            var viewResult = result as ViewResult;
+            var vmResult = viewResult.ViewData.Model as List<IndexViewModel>;
+            Assert.AreEqual(expectedCount, vmResult.Count(), "Count");
+            Assert.AreEqual(10, vmResult[0].Id, "AssetTransaction Id");
+            Assert.AreEqual(20, vmResult[0].AssetId, "Asset Id");
+            Assert.AreEqual("Asset 1", vmResult[0].AssetName, "Asset Name");
+            Assert.AreEqual(new DateTime(2018, 1, 15).ToString("MM/dd/yyyy"), vmResult[0].DueDate, "AssetTransaction Date");
+            Assert.AreEqual(111.11M, vmResult[0].Amount, "AssetTransaction Amount");
+            Assert.AreEqual("Income", vmResult[0].TransactionType, "TransactionType");
+        }
+
+
+
+        [TestMethod()]
+        public void DisplayForAsset_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
+        {
+            // Arrange
+            var controller = _controller;
+            int assetId = 1;
+
+            // Act
+            var result = controller.DisplayForAsset(assetId);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(PartialViewResult), "View Result");
+            var viewResult = result as PartialViewResult;
+            Assert.AreEqual("_DisplayForAsset", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(List<DisplayForAssetViewModel>), "View Model");
+        }
+
+        [TestMethod()]
+        public void DisplayForAsset_Get_WhenProvidedAssetIdIsValid_ReturnActiveRecordsFromDatabase_Test()
+        {
+            // Arrange
+            var _dataAssetTransactions = new List<AssetTransaction>() {
+                new AssetTransaction() {
+                    Id = 10, AssetId = 1, DueDate = new DateTime(2018, 1, 15), Amount = 111.11M,  Note = "Test Note 1",
                     TransactionTypeId = 2, TransactionCategoryId = 4, TransactionDescriptionId = 5, IsActive = true }, // count
                 new AssetTransaction() {
-                    Id = 11, AssetId = 1, TransactionDate = new DateTime(2018, 2, 16), Amount = 222.22M, 
+                    Id = 11, AssetId = 1, DueDate = new DateTime(2018, 2, 16), Amount = 222.22M, Note = "Test Note 2",
                     TransactionTypeId = 2, TransactionCategoryId = 4, TransactionDescriptionId = 5, IsActive = false } }; // NOT active
             _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
             var controller = new AssetTransactionController(_unitOfWork);
@@ -60,16 +115,20 @@ namespace Financial.Tests.WebApplication.Controllers
             int expectedCount = 1;
 
             // Act
-            var result = controller.Index(assetId);
+            var result = controller.DisplayForAsset(assetId);
 
             // Assert
             var viewResult = result as PartialViewResult;
-            var vmResult = viewResult.Model as List<IndexViewModel>;
+            var vmResult = viewResult.Model as List<DisplayForAssetViewModel>;
             Assert.AreEqual(expectedCount, vmResult.Count(), "Count");
+            Assert.AreEqual(10, vmResult[0].Id, "AssetTransaction Id");
+            Assert.AreEqual(new DateTime(2018, 1, 15).ToString("MM/dd/yyyy"), vmResult[0].DueDate, "AssetTransaction Date");
+            Assert.AreEqual(111.11M, vmResult[0].Amount, "AssetTransaction Amount");
+            Assert.AreEqual("Test Note 1", vmResult[0].Note, "AssetTransaction Note");
         }
 
 
-        
+
         [TestMethod()]
         public void Create_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
         {
@@ -197,7 +256,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SelectedTransactionTypeId = "1",
                 SelectedTransactionCategoryId = "2",
                 SelectedTransactionDescriptionId = "4",
-                Date = DateTime.Now.ToShortDateString(),
+                DueDate = DateTime.Now.ToShortDateString(),
                 Amount = 9.99M,
                 Note = "this is a note"
             };
@@ -212,8 +271,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(vmExpected.SelectedTransactionTypeId, dtoResult.TransactionTypeId.ToString(), "Type ID");
             Assert.AreEqual(vmExpected.SelectedTransactionCategoryId, dtoResult.TransactionCategoryId.ToString(), "Category ID");
             Assert.AreEqual(vmExpected.SelectedTransactionDescriptionId, dtoResult.TransactionDescriptionId.ToString(), "Description ID");
-            Assert.IsNotNull(dtoResult.TransactionDate, "Date Found");
-            Assert.AreNotEqual(new DateTime(), dtoResult.TransactionDate, "Date Valid");
+            Assert.IsNotNull(dtoResult.DueDate, "Date Found");
+            Assert.AreNotEqual(new DateTime(), dtoResult.DueDate, "Date Valid");
             Assert.AreEqual(vmExpected.Amount, dtoResult.Amount, "Amount");
             Assert.AreEqual(vmExpected.Note, dtoResult.Note, "Note");
             Assert.IsTrue(dtoResult.IsActive, "IsActive");
@@ -232,7 +291,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 SelectedTransactionTypeId = "2",
                 SelectedTransactionCategoryId = "4",
                 SelectedTransactionDescriptionId = "5",
-                Date = DateTime.Now.ToShortDateString(),
+                DueDate = DateTime.Now.ToShortDateString(),
                 Amount = 20.99M
             };
 
@@ -271,11 +330,12 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Get_WhenProvidedAssetIdIsValid_ReturnValuesFromDatabase_Test()
         {
             // Arrange
-            var date = DateTime.Now;
+            var dueDate = DateTime.Now;
+            var clearDate = dueDate.AddMonths(2);
             var _dataAssetTransactions = new List<AssetTransaction>() {
                 new AssetTransaction() {
                     Id = 10, AssetId = 20, TransactionTypeId = 1, TransactionCategoryId = 2, TransactionDescriptionId = 4,
-                    CheckNumber = "1234", TransactionDate = date, Amount = 199.99M, Note = "Test Note", IsActive = true }}; 
+                    CheckNumber = "1234", DueDate = dueDate, ClearDate = clearDate, Amount = 199.99M, Note = "Test Note", IsActive = true }}; 
             _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
             var _dataAssets = new List<Asset>() {
                 new Asset() { Id = 20, AssetTypeId = 30, Name = "Asset", IsActive = true } }; // NOT active
@@ -298,8 +358,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("AssetType", vmResult.AssetTypeName, "AssetType Name");
             Assert.AreEqual("1", vmResult.SelectedTransactionTypeId, "Selected TransactionType Id");
             Assert.AreEqual("2", vmResult.SelectedTransactionCategoryId, "Selected TransactionCategory Id");
-            Assert.AreEqual("4", vmResult.SelectedTransactionDescriptionId, "Selected TransactionDescription Id");
-            Assert.AreEqual(date.ToString("MM/dd/yyyy"), vmResult.Date, "TransactionDate");
+            Assert.AreEqual(dueDate.ToString("MM/dd/yyyy"), vmResult.DueDate, "DueDate");
+            Assert.AreEqual(clearDate.ToString("MM/dd/yyyy"), vmResult.ClearDate, "ClearDate");
             Assert.AreEqual("1234", vmResult.CheckNumber, "CheckNumber");
             Assert.AreEqual(199.99M, vmResult.Amount, "Ammount");
             Assert.AreEqual("Test Note", vmResult.Note, "Note");
@@ -309,11 +369,12 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
         {
             // Arrange
-            var date = DateTime.Now;
+            var dueDate = DateTime.Now;
+            var clearDate = dueDate.AddMonths(2);
             var _dataAssetTransactions = new List<AssetTransaction>() {
                 new AssetTransaction() {
                     Id = 10, AssetId = 5, TransactionTypeId = 1, TransactionCategoryId = 2, TransactionDescriptionId = 4,
-                    CheckNumber = "1234", TransactionDate = date, Amount = 199.99M, Note = "Test Note", IsActive = true }};
+                    CheckNumber = "1234", DueDate = dueDate, Amount = 199.99M, Note = "Test Note", IsActive = true }};
             _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
             var controller = new AssetTransactionController(_unitOfWork);
             var vmExpected = new EditViewModel()
@@ -323,8 +384,8 @@ namespace Financial.Tests.WebApplication.Controllers
                 CheckNumber = "123", // updated
                 SelectedTransactionTypeId = "2", // updated
                 SelectedTransactionCategoryId = "4", // updated
-                SelectedTransactionDescriptionId = "1", // updated
-                Date = date.AddMonths(2).ToString("MM/dd/yyyy"), // updated
+                DueDate = dueDate.AddMonths(2).ToString("MM/dd/yyyy"), // updated
+                ClearDate = clearDate.ToString("MM/dd/yyyy"), // added
                 Amount = 9.99M, // updated
                 Note = "this is a note" // updated
             };
@@ -339,8 +400,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(vmExpected.CheckNumber, dtoResult.CheckNumber, "CheckNumber");
             Assert.AreEqual(vmExpected.SelectedTransactionTypeId, dtoResult.TransactionTypeId.ToString(), "Type ID");
             Assert.AreEqual(vmExpected.SelectedTransactionCategoryId, dtoResult.TransactionCategoryId.ToString(), "Category ID");
-            Assert.AreEqual(vmExpected.SelectedTransactionDescriptionId, dtoResult.TransactionDescriptionId.ToString(), "Description ID");
-            Assert.AreEqual(vmExpected.Date, dtoResult.TransactionDate.ToString("MM/dd/yyyy"), "Date");
+            Assert.AreEqual(vmExpected.DueDate, dtoResult.DueDate.ToString("MM/dd/yyyy"), "DueDate");
+            Assert.AreEqual(vmExpected.ClearDate, dtoResult.ClearDate.ToString("MM/dd/yyyy"), "ClearDate");
             Assert.AreEqual(vmExpected.Amount, dtoResult.Amount, "Amount");
             Assert.AreEqual(vmExpected.Note, dtoResult.Note, "Note");
             Assert.IsTrue(dtoResult.IsActive, "IsActive");
@@ -350,11 +411,11 @@ namespace Financial.Tests.WebApplication.Controllers
         public void Edit_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
             // Arrange
-            var date = DateTime.Now;
+            var dueDate = DateTime.Now;
             var _dataAssetTransactions = new List<AssetTransaction>() {
                 new AssetTransaction() {
                     Id = 10, AssetId = 5, TransactionTypeId = 1, TransactionCategoryId = 2, TransactionDescriptionId = 4,
-                    CheckNumber = "1234", TransactionDate = date, Amount = 199.99M, Note = "Test Note", IsActive = true }};
+                    CheckNumber = "1234", DueDate = dueDate, Amount = 199.99M, Note = "Test Note", IsActive = true }};
             _unitOfWork.AssetTransactions = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
             var controller = new AssetTransactionController(_unitOfWork);
             var vmExpected = new EditViewModel()
@@ -363,8 +424,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 AssetId = 1,
                 SelectedTransactionTypeId = "2",
                 SelectedTransactionCategoryId = "4",
-                SelectedTransactionDescriptionId = "5",
-                Date = DateTime.Now.ToString("MM/dd/yyyy"),
+                DueDate = DateTime.Now.ToString("MM/dd/yyyy"),
                 Amount = 20.99M,
             };
 

@@ -1,0 +1,87 @@
+﻿@model Financial.Core.ViewModels.AssetTransaction.SelectAssetToCreateViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Asset</h2>
+
+
+@using (Html.BeginForm("SelectAssetToCreate", "AssetTransaction", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Create Transaction</h4>
+        <hr />
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div id="link_asset_types" class="form-group">
+            @Html.LabelFor(model => model.SelectedAssetId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedAssetId, Model.Assets, "-- Select an Asset --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.SelectedAssetId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Submit" class="btn btn-default" />
+                @Html.ActionLink("Create", "Create", "Asset", null, new { @class = "btn btn-default" })
+                @Html.ActionLink("Cancel", "Index", "AssetTransaction", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function () {
+            $(".datepicker").datepicker();
+        });
+
+        /*
+        $("#datepicker").focus(function () {
+            document.getElementById("date_group").style.paddingBottom = "180px";
+        });
+
+        $("#datepicker").focusout(function () {
+            document.getElementById("date_group").style.paddingBottom = "0px";
+        });
+
+        $(function () {
+            $('#datetimepicker').datetimepicker();
+        });
+
+        $('#datetimepicker').datetimepicker({
+            timeFormat: 'hh:mm TT',
+            interval: 60,
+            dynamic: true,
+            dropdown: true,
+            scrollbar: true
+        });
+    */
+
+        // return list of multiple selected values from dropdownlist
+        var categoryList = document.getElementById("category_list");
+        var arrayCategories = [];
+        var selectedCategoriess = document.getElementById("selected_categories");
+        var addCategory = document.getElementById("add_category");
+        addCategory.addEventListener("click", function (event) {
+            // display selected values in view
+            var index = arrayCategories.length;
+            arrayCategories[index] = categoryList.value;
+            selectedCategoriess.innerHTML += categoryList.options[categoryList.selectedIndex].innerHTML;
+            selectedCategoriess.innerHTML += "<br />";
+
+            // store selected values in model
+            $("#category_list_selected").val(JSON.stringify(arrayCategories));
+        });
+    </script>
+}

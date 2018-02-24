@@ -1,12 +1,18 @@
-﻿@model IEnumerable<Financial.Core.ViewModels.AssetTransaction.IndexViewModel>
+﻿@model IEnumerable<Financial.Core.ViewModels.AssetTransaction.DisplayForAssetViewModel>
 
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Date)
+            @Html.DisplayNameFor(model => model.DueDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ClearDate)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Amount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Note)
         </th>
         <th></th>
     </tr>
@@ -14,10 +20,16 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.Date)
+            @Html.DisplayFor(modelItem => item.DueDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ClearDate)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Amount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Note)
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |

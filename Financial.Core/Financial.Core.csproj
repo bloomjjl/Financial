@@ -115,7 +115,9 @@
     <Compile Include="ViewModels\AssetSetting\IndexViewModel.cs" />
     <Compile Include="ViewModels\AssetTransaction\CreateViewModel.cs" />
     <Compile Include="ViewModels\AssetTransaction\EditViewModel.cs" />
+    <Compile Include="ViewModels\AssetTransaction\DisplayForAssetViewModel.cs" />
     <Compile Include="ViewModels\AssetTransaction\IndexViewModel.cs" />
+    <Compile Include="ViewModels\AssetTransaction\SelectAssetToCreateViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DeleteViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\DisplayParentChildRelationshipTypesViewModel.cs" />
     <Compile Include="ViewModels\AssetTypeRelationshipType\CreateViewModel.cs" />
@@ -150,6 +152,7 @@
     <Compile Include="ViewModels\SettingType\DetailsViewModel.cs" />
     <Compile Include="ViewModels\SettingType\EditViewModel.cs" />
     <Compile Include="ViewModels\SettingType\IndexViewModel.cs" />
+    <Compile Include="ViewModels\TransactionCategory\CreateViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -25,17 +25,42 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ActionResult Index(int assetId)
         {
-            // transfer dto to vm
-            var vmIndex = UOW.AssetSettings.GetAll()
+            // transfer id to dto
+            var dtoAsset = UOW.Assets.Get(assetId);
+
+            // validate dto
+            if(dtoAsset == null)
+            {
+                return PartialView("_Index", new List<IndexViewModel>());
+            }
+
+            // get list of linked setting types
+            var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAll()
                 .Where(r => r.IsActive)
-                .Where(r => r.AssetId == assetId)
-                .ToList()
-                .Join(UOW.SettingTypes.GetAll(),
-                    ast => ast.SettingTypeId, st => st.Id,
-                    (ast, st) => new { ast, st })
-                .Where(j => j.st.IsActive)
-                .Select(j => new IndexViewModel(j.ast, assetId, j.st ))
+                .Where(r => r.AssetTypeId == dtoAsset.AssetTypeId)
                 .ToList();
+
+            // create & transfer values to vm
+            var vmIndex = new List<IndexViewModel>();
+            foreach(var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
+            {
+                // transfer to dto
+                var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
+                var dtoAssetSetting = UOW.AssetSettings.GetAll()
+                    .Where(r => r.IsActive)
+                    .Where(r => r.AssetId == dtoAsset.Id)
+                    .FirstOrDefault(r => r.SettingTypeId == dtoSettingType.Id);
+
+                // validate dto
+                if (dtoAssetSetting == null)
+                {
+                    vmIndex.Add(new IndexViewModel(new AssetSetting(), assetId, dtoSettingType));
+                }
+                else
+                { 
+                    vmIndex.Add(new IndexViewModel(dtoAssetSetting, assetId, dtoSettingType));
+                }
+            }
             
             // display view
             return PartialView("_Index", vmIndex);
@@ -98,20 +123,42 @@ namespace Financial.WebApplication.Controllers
         {
             // transfer id to dto
             var dtoAsset = UOW.Assets.Get(assetId);
+            
+            // validate dto
+            if(dtoAsset == null)
+            {
+                return RedirectToAction("Index", "Asset");
+            }
+
             var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 
-            // transfer dto to vm
-            var vmEdit = UOW.AssetSettings.GetAll()
+            // get list of linked setting types
+            var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAll()
                 .Where(r => r.IsActive)
-                .Where(r => r.AssetId == dtoAsset.Id)
-                .ToList()
-                .Join(UOW.SettingTypes.FindAll(r => r.IsActive),
-                    ast => ast.SettingTypeId, st => st.Id,
-                    (ast, st) => new { ast, st })
-                .Where(j => j.st.IsActive)
-                .ToList()
-                .Select(j => new EditViewModel(j.ast, dtoAsset, j.st))
+                .Where(r => r.AssetTypeId == dtoAsset.AssetTypeId)
                 .ToList();
+
+            // create & transfer values to vm
+            var vmEdit = new List<EditViewModel>();
+            foreach (var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
+            {
+                // transfer to dto
+                var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
+                var dtoAssetSetting = UOW.AssetSettings.GetAll()
+                    .Where(r => r.IsActive)
+                    .Where(r => r.AssetId == dtoAsset.Id)
+                    .FirstOrDefault(r => r.SettingTypeId == dtoSettingType.Id);
+
+                // validate dto
+                if (dtoAssetSetting == null)
+                {
+                    vmEdit.Add(new EditViewModel(new AssetSetting(), dtoAsset, dtoSettingType));
+                }
+                else
+                {
+                    vmEdit.Add(new EditViewModel(dtoAssetSetting, dtoAsset, dtoSettingType));
+                }
+            }
 
             // display view
             return View("Edit", new EditLinkedSettingTypesViewModel(dtoAsset, dtoAssetType, vmEdit));
@@ -124,8 +171,23 @@ namespace Financial.WebApplication.Controllers
             // transfer vm to dto
             foreach(var vmEdit in vmEditLinkedSettingTypes.EditViewModels)
             {
-                var dtoAssetSetting = UOW.AssetSettings.Get(vmEdit.Id);
-                dtoAssetSetting.Value = vmEdit.Value;
+                // new entry?
+                if(vmEdit.Id == 0)
+                {
+                    // YES. Create record
+                    UOW.AssetSettings.Add(new AssetSetting()
+                    {
+                        AssetId = vmEditLinkedSettingTypes.AssetId,
+                        SettingTypeId = vmEdit.SettingTypeId,
+                        Value = vmEdit.Value,
+                        IsActive = true
+                    });
+                }
+                else
+                {
+                    var dtoAssetSetting = UOW.AssetSettings.Get(vmEdit.Id);
+                    dtoAssetSetting.Value = vmEdit.Value;
+                }
             }
 
             // update db
