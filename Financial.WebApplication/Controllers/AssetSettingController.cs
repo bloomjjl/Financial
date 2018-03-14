@@ -98,8 +98,15 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateLinkedSettingTypesViewModel vmCreate)
         {
+            // validate vm 
+            if(vmCreate.CreateViewModels == null)
+            {
+                TempData["SuccessMessage"] = "No Linked Setting Types to Update";
+                return RedirectToAction("Details", "Asset", new { id = vmCreate.AssetId });
+            }
+
             // transfer vm to dto
-            foreach(var vm in vmCreate.CreateViewModels)
+            foreach (var vm in vmCreate.CreateViewModels)
             {
                 UOW.AssetSettings.Add(new AssetSetting()
                 {

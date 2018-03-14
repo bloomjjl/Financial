@@ -2,10 +2,13 @@
 
 @{
     ViewBag.Title = "Index";
+    var decTotal = 0.00m;
 }
 
 <h2>Transactions</h2>
-
+@*
+<img src="@Html.Partial("_Chart")" />
+    *@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
@@ -20,13 +23,13 @@
         <th>
             @Html.DisplayNameFor(model => model.AssetName)
         </th>
-        <th>
+        <th style="text-align: right;">
             @Html.DisplayNameFor(model => model.Income)
         </th>
-        <th>
+        <th style="text-align: right;">
             @Html.DisplayNameFor(model => model.Expense)
         </th>
-        <th>
+        <th style="text-align: right;">
             @Html.DisplayNameFor(model => model.Total)
         </th>
         <th></th>
@@ -43,19 +46,19 @@
         <td>
             @Html.DisplayFor(modelItem => item.AssetName)
         </td>
-        <td>
+        <td style="text-align: right;">
             @if (item.TransactionType == "Income")
             {
                 @Html.DisplayFor(modelItem => item.Amount)
             }
         </td>
-        <td>
+        <td style="text-align: right;">
             @if (item.TransactionType == "Expense")
             {
                 @Html.DisplayFor(modelItem => item.Amount)
             }
         </td>
-        <td>
+        <td style="text-align: right;">
             @Html.DisplayFor(modelItem => item.Total)
         </td>
         <td>
@@ -67,3 +70,9 @@
 }
 
 </table>
+
+<script>
+    $(function () {
+        var 
+    });
+</script>

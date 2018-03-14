@@ -8,6 +8,6 @@ namespace Financial.Core.ViewModels.TransactionCategory
 {
     public class CreateViewModel
     {
-        public string CategoryName { get; set; }
+        public string Name { get; set; }
     }
 }

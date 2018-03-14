@@ -36,17 +36,33 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer dto to vm
+            var dbAssets = UOW.Assets.GetAll()
+                .Where(r => r.IsActive);
+
+            var vmIndex = new List<IndexViewModel>();
+            foreach(var dtoAsset in dbAssets)
+            {
+                var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+                var assetNameAdditionalInformaiton = GetAccountNameAdditionalInformation(dtoAsset);
+
+                vmIndex.Add(new IndexViewModel(dtoAsset, assetNameAdditionalInformaiton, dtoAssetType));
+            }
+            /*
             var vmIndex = UOW.Assets.GetAll()
                 .Where(r => r.IsActive)
                 .Join(UOW.AssetTypes.GetAll(),
                     a => a.AssetTypeId, at => at.Id,
                     (a, at) => new { a, at })
                 .Where(j => j.at.IsActive)
-                .Select(vm => new IndexViewModel(vm.a, vm.at))
+                .Join(UOW.AssetSettings.GetAll(),
+                    j.a => j.a.Id, ast => ast.Id,
+                    j.)
+                .Select(j => new IndexViewModel(j.a, j.at))
+                .OrderBy(vm => vm.AssetName)
                 .ToList();
-
+            */
             // display view
-            return View("Index", vmIndex);
+            return View("Index", vmIndex.OrderBy(r => r.AssetName));
         }
 
         [HttpGet]
@@ -111,7 +127,13 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ViewResult Details(int id)
         {
-            // transfer id to vm
+            // get messages from other controllers to display in view
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+
+            // transfer id to dto
             var dtoAsset = UOW.Assets.Get(id);
             var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 

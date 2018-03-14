@@ -27,12 +27,17 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
+                @Html.ActionLink("Create New Asset", "Create", "Asset", null, null)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Submit" class="btn btn-default" />
-                @Html.ActionLink("Create", "Create", "Asset", null, new { @class = "btn btn-default" })
                 @Html.ActionLink("Cancel", "Index", "AssetTransaction", null, new { @class = "btn btn-default" })
             </div>
         </div>
-    </div>
+</div>
 }
 
 @section Scripts {

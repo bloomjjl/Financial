@@ -95,7 +95,7 @@ namespace Financial.WebApplication.Controllers
 
             // display view with message
             TempData["SuccessMessage"] = "Linked setting types created.";
-            return RedirectToAction("Create", "AssetTypeRelationshipType", new { assetTypeId = vmCreateLinkedSettingTypes.AssetTypeId });
+            return RedirectToAction("Index", "AssetType");
         }
 
         [HttpGet]

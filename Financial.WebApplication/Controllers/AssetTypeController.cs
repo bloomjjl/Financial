@@ -38,6 +38,7 @@ namespace Financial.WebApplication.Controllers
             // transfer dto to vm
             var vmIndex = UOW.AssetTypes.GetAll()
                 .Select(r => new IndexViewModel(r))
+                .OrderBy(r => r.Name)
                 .ToList();
 
             // display view

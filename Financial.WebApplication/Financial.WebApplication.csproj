@@ -382,6 +382,11 @@
     <Content Include="Views\AssetTransaction\Index.cshtml" />
     <Content Include="Views\AssetTransaction\SelectAssetToCreate.cshtml" />
     <Content Include="Views\TransactionCategory\Create.cshtml" />
+    <Content Include="Views\TransactionCategory\Index.cshtml" />
+    <Content Include="Views\TransactionCategory\Edit.cshtml" />
+    <Content Include="Views\AssetTransaction\EditAsset.cshtml" />
+    <Content Include="Views\AssetTransaction\_Chart.cshtml" />
+    <Content Include="Views\AssetTransaction\_ChartView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

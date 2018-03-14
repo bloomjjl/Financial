@@ -12,16 +12,15 @@ namespace Financial.Core.ViewModels.AssetTransaction
     {
         public CreateViewModel() { }
 
-        public CreateViewModel(Models.Asset dtoAsset, Models.AssetType dtoAssetType, DateTime date,
-            List<SelectListItem> sliTransactionTypes, List<SelectListItem> sliTransactionCategories, List<SelectListItem> sliTransactionDescriptions)
+        public CreateViewModel(Models.Asset dtoAsset,string assetNameAdditionalInformaiton, Models.AssetType dtoAssetType, DateTime date,
+            List<SelectListItem> sliTransactionTypes, List<SelectListItem> sliTransactionCategories)
         {
             AssetId = dtoAsset.Id;
-            AssetName = dtoAsset.Name;
+            AssetName = dtoAsset.Name + assetNameAdditionalInformaiton;
             AssetTypeName = dtoAssetType.Name;
             DueDate = date.ToString("MM/dd/yyyy");
             TransactionTypes = sliTransactionTypes;
             TransactionCategories = sliTransactionCategories;
-            TransactionDescriptions = sliTransactionDescriptions;
         }
 
         public int AssetId { get; set; }
@@ -49,9 +48,5 @@ namespace Financial.Core.ViewModels.AssetTransaction
         [Display(Name = "Category")]
         public string SelectedTransactionCategoryId { get; set; }
         public IEnumerable<SelectListItem> TransactionCategories { get; set; }
-        [Required]
-        [Display(Name = "Description")]
-        public string SelectedTransactionDescriptionId { get; set; }
-        public IEnumerable<SelectListItem> TransactionDescriptions { get; set; }
     }
 }

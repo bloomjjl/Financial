@@ -11,11 +11,12 @@ namespace Financial.Core.ViewModels.AssetTransaction
     {
         public DisplayForAssetViewModel() { }
 
-        public DisplayForAssetViewModel(Models.AssetTransaction dtoAssetTransaction)
+        public DisplayForAssetViewModel(Models.AssetTransaction dtoAssetTransaction, string clearDate, Models.TransactionCategory dtoTransactionCategory)
         {
             Id = dtoAssetTransaction.Id;
             DueDate = dtoAssetTransaction.DueDate.ToString("MM/dd/yyyy");
-            ClearDate = dtoAssetTransaction.ClearDate.ToString("MM/dd/yyyy");
+            ClearDate = clearDate;
+            Category = dtoTransactionCategory.Name;
             Amount = dtoAssetTransaction.Amount;
             Note = dtoAssetTransaction.Note;
         }
@@ -28,6 +29,7 @@ namespace Financial.Core.ViewModels.AssetTransaction
         [Display(Name = "Cleared")]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public string ClearDate { get; set; }
+        public string Category { get; set; }
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:c}")]
         public decimal Amount { get; set; }
         public string Note { get; set; }

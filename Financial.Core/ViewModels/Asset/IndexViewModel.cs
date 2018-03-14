@@ -11,10 +11,10 @@ namespace Financial.Core.ViewModels.Asset
     {
         public IndexViewModel() {}
 
-        public IndexViewModel(Models.Asset dtoAsset, Models.AssetType dtoAssetType)
+        public IndexViewModel(Models.Asset dtoAsset, string assetNameAdditionalInformation, Models.AssetType dtoAssetType)
         {
             Id = dtoAsset.Id;
-            AssetName = dtoAsset.Name;
+            AssetName = dtoAsset.Name + assetNameAdditionalInformation;
             AssetTypeName = dtoAssetType.Name;
         }
 
@@ -24,5 +24,6 @@ namespace Financial.Core.ViewModels.Asset
         public string AssetName { get; set; }
         [Display(Name = "Type")]
         public string AssetTypeName { get; set; }
+
     }
 }

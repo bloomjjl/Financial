@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Financial Application</title>
+    <title>Financial Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -21,8 +21,9 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("AssetTypes", "Index", "AssetType")</li>
-                    <li>@Html.ActionLink("SettingTypes", "Index", "SettingType")</li>
+                    <li>@Html.ActionLink("Asset Types", "Index", "AssetType")</li>
+                    <li>@Html.ActionLink("Setting Types", "Index", "SettingType")</li>
+                    <li>@Html.ActionLink("Transaction Categories", "Index", "TransactionCategory")</li>
                     <li>@Html.ActionLink("Assets", "Index", "Asset")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
