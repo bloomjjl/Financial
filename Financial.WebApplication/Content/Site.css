@@ -22,3 +22,8 @@ select,
 textarea {
     max-width: 280px;
 }
+
+#table_trasactions th:hover {
+    color: red;
+    cursor: pointer;
+}
