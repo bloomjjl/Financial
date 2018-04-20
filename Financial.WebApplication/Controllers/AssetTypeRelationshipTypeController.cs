@@ -120,8 +120,8 @@ namespace Financial.WebApplication.Controllers
                 UOW.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
                 {
                     ParentAssetTypeId = vmCreate.SuppliedAssetTypeId,
-                    ChildAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkedAssetTypeId.ToString()),
-                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipTypeId),
+                    ChildAssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedAssetTypeId.ToString()),
+                    ParentChildRelationshipTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedParentChildRelationshipTypeId),
                     IsActive = true
                 });
             }
@@ -129,9 +129,9 @@ namespace Financial.WebApplication.Controllers
             {
                 UOW.AssetTypesRelationshipTypes.Add(new AssetTypeRelationshipType
                 {
-                    ParentAssetTypeId = GetIntegerFromString(vmCreate.SelectedLinkedAssetTypeId),
+                    ParentAssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedAssetTypeId),
                     ChildAssetTypeId = vmCreate.SuppliedAssetTypeId,
-                    ParentChildRelationshipTypeId = GetIntegerFromString(vmCreate.SelectedParentChildRelationshipTypeId),
+                    ParentChildRelationshipTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedParentChildRelationshipTypeId),
                     IsActive = true
                 });
             }
@@ -149,14 +149,14 @@ namespace Financial.WebApplication.Controllers
             var countParent = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.Id != id)
                 .Where(r => r.ParentAssetTypeId == suppliedAssetTypeId)
-                .Where(r => r.ChildAssetTypeId == GetIntegerFromString(selectedAssetTypeId))
-                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(selectedParentChildRelationshipType))
+                .Where(r => r.ChildAssetTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(selectedAssetTypeId))
+                .Where(r => r.ParentChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(selectedParentChildRelationshipType))
                 .Count(r => r.IsActive);
             var countChild = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.Id != id)
-                .Where(r => r.ParentAssetTypeId == GetIntegerFromString(selectedAssetTypeId))
+                .Where(r => r.ParentAssetTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(selectedAssetTypeId))
                 .Where(r => r.ChildAssetTypeId == suppliedAssetTypeId)
-                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(selectedParentChildRelationshipType))
+                .Where(r => r.ParentChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(selectedParentChildRelationshipType))
                 .Count(r => r.IsActive);
 
             return countParent + countChild;
@@ -224,14 +224,14 @@ namespace Financial.WebApplication.Controllers
             var countParentRelationship = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.Id == vmEdit.Id)
                 .Where(r => r.ParentAssetTypeId == vmEdit.SuppliedAssetTypeId)
-                .Where(r => r.ChildAssetTypeId == GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId))
-                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
+                .Where(r => r.ChildAssetTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId))
+                .Where(r => r.ParentChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
                 .Count(r => r.IsActive);
             var countChildRelationship = UOW.AssetTypesRelationshipTypes.GetAll()
                 .Where(r => r.Id == vmEdit.Id)
-                .Where(r => r.ParentAssetTypeId == GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId))
+                .Where(r => r.ParentAssetTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId))
                 .Where(r => r.ChildAssetTypeId == vmEdit.SuppliedAssetTypeId)
-                .Where(r => r.ParentChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
+                .Where(r => r.ParentChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId))
                 .Count(r => r.IsActive);
 
             // record changed?
@@ -242,15 +242,15 @@ namespace Financial.WebApplication.Controllers
 
 
                 // transfer vm to dto
-                dtoAssetTypeRelationshipType.ParentChildRelationshipTypeId = GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId);
+                dtoAssetTypeRelationshipType.ParentChildRelationshipTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedParentChildRelationshipTypeId);
                 if (vmEdit.SelectedRelationshipLevel == "Parent")
                 {
                     dtoAssetTypeRelationshipType.ParentAssetTypeId = vmEdit.SuppliedAssetTypeId;
-                    dtoAssetTypeRelationshipType.ChildAssetTypeId = GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId);
+                    dtoAssetTypeRelationshipType.ChildAssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId);
                 }
                 else
                 {
-                    dtoAssetTypeRelationshipType.ParentAssetTypeId = GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId);
+                    dtoAssetTypeRelationshipType.ParentAssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedLinkedAssetTypeId);
                     dtoAssetTypeRelationshipType.ChildAssetTypeId = vmEdit.SuppliedAssetTypeId;
                 }
 

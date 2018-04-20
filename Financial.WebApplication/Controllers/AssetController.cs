@@ -36,97 +36,138 @@ namespace Financial.WebApplication.Controllers
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
             }
 
-            // transfer dto to vm
-            var dbAssets = UOW.Assets.GetAll()
-                .Where(r => r.IsActive);
-
-            var vmIndex = new List<IndexViewModel>();
-            foreach(var dtoAsset in dbAssets)
+            try
             {
-                var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
-                var assetNameAdditionalInformaiton = GetAccountNameAdditionalInformation(dtoAsset);
+                // transfer dto to vm
+                var dbAssets = UOW.Assets.GetAll()
+                    .Where(r => r.IsActive);
 
-                vmIndex.Add(new IndexViewModel(dtoAsset, assetNameAdditionalInformaiton, dtoAssetType));
+                var vmIndex = new List<IndexViewModel>();
+                foreach(var dtoAsset in dbAssets)
+                {
+                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+                    var assetNameAdditionalInformaiton = BS.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
+
+                    vmIndex.Add(new IndexViewModel(dtoAsset, assetNameAdditionalInformaiton, dtoAssetType));
+                }
+ 
+                // display view
+                return View("Index", vmIndex.OrderBy(r => r.AssetName));
             }
-            /*
-            var vmIndex = UOW.Assets.GetAll()
-                .Where(r => r.IsActive)
-                .Join(UOW.AssetTypes.GetAll(),
-                    a => a.AssetTypeId, at => at.Id,
-                    (a, at) => new { a, at })
-                .Where(j => j.at.IsActive)
-                .Join(UOW.AssetSettings.GetAll(),
-                    j.a => j.a.Id, ast => ast.Id,
-                    j.)
-                .Select(j => new IndexViewModel(j.a, j.at))
-                .OrderBy(vm => vm.AssetName)
-                .ToList();
-            */
-            // display view
-            return View("Index", vmIndex.OrderBy(r => r.AssetName));
+            catch (Exception)
+            {
+                return View("Index", new List<IndexViewModel>());
+            }
         }
 
         [HttpGet]
-        public ViewResult Create()
+        public ActionResult Create()
         {
-            // transfer dto to sli
-            var sliAssetTypes = GetAssetTypesDropDownList(null);
+            try
+            {
+                // transfer dto to sli
+                var sliAssetTypes = BS.AssetTypeService.GetAssetTypesDropDownList(null);
 
-            // display view
-            return View("Create", new CreateViewModel(sliAssetTypes));
+                // display view
+                return View("Create", new CreateViewModel(sliAssetTypes));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
-            // transfer vm to dto
-            var dtoAsset = new Asset()
+            try
             {
-                AssetTypeId = GetIntegerFromString(vmCreate.SelectedAssetTypeId),
-                Name = vmCreate.AssetName,
-                IsActive = true
-            };
-            UOW.Assets.Add(dtoAsset);
+                if (ModelState.IsValid)
+                {
+                    // transfer vm to dto
+                    var dtoAsset = new Asset()
+                    {
+                        AssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedAssetTypeId),
+                        Name = vmCreate.AssetName,
+                        IsActive = true
+                    };
+                    UOW.Assets.Add(dtoAsset);
 
-            // update db
-            UOW.CommitTrans();
+                    // update db
+                    UOW.CommitTrans();
 
-            // display view
-            TempData["SuccessMessage"] = "Asset Created";
-            return RedirectToAction("Create", "AssetSetting", new { assetId = dtoAsset.Id });
+                    // display view
+                    TempData["SuccessMessage"] = "Asset Created";
+                    return RedirectToAction("Create", "AssetSetting", new { assetId = dtoAsset.Id });
+                }
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
         }
 
         [HttpGet]
-        public ViewResult Edit(int id)
+        public ActionResult Edit(int id)
         {
-            // transfer id to dto
-            var dtoAsset = UOW.Assets.Get(id);
-            var sliAssetTypes = GetAssetTypesDropDownList(dtoAsset.AssetTypeId);
+            try
+            { 
+                // transfer id to dto
+                var dtoAsset = UOW.Assets.Get(id);
+                if (dtoAsset != null)
+                {
+                    var sliAssetTypes = BS.AssetTypeService.GetAssetTypesDropDownList(dtoAsset.AssetTypeId);
 
-            // display view
-            return View("Edit", new EditViewModel(dtoAsset, sliAssetTypes));
+                    // display view
+                    return View("Edit", new EditViewModel(dtoAsset, sliAssetTypes));
+                }
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EditViewModel vmEdit)
         {
-            // transfer vm to dto
-            var dtoAsset = UOW.Assets.Get(vmEdit.Id);
-            dtoAsset.Name = vmEdit.Name;
-            dtoAsset.AssetTypeId = GetIntegerFromString(vmEdit.SelectedAssetTypeId);
+            try
+            { 
+                // transfer vm to dto
+                var dtoAsset = UOW.Assets.Get(vmEdit.Id);
+                if (dtoAsset != null)
+                {
+                    dtoAsset.Name = vmEdit.Name;
+                    dtoAsset.AssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedAssetTypeId);
 
-            // update db
-            UOW.CommitTrans();
+                    // update db
+                    UOW.CommitTrans();
 
-            // display view with message
-            TempData["SuccessMessage"] = "Record updated.";
-            return RedirectToAction("Details", "Asset", new { id = vmEdit.Id });
+                    // display view with message
+                    TempData["SuccessMessage"] = "Record updated.";
+                    return RedirectToAction("Details", "Asset", new { id = vmEdit.Id });
+                }
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
         } 
 
         [HttpGet]
-        public ViewResult Details(int id)
+        public ActionResult Details(int id)
         {
             // get messages from other controllers to display in view
             if (TempData["SuccessMessage"] != null)
@@ -134,51 +175,78 @@ namespace Financial.WebApplication.Controllers
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
             }
 
-            // transfer id to dto
-            var dtoAsset = UOW.Assets.Get(id);
-            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+            try
+            { 
+                // transfer id to dto
+                var dtoAsset = UOW.Assets.Get(id);
+                if (dtoAsset != null)
+                {
+                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 
-            // display view with message
-            return View("Details", new DetailsViewModel(dtoAsset, dtoAssetType));
+                    // display view with message
+                    return View("Details", new DetailsViewModel(dtoAsset, dtoAssetType));
+                }
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
         }
 
         [HttpGet]
-        public ViewResult Delete(int id)
+        public ActionResult Delete(int id)
         {
-            // transfer id to dto
-            var dtoAsset = UOW.Assets.Get(id);
-            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+            try
+            { 
+                // transfer id to dto
+                var dtoAsset = UOW.Assets.Get(id);
+                if (dtoAsset != null)
+                {
+                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 
-            // display view
-            return View("Delete", new DeleteViewModel(dtoAsset, dtoAssetType));
+                    // display view
+                    return View("Delete", new DeleteViewModel(dtoAsset, dtoAssetType));
+                }
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(DeleteViewModel vmDelete)
         {
-            // transfer vm to dto
-            var dtoAsset = UOW.Assets.Get(vmDelete.Id);
-            dtoAsset.IsActive = false;
-
-            // update db
-            UOW.CommitTrans();
-
-            // display view with message
-            TempData["SuccessMessage"] = "Record Deleted";
-            return RedirectToAction("Index", "Asset");
-        }
-
-        private List<SelectListItem> GetAssetTypesDropDownList(int? selectedId)
-        {
-            return UOW.AssetTypes.FindAll(r => r.IsActive)
-                .Select(r => new SelectListItem()
+            try
+            { 
+                // transfer vm to dto
+                var dtoAsset = UOW.Assets.Get(vmDelete.Id);
+                if (dtoAsset != null)
                 {
-                    Value = r.Id.ToString(),
-                    Selected = r.Id == selectedId,
-                    Text = r.Name
-                })
-                .ToList();
+                    dtoAsset.IsActive = false;
+
+                    // update db
+                    UOW.CommitTrans();
+
+                    // display view with message
+                    TempData["SuccessMessage"] = "Record Deleted";
+                    return RedirectToAction("Index", "Asset");
+                }
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
         }
     }
 }

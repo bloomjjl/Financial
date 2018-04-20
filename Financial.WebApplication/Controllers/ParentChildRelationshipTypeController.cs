@@ -89,11 +89,11 @@ namespace Financial.WebApplication.Controllers
             // link duplicated?
             var countExistingParentLinks = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.ParentRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
-                .Where(r => r.ChildRelationshipTypeId == GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
+                .Where(r => r.ChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
             var countExistingChildLinks = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.ChildRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
-                .Where(r => r.ParentRelationshipTypeId == GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
+                .Where(r => r.ParentRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
             if (countExistingParentLinks > 0 || countExistingChildLinks > 0)
             {
@@ -112,11 +112,11 @@ namespace Financial.WebApplication.Controllers
             if(vmCreate.SelectedRelationshipLevel == "Parent-Child")
             {
                 parentRelationshipType = vmCreate.SuppliedRelationshipTypeId;
-                childRelationshipType = GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType);
+                childRelationshipType = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType);
             }
             else // Child-Parent
             { 
-                parentRelationshipType = GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType);
+                parentRelationshipType = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType);
                 childRelationshipType = vmCreate.SuppliedRelationshipTypeId;
             }
 
@@ -169,18 +169,18 @@ namespace Financial.WebApplication.Controllers
             var countExistingParentChildRelationship = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
                 .Where(r => r.ParentRelationshipTypeId == vmEdit.RelationshipTypeId)
-                .Where(r => r.ChildRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedRelationshipType))
+                .Where(r => r.ChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedRelationshipType))
                 .Count(r => r.IsActive);
             var countExistingChildParentRelationship = UOW.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
                 .Where(r => r.ChildRelationshipTypeId == vmEdit.RelationshipTypeId)
-                .Where(r => r.ParentRelationshipTypeId == GetIntegerFromString(vmEdit.SelectedRelationshipType))
+                .Where(r => r.ParentRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedRelationshipType))
                 .Count(r => r.IsActive);
 
             if (countExistingParentChildRelationship > 0 || countExistingChildParentRelationship > 0)
             {
                 // update Drop Down Lists for vm
-                vmEdit.RelationshipTypes = GetDropDownListForRelationshipTypes(vmEdit.RelationshipTypeId, GetIntegerFromString(vmEdit.SelectedRelationshipType));
+                vmEdit.RelationshipTypes = GetDropDownListForRelationshipTypes(vmEdit.RelationshipTypeId, Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedRelationshipType));
                 vmEdit.RelationshipLevels = GetDropDownListForRelationshipLevels(vmEdit.SelectedRelationshipLevel);
 
                 // redisplay view
@@ -193,11 +193,11 @@ namespace Financial.WebApplication.Controllers
             if(vmEdit.SelectedRelationshipLevel == "Parent-Child")
             {
                 dtoParentChildRelationshipType.ParentRelationshipTypeId = vmEdit.RelationshipTypeId;
-                dtoParentChildRelationshipType.ChildRelationshipTypeId = GetIntegerFromString(vmEdit.SelectedRelationshipType);
+                dtoParentChildRelationshipType.ChildRelationshipTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedRelationshipType);
             }
             else // Child-Parent
             {
-                dtoParentChildRelationshipType.ParentRelationshipTypeId = GetIntegerFromString(vmEdit.SelectedRelationshipType);
+                dtoParentChildRelationshipType.ParentRelationshipTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedRelationshipType);
                 dtoParentChildRelationshipType.ChildRelationshipTypeId = vmEdit.RelationshipTypeId; 
             }
 

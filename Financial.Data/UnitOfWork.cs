@@ -17,24 +17,17 @@ namespace Financial.Data
         public UnitOfWork()
         {
             _context = new FinancialDbContext();
-            AssetSettings = new AssetSettingRepository(_context);
-            AssetRelationships = new AssetRelationshipRepository(_context);
-            Assets = new AssetRepository(_context);
-            AssetTransactions = new AssetTransactionRepository(_context);
-            AssetTypesSettingTypes = new AssetTypeSettingTypeRepository(_context);
-            AssetTypesRelationshipTypes = new AssetTypeRelationshipTypeRepository(_context);
-            AssetTypes = new AssetTypeRepository(_context);
-            ParentChildRelationshipTypes = new ParentChildRelationshipTypeRepository(_context);
-            RelationshipTypes = new RelationshipTypeRepository(_context);
-            SettingTypes = new SettingTypeRepository(_context);
-            TransactionCategories = new TransactionCategoryRepository(_context);
-            TransactionDescriptions = new TransactionDescriptionRepository(_context);
-            TransactionTypes = new TransactionTypeRepository(_context);
+            SetRepositories();
         }
 
         public UnitOfWork(FinancialDbContext context)
         {
             _context = context;
+            SetRepositories();
+        }
+
+        private void SetRepositories()
+        {
             AssetSettings = new AssetSettingRepository(_context);
             AssetRelationships = new AssetRelationshipRepository(_context);
             Assets = new AssetRepository(_context);

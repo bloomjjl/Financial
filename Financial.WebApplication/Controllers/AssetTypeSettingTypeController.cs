@@ -108,7 +108,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer dto to vm
-            var dtoSettingType = UOW.SettingTypes.Get(GetIntegerFromString(settingTypeId.ToString()));
+            var dtoSettingType = UOW.SettingTypes.Get(Business.Utilities.DataTypeUtility.GetIntegerFromString(settingTypeId.ToString()));
             var vmCreate = UOW.AssetTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Select(r => new CreateViewModel(dtoSettingType.Id, r))

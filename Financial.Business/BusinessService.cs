@@ -1,4 +1,6 @@
-﻿using Financial.Data;
+﻿using Financial.Business.ServiceInterfaces;
+using Financial.Business.Services;
+using Financial.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +16,26 @@ namespace Financial.Business
         public BusinessService()
         {
             _unitOfWork = new UnitOfWork();
+            SetServices();
         }
 
         public BusinessService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            SetServices();
         }
+
+        private void SetServices()
+        {
+            AssetSettingService = new AssetSettingService(_unitOfWork);
+            AssetTypeService = new AssetTypeService(_unitOfWork);
+        }
+
+        public IAssetSettingService AssetSettingService { get; private set; }
+        public IAssetTypeService AssetTypeService { get; private set; }
+
+
+
 
         public void Dispose()
         {

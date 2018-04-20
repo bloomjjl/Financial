@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Financial.Business.ServiceInterfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace Financial.Business
 {
     public interface IBusinessService : IDisposable
     {
+        IAssetSettingService AssetSettingService { get; }
+        IAssetTypeService AssetTypeService { get; }
     }
 }

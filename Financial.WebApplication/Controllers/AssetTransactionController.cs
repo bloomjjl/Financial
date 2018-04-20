@@ -46,7 +46,7 @@ namespace Financial.WebApplication.Controllers
                 total = UpdateAssetTransactionTotal(total, dtoAssetTransaction.Amount, dtoTransactionType.Name);
 
                 // add additional identifying info to asset title
-                var assetNameAdditionalInformation = GetAccountNameAdditionalInformation(dtoAsset);
+                var assetNameAdditionalInformation = BS.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
 
                 // format clear date
                 string clearDate = FormatDateToString(dtoAssetTransaction.ClearDate);
@@ -150,11 +150,11 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer id to dto 
-            var dtoAsset = UOW.Assets.Get(GetIntegerFromString(assetId.ToString()));
+            var dtoAsset = UOW.Assets.Get(Business.Utilities.DataTypeUtility.GetIntegerFromString(assetId.ToString()));
             var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 
             // add additional identifying info to asset title
-            var assetNameAdditionalInformaiton = GetAccountNameAdditionalInformation(dtoAsset);
+            var assetNameAdditionalInformaiton = BS.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
 
             // transfer dto to sli
             var sliTransactionTypes = GetSelectListOfTransactionTypes(null);
@@ -191,8 +191,8 @@ namespace Financial.WebApplication.Controllers
             UOW.AssetTransactions.Add(new AssetTransaction()
             {
                 AssetId = vmCreate.AssetId,
-                TransactionTypeId = GetIntegerFromString(vmCreate.SelectedTransactionTypeId),
-                TransactionCategoryId = GetIntegerFromString(vmCreate.SelectedTransactionCategoryId),
+                TransactionTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedTransactionTypeId),
+                TransactionCategoryId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedTransactionCategoryId),
                 CheckNumber = vmCreate.CheckNumber,
                 DueDate = Convert.ToDateTime(vmCreate.DueDate),
                 ClearDate = Convert.ToDateTime(vmCreate.ClearDate),
@@ -217,7 +217,7 @@ namespace Financial.WebApplication.Controllers
         public ActionResult SelectAssetToCreate(SelectAssetToCreateViewModel vmSelectedAssetToCreate)
         {
             // get selected id as integer
-            var id = GetIntegerFromString(vmSelectedAssetToCreate.SelectedAssetId);
+            var id = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmSelectedAssetToCreate.SelectedAssetId);
 
             // validate selected id
             if (id == 0)
@@ -263,8 +263,8 @@ namespace Financial.WebApplication.Controllers
         private void UpdateAssetTransaction(EditViewModel vmEdit)
         {
             var dtoAssetTransaction = UOW.AssetTransactions.Get(vmEdit.Id);
-            dtoAssetTransaction.TransactionTypeId = GetIntegerFromString(vmEdit.SelectedTransactionTypeId);
-            dtoAssetTransaction.TransactionCategoryId = GetIntegerFromString(vmEdit.SelectedTransactionCategoryId);
+            dtoAssetTransaction.TransactionTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedTransactionTypeId);
+            dtoAssetTransaction.TransactionCategoryId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedTransactionCategoryId);
             dtoAssetTransaction.CheckNumber = vmEdit.CheckNumber;
             dtoAssetTransaction.DueDate = Convert.ToDateTime(vmEdit.DueDate);
             dtoAssetTransaction.ClearDate = Convert.ToDateTime(vmEdit.ClearDate);
@@ -323,7 +323,7 @@ namespace Financial.WebApplication.Controllers
 
             // transfer vm to dto
             var dtoAssetTransaction = UOW.AssetTransactions.Get(vmEditAsset.Id);
-            dtoAssetTransaction.AssetId = GetIntegerFromString(vmEditAsset.SelectedAssetId);
+            dtoAssetTransaction.AssetId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEditAsset.SelectedAssetId);
 
             // update db
             UOW.CommitTrans();
@@ -367,7 +367,7 @@ namespace Financial.WebApplication.Controllers
             {
                 // add credit card account number to name
                 var assetName = dtoAsset.Name;
-                var assetNameInformation = GetAccountNameAdditionalInformation(dtoAsset);
+                var assetNameInformation = BS.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
 
                 sliAssets.Add(new SelectListItem()
                 {
