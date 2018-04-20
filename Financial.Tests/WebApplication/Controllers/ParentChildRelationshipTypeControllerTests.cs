@@ -10,7 +10,7 @@ using Financial.Tests.Data.Repositories;
 using Financial.Core.Models;
 using Financial.Tests.Data;
 using System.Web.Mvc;
-using Financial.Core.ViewModels.ParentChildRelationshipType;
+using Financial.WebApplication.Models.ViewModels.ParentChildRelationshipType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {

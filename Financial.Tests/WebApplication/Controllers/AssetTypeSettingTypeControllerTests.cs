@@ -10,7 +10,7 @@ using Financial.Tests.Data.Repositories;
 using Financial.Tests.Data;
 using Financial.Core.Models;
 using System.Web.Mvc;
-using Financial.Core.ViewModels.AssetTypeSettingType;
+using Financial.WebApplication.Models.ViewModels.AssetTypeSettingType;
 
 namespace Financial.Tests.WebApplication.Controllers
 {

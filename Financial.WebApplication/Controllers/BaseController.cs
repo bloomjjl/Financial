@@ -1,4 +1,5 @@
-﻿using Financial.Core;
+﻿using Financial.Business;
+using Financial.Core;
 using Financial.Data;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Financial.WebApplication.Controllers
     public class BaseController : Controller
     {
         private IUnitOfWork _unitOfWork;
+        private IBusinessService _businessService;
 
         public BaseController()
         {
@@ -31,6 +33,18 @@ namespace Financial.WebApplication.Controllers
             set
             {
                 _unitOfWork = value;
+            }
+        }
+
+        public IBusinessService BS
+        {
+            get
+            {
+                return _businessService;
+            }
+            set
+            {
+                _businessService = value;
             }
         }
 

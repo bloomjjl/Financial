@@ -9,7 +9,7 @@ using Financial.Tests.Data.Fakes;
 using Financial.Tests.Data.Repositories;
 using Financial.Tests.Data;
 using Financial.Core.Models;
-using Financial.Core.ViewModels.SettingType;
+using Financial.WebApplication.Models.ViewModels.SettingType;
 using System.Web.Mvc;
 
 namespace Financial.Tests.WebApplication.Controllers

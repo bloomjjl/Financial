@@ -231,6 +231,10 @@
       <Project>{B454AEF2-D9B8-45C0-AE22-AEAD2DE95567}</Project>
       <Name>Financial.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Financial.Data\Financial.Data.csproj">
+      <Project>{FDE8B572-92AF-410F-B420-DF75C06BA734}</Project>
+      <Name>Financial.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Financial.WebApplication\Financial.WebApplication.csproj">
       <Project>{4079845B-9B5D-454C-9779-F573DDF69DB7}</Project>
       <Name>Financial.WebApplication</Name>

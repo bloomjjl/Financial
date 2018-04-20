@@ -1,5 +1,5 @@
 ﻿using Financial.Core;
-using Financial.Core.ViewModels.AssetTypeSettingType;
+using Financial.WebApplication.Models.ViewModels.AssetTypeSettingType;
 using Financial.Data;
 using System;
 using System.Collections.Generic;

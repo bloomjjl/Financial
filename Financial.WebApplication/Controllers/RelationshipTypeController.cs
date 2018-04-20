@@ -1,6 +1,6 @@
 ﻿using Financial.Core;
 using Financial.Core.Models;
-using Financial.Core.ViewModels.RelationshipType;
+using Financial.WebApplication.Models.ViewModels.RelationshipType;
 using Financial.Data;
 using System;
 using System.Collections.Generic;

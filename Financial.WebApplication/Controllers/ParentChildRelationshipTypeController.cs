@@ -1,6 +1,6 @@
 ﻿using Financial.Core;
 using Financial.Core.Models;
-using Financial.Core.ViewModels.ParentChildRelationshipType;
+using Financial.WebApplication.Models.ViewModels.ParentChildRelationshipType;
 using Financial.Data;
 using System;
 using System.Collections.Generic;

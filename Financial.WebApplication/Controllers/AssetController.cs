@@ -1,6 +1,7 @@
-﻿using Financial.Core;
+﻿using Financial.Business;
+using Financial.Core;
 using Financial.Core.Models;
-using Financial.Core.ViewModels.Asset;
+using Financial.WebApplication.Models.ViewModels.Asset;
 using Financial.Data;
 using System;
 using System.Collections.Generic;

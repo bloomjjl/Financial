@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Financial.Core.Models;
 using System.Web.Mvc;
 using Financial.Tests.Data.Repositories;
-using Financial.Core.ViewModels.AssetTransaction;
+using Financial.WebApplication.Models.ViewModels.AssetTransaction;
 
 namespace Financial.Tests.WebApplication.Controllers
 {

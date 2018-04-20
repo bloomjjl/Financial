@@ -1,4 +1,4 @@
-﻿using Financial.Core.ViewModels.TransactionCategory;
+﻿using Financial.WebApplication.Models.ViewModels.TransactionCategory;
 using System;
 using System.Collections.Generic;
 using System.Linq;

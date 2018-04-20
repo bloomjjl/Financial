@@ -1,5 +1,5 @@
 ﻿using Financial.Core;
-using Financial.Core.RepositoryInterfaces;
+using Financial.Data.RepositoryInterfaces;
 using Financial.Data.Repositories;
 using System;
 using System.Collections.Generic;

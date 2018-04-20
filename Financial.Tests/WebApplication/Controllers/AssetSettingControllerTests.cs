@@ -10,7 +10,7 @@ using Financial.Tests.Data.Repositories;
 using Financial.Tests.Data;
 using Financial.Tests.Data.Fakes;
 using System.Web.Mvc;
-using Financial.Core.ViewModels.AssetSetting;
+using Financial.WebApplication.Models.ViewModels.AssetSetting;
 
 namespace Financial.Tests.WebApplication.Controllers
 {

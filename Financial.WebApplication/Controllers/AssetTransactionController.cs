@@ -1,6 +1,7 @@
 ﻿using Financial.Core;
 using Financial.Core.Models;
-using Financial.Core.ViewModels.AssetTransaction;
+using Financial.Data;
+using Financial.WebApplication.Models.ViewModels.AssetTransaction;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
