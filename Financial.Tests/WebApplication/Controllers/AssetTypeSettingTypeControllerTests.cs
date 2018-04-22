@@ -29,7 +29,7 @@ namespace Financial.Tests.WebApplication.Controllers
     [TestClass()]
     public class AssetTypeSettingTypeControllerTests : AssetTypeSettingTypeControllerTestsBase
     {
-        /*
+        
         [TestMethod()]
         public void IndexLinkedSettingTypes_Child_WhenProvidedAssetTypeIdIsValid_ReturnRouteValues_Test()
         {
@@ -302,6 +302,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedCount, dbResult.Count(), "New Records Added Count");
         }
 
+        
         [TestMethod()]
         public void CreateLinkedSettingTypes_Post_WhenProvidedViewModelIsValid_ReturnRouteValues_Test()
         {
@@ -329,12 +330,11 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
             var routeResult = result as RedirectToRouteResult;
-            Assert.AreEqual("Create", routeResult.RouteValues["action"], "Route Action");
-            Assert.AreEqual("AssetTypeRelationshipType", routeResult.RouteValues["controller"], "Route Controller");
-            Assert.AreEqual(assetTypeId, routeResult.RouteValues["assetTypeId"], "Route AssetTypeId");
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Route Action");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Route Controller");
             Assert.AreEqual("Linked setting types created.", controller.TempData["SuccessMessage"], "Success Message");
         }
-
+        
 
 
         [TestMethod()]
@@ -861,7 +861,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedSettingTypeId, routeResult.RouteValues["id"], "Route Id");
             Assert.AreEqual("Linked asset types updated.", controller.TempData["SuccessMessage"], "Message");
         }
-        */
+        
 
 
 

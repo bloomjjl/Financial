@@ -28,5 +28,21 @@ namespace Financial.Tests.Data.Repositories
                 .Where(r => r.AssetId == assetId)
                 .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
         }
+
+        public IEnumerable<AssetSetting> GetAllActiveForAsset(int assetId)
+        {
+            return _entities
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetId == assetId)
+                .ToList();
+        }
+
+        public IEnumerable<AssetSetting> GetAllActiveForSettingType(int settingTypeId)
+        {
+            return _entities
+                .Where(r => r.IsActive)
+                .Where(r => r.SettingTypeId == settingTypeId)
+                .ToList();
+        }
     }
 }

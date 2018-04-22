@@ -56,8 +56,6 @@ namespace Financial.Tests.WebApplication.Controllers
         // Invalid Output Values
         // Invalid Returned Error Messages
 
-            /*
-
         [TestMethod()]
         public void Index_Get_WhenProvidedNoInputValues_ReturnRouteValues_Test()
         {
@@ -216,9 +214,10 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.Create(vmExpected);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
-            var viewResult = result as ViewResult;
-            Assert.AreEqual("Create", viewResult.ViewName, "View Name");
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action Result");
+            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller Result");
         }
 
         [TestMethod()]
@@ -343,10 +342,10 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.Edit(vmExpected);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
-            var viewResult = result as ViewResult;
-            Assert.AreEqual("Edit", viewResult.ViewName, "View Name");
-            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel), "View Model");
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action Result");
+            Assert.AreEqual("SettingType", routeResult.RouteValues["controller"], "Controller Result");
         }
 
         [TestMethod()]
@@ -415,6 +414,6 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Name", vmResult.Name, "Name");
             Assert.AreEqual(true, vmResult.IsActive, "IsActive");
         }
-        */
+        
     }
 }

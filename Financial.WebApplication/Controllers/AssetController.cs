@@ -53,7 +53,7 @@ namespace Financial.WebApplication.Controllers
                 }
  
                 // display view
-                return View("Index", vmIndex.OrderBy(r => r.AssetName));
+                return View("Index", vmIndex.OrderBy(r => r.AssetName).ToList());
             }
             catch (Exception)
             {

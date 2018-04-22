@@ -32,15 +32,14 @@ namespace Financial.WebApplication.Controllers
                 if (dtoAsset != null)
                 {
                     // get list of linked setting types
-                    var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
+                    var dbAssetSettings = UOW.AssetSettings.GetAllActiveForAsset(dtoAsset.Id);
 
                     // create & transfer values to vm
                     var vmIndex = new List<IndexViewModel>();
-                    foreach (var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
+                    foreach (var dtoAssetSetting in dbAssetSettings)
                     {
                         // transfer to dto
-                        var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
-                        var dtoAssetSetting = UOW.AssetSettings.GetActive(dtoAsset.Id, dtoSettingType.Id);
+                        var dtoSettingType = UOW.SettingTypes.GetActive(dtoAssetSetting.SettingTypeId);
 
                         // validate dto & update vm
                         var vm = dtoAssetSetting == null 
@@ -82,8 +81,11 @@ namespace Financial.WebApplication.Controllers
                     var dbATST = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
                     foreach(var dtoATST in dbATST)
                     {
-                        var dtoSettingType = UOW.SettingTypes.Get(dtoATST.SettingTypeId);
-                        vmCreate.Add(new CreateViewModel(dtoAsset, dtoSettingType));
+                        var dtoSettingType = UOW.SettingTypes.GetActive(dtoATST.SettingTypeId);
+                        if (dtoSettingType != null)
+                        {
+                            vmCreate.Add(new CreateViewModel(dtoAsset, dtoSettingType));
+                        }
                     }
 
                     // display view
@@ -161,14 +163,15 @@ namespace Financial.WebApplication.Controllers
                     foreach (var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
                     {
                         // transfer to dto
-                        var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
-                        var dtoAssetSetting = UOW.AssetSettings.GetActive(dtoAsset.Id, dtoSettingType.Id);
-                        
-                        // validate dto & update vm
-                        var vm = dtoAssetSetting == null
-                            ? new EditViewModel(new AssetSetting(), dtoAsset, dtoSettingType)
-                            : new EditViewModel(dtoAssetSetting, dtoAsset, dtoSettingType);
-                        vmEdit.Add(vm);
+                        var dtoSettingType = UOW.SettingTypes.GetActive(dtoAssetTypeSettingType.SettingTypeId);
+                        if (dtoSettingType != null)
+                        {
+                            var dtoAssetSetting = UOW.AssetSettings.GetActive(dtoAsset.Id, dtoSettingType.Id);
+                            if (dtoAssetSetting != null)
+                            {
+                                vmEdit.Add(new EditViewModel(dtoAssetSetting, dtoAsset, dtoSettingType));
+                            }
+                        }
                     }
 
                     // display view

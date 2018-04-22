@@ -27,7 +27,7 @@ namespace Financial.Tests.WebApplication.Controllers
     [TestClass()]
     public class AssetControllerTests : AssetControllerTestsBase
     {
-        /*
+        
         [TestMethod()]
         public void Index_Get_WhenProvidedNoInputVaues_ReturnRouteValues_Test()
         {
@@ -465,7 +465,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Asset", routeResult.RouteValues["controller"], "Route Controller");
             Assert.AreEqual("Record Deleted", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
-        */
+        
 
 
     }

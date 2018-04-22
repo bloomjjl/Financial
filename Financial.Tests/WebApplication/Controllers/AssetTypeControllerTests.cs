@@ -58,8 +58,6 @@ namespace Financial.Tests.WebApplication.Controllers
         // Invalid Output Values
         // Invalid Returned Error Messages
 
-            /*
-
         [TestMethod()]
         public void Index_Get_WhenProvidedNoInputVaues_ReturnRouteValues_Test()
         {
@@ -245,7 +243,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to view information at this time. Try again later.", controller.ViewData["ErrorMessage"]);
         }
-        * /
+        */
 
 
 
@@ -578,7 +576,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to add record at this time. Try again later.", controller.ViewData["ErrorMessage"]);
         }
-        * /
+        */
 
 
 
@@ -681,10 +679,10 @@ namespace Financial.Tests.WebApplication.Controllers
             var result = controller.Edit(vmExpected);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(ViewResult), "View Result");
-            var viewResult = result as ViewResult;
-            Assert.AreEqual("Edit", viewResult.ViewName, "View Name");
-            Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(EditViewModel), "View Model");
+            Assert.IsInstanceOfType(result, typeof(RedirectToRouteResult), "Route Result");
+            var routeResult = result as RedirectToRouteResult;
+            Assert.AreEqual("Index", routeResult.RouteValues["action"], "Action Result");
+            Assert.AreEqual("AssetType", routeResult.RouteValues["controller"], "Controller Result");
         }
 
         [TestMethod()]
@@ -1106,7 +1104,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to edit record at this time. Try again later.", controller.TempData["ErrorMessage"]);
         }
-        * /
+        */
 
 
 
@@ -1299,8 +1297,8 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert - MESSAGE
             Assert.AreEqual("Unable to display record. Try again later.", controller.TempData["ErrorMessage"]);
         }
-        * /
         */
+        
 
 
 

@@ -221,15 +221,16 @@ namespace Financial.WebApplication.Controllers
                 var dtoAssetType = UOW.AssetTypes.Get(assetTypeId);
                 if (dtoAssetType != null)
                 {
-                    // transfer dto to vm
+                    // get list of all active setting types
                     var atstLinks = new List<LinkedAssetTypeSettingType>();
-                    var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAssetType.Id);
-                    foreach (var dtoATST in dbAssetTypeSettingTypes)
+                    var dbSettingTypes = UOW.SettingTypes.GetAllActive();
+                    foreach (var dtoSettingType in dbSettingTypes)
                     {
-                        var dtoSettingType = UOW.SettingTypes.GetActive(dtoATST.SettingTypeId);
-                        var link = dtoSettingType != null
-                            ? new LinkedAssetTypeSettingType(dtoATST, dtoAssetType, dtoSettingType)
-                            : new LinkedAssetTypeSettingType(dtoATST, dtoAssetType, new Core.Models.SettingType());
+                        // transfer dto to vm
+                        var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.Get(dtoAssetType.Id, dtoSettingType.Id);
+                        var link = dtoAssetTypeSettingType != null
+                            ? new LinkedAssetTypeSettingType(dtoAssetTypeSettingType, dtoAssetType, dtoSettingType)
+                            : new LinkedAssetTypeSettingType(new Core.Models.AssetTypeSettingType(), dtoAssetType, dtoSettingType);
                         atstLinks.Add(link);
                     }
                     // display view
@@ -300,15 +301,16 @@ namespace Financial.WebApplication.Controllers
                 var dtoSettingType = UOW.SettingTypes.Get(settingTypeId);
                 if (dtoSettingType != null)
                 {
-                    // transfer dto to vm
+                    // get list of all active asset types
                     var atstLinks = new List<LinkedAssetTypeSettingType>();
-                    var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForSettingType(dtoSettingType.Id);
-                    foreach (var dtoATST in dbAssetTypeSettingTypes)
+                    var dbAssetTypes = UOW.AssetTypes.GetAllActive();
+                    foreach (var dtoAssetType in dbAssetTypes)
                     {
-                        var dtoAssetType = UOW.AssetTypes.GetActive(dtoATST.AssetTypeId);
-                        var link = dtoAssetType != null
-                            ? new LinkedAssetTypeSettingType(dtoATST, dtoAssetType, dtoSettingType)
-                            : new LinkedAssetTypeSettingType(dtoATST, new Core.Models.AssetType(), dtoSettingType);
+                        // transfer dto to vm
+                        var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.Get(dtoAssetType.Id, dtoSettingType.Id);
+                        var link = dtoAssetTypeSettingType != null
+                            ? new LinkedAssetTypeSettingType(dtoAssetTypeSettingType, dtoAssetType, dtoSettingType)
+                            : new LinkedAssetTypeSettingType(new Core.Models.AssetTypeSettingType(), dtoAssetType, dtoSettingType);
                         atstLinks.Add(link);
                     }
 

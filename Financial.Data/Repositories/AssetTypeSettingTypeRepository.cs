@@ -23,6 +23,12 @@ namespace Financial.Data.Repositories
 
 
 
+        public AssetTypeSettingType Get(int assetTypeId, int settingTypeId)
+        {
+            return FinancialDbContext.AssetTypesSettingTypes
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
+        }
 
         public AssetTypeSettingType GetActive(int assetTypeId, int settingTypeId)
         {
@@ -30,6 +36,20 @@ namespace Financial.Data.Repositories
                 .Where(r => r.IsActive)
                 .Where(r => r.AssetTypeId == assetTypeId)
                 .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
+        }
+
+        public IEnumerable<AssetTypeSettingType> GetAllForAssetType(int assetTypeId)
+        {
+            return FinancialDbContext.AssetTypesSettingTypes
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .ToList();
+        }
+
+        public IEnumerable<AssetTypeSettingType> GetAllForSettingType(int settingTypeId)
+        {
+            return FinancialDbContext.AssetTypesSettingTypes
+                .Where(r => r.SettingTypeId == settingTypeId)
+                .ToList();
         }
 
         public IEnumerable<AssetTypeSettingType> GetAllActiveForAssetType(int assetTypeId)

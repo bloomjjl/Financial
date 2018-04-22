@@ -18,15 +18,39 @@ namespace Financial.Tests.Data.Repositories
             _entities = entities as List<AssetTypeSettingType>;
         }
 
-        public AssetTypeSettingType GetActive(int assetTypeId, int settingTypeId)
+
+
+
+
+
+        public AssetTypeSettingType Get(int assetTypeId, int settingTypeId)
         {
-            throw new NotImplementedException();
+            return _entities
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
         }
 
+        public AssetTypeSettingType GetActive(int assetTypeId, int settingTypeId)
+        {
+            return _entities
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
+        }
 
+        public IEnumerable<AssetTypeSettingType> GetAllForAssetType(int assetTypeId)
+        {
+            return _entities
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .ToList();
+        }
 
-
-
+        public IEnumerable<AssetTypeSettingType> GetAllForSettingType(int settingTypeId)
+        {
+            return _entities
+                .Where(r => r.SettingTypeId == settingTypeId)
+                .ToList();
+        }
 
         public IEnumerable<AssetTypeSettingType> GetAllActiveForAssetType(int assetTypeId)
         {
