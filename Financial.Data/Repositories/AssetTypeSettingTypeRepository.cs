@@ -20,5 +20,32 @@ namespace Financial.Data.Repositories
         {
             get { return _context as FinancialDbContext; }
         }
+
+
+
+
+        public AssetTypeSettingType GetActive(int assetTypeId, int settingTypeId)
+        {
+            return FinancialDbContext.AssetTypesSettingTypes
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
+        }
+
+        public IEnumerable<AssetTypeSettingType> GetAllActiveForAssetType(int assetTypeId)
+        {
+            return FinancialDbContext.AssetTypesSettingTypes
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetTypeId == assetTypeId)
+                .ToList();
+        }
+
+        public IEnumerable<AssetTypeSettingType> GetAllActiveForSettingType(int settingTypeId)
+        {
+            return FinancialDbContext.AssetTypesSettingTypes
+                .Where(r => r.IsActive)
+                .Where(r => r.SettingTypeId == settingTypeId)
+                .ToList();
+        }
     }
 }

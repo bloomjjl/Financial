@@ -9,5 +9,6 @@ namespace Financial.Data.RepositoryInterfaces
 {
     public interface IAssetSettingRepository : IRepository<AssetSetting>
     {
+        AssetSetting GetActive(int assetId, int settingTypeId);
     }
 }

@@ -9,5 +9,7 @@ namespace Financial.Data.RepositoryInterfaces
 {
     public interface IAssetRepository : IRepository<Asset>
     {
+        Asset GetActive(int assetId);
+        IEnumerable<Asset> GetAllActiveOrderedByName();
     }
 }

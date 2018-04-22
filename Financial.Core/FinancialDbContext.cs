@@ -14,7 +14,7 @@ namespace Financial.Core
     public class FinancialDbContext : DbContext
     {
         public DbSet<Asset> Assets { get; set; }
-        public DbSet<AssetSetting> AssetAttributes { get; set; }
+        public DbSet<AssetSetting> AssetSettings { get; set; }
         public DbSet<AssetRelationship> AssetRelationships { get; set; }
         public DbSet<AssetTransaction> AssetTransactions { get; set; }
         public DbSet<AssetType> AssetTypes { get; set; }

@@ -49,9 +49,9 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
         [Display(Name = "Category")]
         public string SelectedTransactionCategoryId { get; set; }
         public IEnumerable<SelectListItem> TransactionCategories { get; set; }
-        [Required]
-        [Display(Name = "Description")]
-        public string SelectedTransactionDescriptionId { get; set; }
-        public IEnumerable<SelectListItem> TransactionDescriptions { get; set; }
+        //[Required]
+        //[Display(Name = "Description")]
+        //public string SelectedTransactionDescriptionId { get; set; }
+        //public IEnumerable<SelectListItem> TransactionDescriptions { get; set; }
     }
 }

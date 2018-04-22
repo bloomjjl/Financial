@@ -35,18 +35,18 @@
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        @for (int i = 0; i < Model.CreateViewModels.Count(); i++)
+        @for (int i = 0; i < Model.LinkedAssetTypeSettingTypes.Count(); i++)
         {
             @Html.HiddenFor(modelItem => Model.SettingTypeId)
-            @Html.HiddenFor(modelItem => Model.CreateViewModels[i].AssetTypeId)
-            @Html.HiddenFor(modelItem => Model.CreateViewModels[i].SettingTypeId)
+            @Html.HiddenFor(modelItem => Model.LinkedAssetTypeSettingTypes[i].AssetTypeId)
+            @Html.HiddenFor(modelItem => Model.LinkedAssetTypeSettingTypes[i].SettingTypeId)
 
             <div class="form-group">
                 <div class="col-md-offset-1 col-md-1 checkbox">
-                    @Html.EditorFor(modelItem => Model.CreateViewModels[i].IsActive)
+                    @Html.EditorFor(modelItem => Model.LinkedAssetTypeSettingTypes[i].IsActive)
                 </div>
                 <div class="col-md-10">
-                    @Html.DisplayFor(modelItem => Model.CreateViewModels[i].AssetTypeName, new { @class = "control-label" })
+                    @Html.DisplayFor(modelItem => Model.LinkedAssetTypeSettingTypes[i].AssetTypeName, new { @class = "control-label" })
                 </div>
             </div>
         }

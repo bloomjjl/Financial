@@ -27,6 +27,7 @@ namespace Financial.Tests.WebApplication.Controllers
     [TestClass()]
     public class RelationshipTypeControllerTests : RelationshipTypeControllerTestsBase
     {
+        /*
         [TestMethod()]
         public void Index_Get_WhenProvidedNoInputValues_ReturnRouteValues_Test()
         {
@@ -418,6 +419,6 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Test Message", viewResult.ViewData["ErrorMessage"].ToString(), "Message");
         }
 
-
+        */
     }
 }

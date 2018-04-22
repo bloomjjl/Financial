@@ -9,5 +9,7 @@ namespace Financial.Data.RepositoryInterfaces
 {
     public interface IAssetTransactionRepository : IRepository<AssetTransaction>
     {
+        IEnumerable<AssetTransaction> GetAllActiveByDueDate();
+        IEnumerable<AssetTransaction> GetAllActiveByDescendingDueDate(int assetId);
     }
 }

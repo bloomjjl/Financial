@@ -27,13 +27,17 @@ namespace Financial.Business
 
         private void SetServices()
         {
+            AssetService = new AssetService(_unitOfWork);
             AssetSettingService = new AssetSettingService(_unitOfWork);
             AssetTypeService = new AssetTypeService(_unitOfWork);
+            SelectListService = new SelectListService(_unitOfWork);
         }
 
+
+        public IAssetService AssetService { get; private set; }
         public IAssetSettingService AssetSettingService { get; private set; }
         public IAssetTypeService AssetTypeService { get; private set; }
-
+        public ISelectListService SelectListService { get; private set; }
 
 
 

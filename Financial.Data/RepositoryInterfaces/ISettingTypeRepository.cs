@@ -9,5 +9,9 @@ namespace Financial.Data.RepositoryInterfaces
 {
     public interface ISettingTypeRepository : IRepository<SettingType>
     {
+        SettingType GetActive(int id);
+        IEnumerable<SettingType> GetAllOrderedByName();
+        int CountMatching(string name);
+        int CountMatching(int excludeId, string name);
     }
 }

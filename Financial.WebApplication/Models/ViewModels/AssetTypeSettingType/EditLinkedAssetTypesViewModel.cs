@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Financial.Business.Models.BusinessModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,11 +15,11 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         }
 
         public EditLinkedAssetTypesViewModel(Core.Models.SettingType dtoSettingType, 
-            List<EditViewModel> vmEditList)
+            List<LinkedAssetTypeSettingType> atstLinks)
         {
             SettingTypeId = dtoSettingType.Id;
             SettingTypeName = dtoSettingType.Name;
-            EditViewModels = vmEditList;
+            LinkedAssetTypeSettingTypes = atstLinks;
         }
 
         public int SettingTypeId { get; set; }
@@ -26,6 +27,6 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         [Display(Name = "Setting Type")]
         public string SettingTypeName { get; set; }
 
-        public List<EditViewModel> EditViewModels { get; set; }
+        public List<LinkedAssetTypeSettingType> LinkedAssetTypeSettingTypes { get; set; }
     }
 }

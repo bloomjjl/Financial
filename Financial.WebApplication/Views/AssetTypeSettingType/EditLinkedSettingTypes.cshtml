@@ -30,14 +30,14 @@
         <h4>Setting Types</h4>
         <hr />
 
-        @for (int i = 0; i < Model.EditViewModels.Count(); i++)
+        @for (int i = 0; i < Model.LinkedAssetTypeSettingTypes.Count(); i++)
         {
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
-                    @Html.HiddenFor(modelItem => Model.EditViewModels[i].Id)
-                    @Html.HiddenFor(modelItem => Model.EditViewModels[i].SettingTypeId)
-                    @Html.CheckBoxFor(modelItem => Model.EditViewModels[i].IsActive, htmlAttributes: new { @class = "control-checkbox" })
-                    @Html.Label(Model.EditViewModels[i].SettingTypeName, new { @class = "control-label" })
+                    @Html.HiddenFor(modelItem => Model.LinkedAssetTypeSettingTypes[i].Id)
+                    @Html.HiddenFor(modelItem => Model.LinkedAssetTypeSettingTypes[i].SettingTypeId)
+                    @Html.CheckBoxFor(modelItem => Model.LinkedAssetTypeSettingTypes[i].IsActive, htmlAttributes: new { @class = "control-checkbox" })
+                    @Html.Label(Model.LinkedAssetTypeSettingTypes[i].SettingTypeName, new { @class = "control-label" })
                 </div>
             </div>
         }

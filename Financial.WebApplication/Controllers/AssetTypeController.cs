@@ -35,14 +35,21 @@ namespace Financial.WebApplication.Controllers
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
             }
 
-            // transfer dto to vm
-            var vmIndex = UOW.AssetTypes.GetAll()
-                .Select(r => new IndexViewModel(r))
-                .OrderBy(r => r.Name)
-                .ToList();
+            try
+            {
+                // transfer dto to vm
+                var vmIndex = UOW.AssetTypes.GetAllOrderedByName()
+                    .Select(r => new IndexViewModel(r))
+                    .ToList();
 
-            // display view
-            return View("Index", vmIndex);
+                // display view
+                return View("Index", vmIndex);
+            }
+            catch(Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem";
+                return View("Index", new List<IndexViewModel>());
+            }
         }
 
         [HttpGet]
@@ -56,82 +63,103 @@ namespace Financial.WebApplication.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateViewModel vmCreate)
         {
-            // validation
-            if (!ModelState.IsValid)
+            try
             {
-                return View("Index", vmCreate);
+                // validation
+                if (ModelState.IsValid)
+                {
+                    // check for duplicate
+                    var count = UOW.AssetTypes.CountMatching(vmCreate.Name);
+                    if (count == 0)
+                    {
+                        // transfer vm to dto
+                        var dtoAssetType = new AssetType()
+                        {
+                            Name = vmCreate.Name,
+                            IsActive = true
+                        };
+
+                        // update db
+                        UOW.AssetTypes.Add(dtoAssetType);
+                        UOW.CommitTrans();
+
+                        // display View with message
+                        TempData["SuccessMessage"] = "Asset Type Created";
+                        return RedirectToAction("CreateLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = dtoAssetType.Id });
+                    }
+                    // display view with message
+                    ViewData["ErrorMessage"] = "Record already exists";
+                    return View("Create", vmCreate);
+                }
+                TempData["ErrorMessage"] = "Unable to create record. Try again.";
+                return RedirectToAction("Index", "AssetType");
             }
-
-            // check for duplicate
-            var count = UOW.AssetTypes.GetAll()
-                .Count(r => r.Name == vmCreate.Name);
-            if (count > 0)
+            catch (Exception)
             {
-                // display view with message
-                ViewData["ErrorMessage"] = "Record already exists";
-                return View("Create", vmCreate);
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "AssetType");
             }
-
-            // transfer vm to dto
-            var dtoAssetType = new AssetType()
-            {
-                Name = vmCreate.Name,
-                IsActive = true
-            };
-
-            // update db
-            UOW.AssetTypes.Add(dtoAssetType);
-            UOW.CommitTrans();
-
-            // display View with message
-            TempData["SuccessMessage"] = "Asset Type Created";
-            return RedirectToAction("CreateLinkedSettingTypes", "AssetTypeSettingType", new { assetTypeId = dtoAssetType.Id });
         }
 
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            // transfer dto to vm
-            var vmEdit = UOW.AssetTypes.GetAll()
-                .Select(r => new EditViewModel(r))
-                .FirstOrDefault(r => r.Id == id);
-
-            // display view
-            return View("Edit", vmEdit);
+            try
+            { 
+                // transfer dto to vm
+                var dtoAssetType = UOW.AssetTypes.Get(id);
+                if (dtoAssetType != null)
+                {
+                    // display view
+                    return View("Edit", new EditViewModel(dtoAssetType));
+                }
+                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+                return RedirectToAction("Index", "AssetType");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "AssetType");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EditViewModel vmEdit)
         {
-            // validation
-            if (!ModelState.IsValid)
+            try
             {
-                return View("Edit", vmEdit);
-            }
+                // validation
+                if (ModelState.IsValid)
+                {
+                    // check for duplicate
+                    var count = UOW.AssetTypes.CountMatching(vmEdit.Id, vmEdit.Name);
+                    if (count == 0)
+                    {
+                        // transfer vm to dto
+                        var dtoAssetType = UOW.AssetTypes.Get(vmEdit.Id);
+                        dtoAssetType.Name = vmEdit.Name;
+                        dtoAssetType.IsActive = vmEdit.IsActive;
 
-            // check for duplicate
-            var count = UOW.AssetTypes.GetAll()
-                .Where(r => r.Name == vmEdit.Name)
-                .Count(r => r.Id != vmEdit.Id);
-            if (count > 0)
+                        // update db
+                        UOW.CommitTrans();
+
+                        // display view with message
+                        TempData["SuccessMessage"] = "Record updated.";
+                        return RedirectToAction("Index", "AssetType");
+                    }
+                    // display view with message
+                    ViewData["ErrorMessage"] = "Record already exists";
+                    return View("Edit", vmEdit);
+                }
+                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+                return RedirectToAction("Index", "AssetType");
+            }
+            catch (Exception)
             {
-                // display view with message
-                ViewData["ErrorMessage"] = "Record already exists";
-                return View("Edit", vmEdit);
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "AssetType");
             }
-
-            // transfer vm to dto
-            var dtoAssetType = UOW.AssetTypes.Get(vmEdit.Id);
-            dtoAssetType.Name = vmEdit.Name;
-            dtoAssetType.IsActive = vmEdit.IsActive;
-
-            // update db
-            UOW.CommitTrans();
-
-            // display view with message
-            TempData["SuccessMessage"] = "Record updated.";
-            return RedirectToAction("Index", "AssetType");
         }
 
         [HttpGet]
@@ -143,13 +171,24 @@ namespace Financial.WebApplication.Controllers
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
             }
 
-            // transfer dto to vm
-            var vmDetails = UOW.AssetTypes.GetAll()
-                .Select(r => new DetailsViewModel(r))
-                .FirstOrDefault( r => r.Id == id);
+            try
+            { 
+                // transfer dto to vm
+                var dtoAssetType = UOW.AssetTypes.Get(id);
+                if(dtoAssetType != null)
+                {
+                    // display view
+                    return View("Details", new DetailsViewModel(dtoAssetType));
+                }
+                TempData["ErrorMessage"] = "Unable to display record. Try again.";
+                return RedirectToAction("Index", "AssetType");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "AssetType");
+            }
 
-            // display view
-            return View("Details", vmDetails);
         }
     }
 }

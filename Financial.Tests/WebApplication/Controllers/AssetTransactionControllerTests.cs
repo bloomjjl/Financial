@@ -25,7 +25,7 @@ namespace Financial.Tests.WebApplication.Controllers
     [TestClass()]
     public class AssetTransactionControllerTests : AssetTransactionControllerTestsBase
     {
-
+        
         [TestMethod()]
         public void Index_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
         {
@@ -160,7 +160,6 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var controller = new AssetTransactionController(_unitOfWork);
             int assetId = 20;
-            int expectedCount = 1;
 
             // Act
             var result = controller.Create(assetId);
@@ -219,6 +218,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(expectedCount, vmResult.TransactionCategories.Count(), "Count");
         }
 
+        /*
         [TestMethod()]
         public void Create_Get_WhenProvidedAssetIdIsValid_ReturnActiveTransactionDescriptionsFromDatabase_Test()
         {
@@ -241,6 +241,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var vmResult = viewResult.Model as CreateViewModel;
             Assert.AreEqual(expectedCount, vmResult.TransactionDescriptions.Count(), "Count");
         }
+        */
 
         [TestMethod()]
         public void Create_Post_WhenProvidedViewModelIsValid_UpdateDatabase_Test()
@@ -255,7 +256,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 CheckNumber = "123",
                 SelectedTransactionTypeId = "1",
                 SelectedTransactionCategoryId = "2",
-                SelectedTransactionDescriptionId = "4",
+                //SelectedTransactionDescriptionId = "4",
                 DueDate = DateTime.Now.ToShortDateString(),
                 Amount = 9.99M,
                 Note = "this is a note"
@@ -270,7 +271,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(vmExpected.CheckNumber, dtoResult.CheckNumber, "CheckNumber");
             Assert.AreEqual(vmExpected.SelectedTransactionTypeId, dtoResult.TransactionTypeId.ToString(), "Type ID");
             Assert.AreEqual(vmExpected.SelectedTransactionCategoryId, dtoResult.TransactionCategoryId.ToString(), "Category ID");
-            Assert.AreEqual(vmExpected.SelectedTransactionDescriptionId, dtoResult.TransactionDescriptionId.ToString(), "Description ID");
+            //Assert.AreEqual(vmExpected.SelectedTransactionDescriptionId, dtoResult.TransactionDescriptionId.ToString(), "Description ID");
             Assert.IsNotNull(dtoResult.DueDate, "Date Found");
             Assert.AreNotEqual(new DateTime(), dtoResult.DueDate, "Date Valid");
             Assert.AreEqual(vmExpected.Amount, dtoResult.Amount, "Amount");
@@ -290,7 +291,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 AssetId = 1,
                 SelectedTransactionTypeId = "2",
                 SelectedTransactionCategoryId = "4",
-                SelectedTransactionDescriptionId = "5",
+                //SelectedTransactionDescriptionId = "5",
                 DueDate = DateTime.Now.ToShortDateString(),
                 Amount = 20.99M
             };
@@ -439,6 +440,6 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(vmExpected.AssetId, routeResult.RouteValues["id"], "Route Id");
             Assert.AreEqual("Record updated", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
-
+        
     }
 }

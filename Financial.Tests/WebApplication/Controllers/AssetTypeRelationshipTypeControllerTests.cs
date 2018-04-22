@@ -119,7 +119,7 @@ namespace Financial.Tests.WebApplication.Controllers
         */
 
 
-        
+        /*
         [TestMethod()]
         public void Index_Child_WhenProvidedAssetTypeIdIsValid_ReturnRouteValues_Test()
         {
@@ -1559,7 +1559,7 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.IsNotNull(vmResult.LinkAssetTypes.FirstOrDefault(r => r.Selected), "Value selected in list");
             Assert.AreEqual(selectedLinkedAssetTypeId.ToString(), vmResult.SelectedLinkedAssetTypeId, "Selected LinkAssetTypes Id");
         }
-        */
+        * /
 
 
 
@@ -1783,6 +1783,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(vmExpected.SuppliedAssetTypeId, routeResult.RouteValues["id"], "Route Id");
             Assert.AreEqual("Relationship deleted.", controller.TempData["SuccessMessage"], "Message");
         }
+        */
+
 
 
     }

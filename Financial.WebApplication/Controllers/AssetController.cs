@@ -1,4 +1,5 @@
 ﻿using Financial.Business;
+using Financial.Business.Utilities;
 using Financial.Core;
 using Financial.Core.Models;
 using Financial.WebApplication.Models.ViewModels.Asset;
@@ -56,6 +57,7 @@ namespace Financial.WebApplication.Controllers
             }
             catch (Exception)
             {
+                TempData["ErrorMessage"] = "Encountered problem";
                 return View("Index", new List<IndexViewModel>());
             }
         }
@@ -73,7 +75,7 @@ namespace Financial.WebApplication.Controllers
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Encountered problem";
                 return RedirectToAction("Index", "Asset");
             }
         }
@@ -89,7 +91,7 @@ namespace Financial.WebApplication.Controllers
                     // transfer vm to dto
                     var dtoAsset = new Asset()
                     {
-                        AssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedAssetTypeId),
+                        AssetTypeId = DataTypeUtility.GetIntegerFromString(vmCreate.SelectedAssetTypeId),
                         Name = vmCreate.AssetName,
                         IsActive = true
                     };
@@ -102,12 +104,12 @@ namespace Financial.WebApplication.Controllers
                     TempData["SuccessMessage"] = "Asset Created";
                     return RedirectToAction("Create", "AssetSetting", new { assetId = dtoAsset.Id });
                 }
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Unable to create record. Try again.";
                 return RedirectToAction("Index", "Asset");
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Encountered problem";
                 return RedirectToAction("Index", "Asset");
             }
         }
@@ -126,12 +128,12 @@ namespace Financial.WebApplication.Controllers
                     // display view
                     return View("Edit", new EditViewModel(dtoAsset, sliAssetTypes));
                 }
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
                 return RedirectToAction("Index", "Asset");
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Encountered problem";
                 return RedirectToAction("Index", "Asset");
             }
         }
@@ -147,7 +149,7 @@ namespace Financial.WebApplication.Controllers
                 if (dtoAsset != null)
                 {
                     dtoAsset.Name = vmEdit.Name;
-                    dtoAsset.AssetTypeId = Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedAssetTypeId);
+                    dtoAsset.AssetTypeId = DataTypeUtility.GetIntegerFromString(vmEdit.SelectedAssetTypeId);
 
                     // update db
                     UOW.CommitTrans();
@@ -156,12 +158,12 @@ namespace Financial.WebApplication.Controllers
                     TempData["SuccessMessage"] = "Record updated.";
                     return RedirectToAction("Details", "Asset", new { id = vmEdit.Id });
                 }
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
                 return RedirectToAction("Index", "Asset");
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Encountered problem";
                 return RedirectToAction("Index", "Asset");
             }
         } 
@@ -186,12 +188,12 @@ namespace Financial.WebApplication.Controllers
                     // display view with message
                     return View("Details", new DetailsViewModel(dtoAsset, dtoAssetType));
                 }
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Unable to display record. Try again.";
                 return RedirectToAction("Index", "Asset");
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Encountered problem";
                 return RedirectToAction("Index", "Asset");
             }
         }
@@ -210,12 +212,12 @@ namespace Financial.WebApplication.Controllers
                     // display view
                     return View("Delete", new DeleteViewModel(dtoAsset, dtoAssetType));
                 }
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Unable to delete record. Try again.";
                 return RedirectToAction("Index", "Asset");
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Encountered problem";
                 return RedirectToAction("Index", "Asset");
             }
         }
@@ -239,12 +241,12 @@ namespace Financial.WebApplication.Controllers
                     TempData["SuccessMessage"] = "Record Deleted";
                     return RedirectToAction("Index", "Asset");
                 }
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Unable to delete record. Try again.";
                 return RedirectToAction("Index", "Asset");
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Encountered problem. Try again.";
+                TempData["ErrorMessage"] = "Encountered problem";
                 return RedirectToAction("Index", "Asset");
             }
         }

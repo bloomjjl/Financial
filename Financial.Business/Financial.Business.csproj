@@ -42,11 +42,17 @@
   <ItemGroup>
     <Compile Include="BusinessService.cs" />
     <Compile Include="IBusinessService.cs" />
+    <Compile Include="Models\BusinessModels\LinkedAssetTypeSettingType.cs" />
+    <Compile Include="ServiceInterfaces\IAssetService.cs" />
     <Compile Include="ServiceInterfaces\IAssetSettingService.cs" />
     <Compile Include="ServiceInterfaces\IAssetTypeService.cs" />
+    <Compile Include="ServiceInterfaces\ISelectListService.cs" />
+    <Compile Include="Services\AssetService.cs" />
     <Compile Include="Services\AssetSettingService.cs" />
     <Compile Include="Services\AssetTypeService.cs" />
+    <Compile Include="Services\SelectListService.cs" />
     <Compile Include="Utilities\DataTypeUtility.cs" />
+    <Compile Include="Utilities\TransactionUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -54,6 +60,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.Helpers.dll</HintPath>
       <Private>True</Private>
@@ -89,9 +96,7 @@
       <Name>Financial.Data</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

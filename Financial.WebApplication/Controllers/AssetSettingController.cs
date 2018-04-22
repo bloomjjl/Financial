@@ -25,45 +25,39 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ActionResult Index(int assetId)
         {
-            // transfer id to dto
-            var dtoAsset = UOW.Assets.Get(assetId);
-
-            // validate dto
-            if(dtoAsset == null)
+            try
             {
+                // transfer id to dto
+                var dtoAsset = UOW.Assets.Get(assetId);
+                if (dtoAsset != null)
+                {
+                    // get list of linked setting types
+                    var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
+
+                    // create & transfer values to vm
+                    var vmIndex = new List<IndexViewModel>();
+                    foreach (var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
+                    {
+                        // transfer to dto
+                        var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
+                        var dtoAssetSetting = UOW.AssetSettings.GetActive(dtoAsset.Id, dtoSettingType.Id);
+
+                        // validate dto & update vm
+                        var vm = dtoAssetSetting == null 
+                            ? new IndexViewModel(new AssetSetting(), assetId, dtoSettingType)
+                            : new IndexViewModel(dtoAssetSetting, assetId, dtoSettingType);
+                        vmIndex.Add(vm);
+                    }
+                    // display view
+                    return PartialView("_Index", vmIndex);
+                }
                 return PartialView("_Index", new List<IndexViewModel>());
             }
-
-            // get list of linked setting types
-            var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.AssetTypeId == dtoAsset.AssetTypeId)
-                .ToList();
-
-            // create & transfer values to vm
-            var vmIndex = new List<IndexViewModel>();
-            foreach(var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
+            catch (Exception)
             {
-                // transfer to dto
-                var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
-                var dtoAssetSetting = UOW.AssetSettings.GetAll()
-                    .Where(r => r.IsActive)
-                    .Where(r => r.AssetId == dtoAsset.Id)
-                    .FirstOrDefault(r => r.SettingTypeId == dtoSettingType.Id);
-
-                // validate dto
-                if (dtoAssetSetting == null)
-                {
-                    vmIndex.Add(new IndexViewModel(new AssetSetting(), assetId, dtoSettingType));
-                }
-                else
-                { 
-                    vmIndex.Add(new IndexViewModel(dtoAssetSetting, assetId, dtoSettingType));
-                }
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "AssetSetting");
             }
-            
-            // display view
-            return PartialView("_Index", vmIndex);
         }
 
         [HttpGet]
@@ -75,134 +69,168 @@ namespace Financial.WebApplication.Controllers
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
             }
 
-            // transfer id to dto
-            var dtoAsset = UOW.Assets.Get(assetId);
-            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+            try
+            {
+                // transfer id to dto
+                var dtoAsset = UOW.Assets.Get(assetId);
+                if (dtoAsset != null)
+                {
+                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
 
-            // transfer dto to vm
-            var vmCreate = UOW.AssetTypesSettingTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.AssetTypeId == dtoAsset.AssetTypeId)
-                .Join(UOW.SettingTypes.GetAll(),
-                    atst => atst.SettingTypeId, st => st.Id,
-                    (atst, st) => new { dtoAsset, st })
-                .Where(j => j.st.IsActive)
-                .Select(j => new CreateViewModel(dtoAsset, j.st))
-                .ToList();
+                    // transfer dto to vm
+                    var vmCreate = new List<CreateViewModel>();
+                    var dbATST = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
+                    foreach(var dtoATST in dbATST)
+                    {
+                        var dtoSettingType = UOW.SettingTypes.Get(dtoATST.SettingTypeId);
+                        vmCreate.Add(new CreateViewModel(dtoAsset, dtoSettingType));
+                    }
 
-            // display view
-            return View("Create", new CreateLinkedSettingTypesViewModel(dtoAsset, dtoAssetType, vmCreate));
+                    // display view
+                    return View("Create", new CreateLinkedSettingTypesViewModel(dtoAsset, dtoAssetType, vmCreate));
+                }
+                TempData["ErrorMessage"] = "Unable to create record. Try again.";
+                return RedirectToAction("Index", "Asset");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "Asset");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateLinkedSettingTypesViewModel vmCreate)
         {
-            // validate vm 
-            if(vmCreate.CreateViewModels == null)
+            try
             {
-                TempData["SuccessMessage"] = "No Linked Setting Types to Update";
-                return RedirectToAction("Details", "Asset", new { id = vmCreate.AssetId });
-            }
-
-            // transfer vm to dto
-            foreach (var vm in vmCreate.CreateViewModels)
-            {
-                UOW.AssetSettings.Add(new AssetSetting()
+                if (ModelState.IsValid)
                 {
-                    AssetId = vm.AssetId,
-                    SettingTypeId = vm.SettingTypeId,
-                    Value = vm.Value,
-                    IsActive = true
-                });
+                    // validate vm 
+                    if (vmCreate.CreateViewModels != null)
+                    {
+                        // transfer vm to dto
+                        foreach (var vm in vmCreate.CreateViewModels)
+                        {
+                            UOW.AssetSettings.Add(new AssetSetting()
+                            {
+                                AssetId = vm.AssetId,
+                                SettingTypeId = vm.SettingTypeId,
+                                Value = vm.Value,
+                                IsActive = true
+                            });
+                        }
+
+                        // update db
+                        UOW.CommitTrans();
+
+                        // display view with message
+                        TempData["SuccessMessage"] = "Records created";
+                        return RedirectToAction("Details", "Asset", new { id = vmCreate.AssetId });
+                    }
+                    TempData["SuccessMessage"] = "No Linked Setting Types to Update";
+                    return RedirectToAction("Details", "Asset", new { id = vmCreate.AssetId });
+                }
+                TempData["ErrorMessage"] = "Unable to create record. Try again.";
+                return RedirectToAction("Index", "Asset");
             }
-
-            // update db
-            UOW.CommitTrans();
-
-            // display view with message
-            TempData["SuccessMessage"] = "Records created";
-            return RedirectToAction("Details", "Asset", new { id = vmCreate.AssetId });
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered Problem";
+                return RedirectToAction("Index", "Asset");
+            }
         }
 
         [HttpGet]
         public ActionResult Edit(int assetId)
         {
-            // transfer id to dto
-            var dtoAsset = UOW.Assets.Get(assetId);
-            
-            // validate dto
-            if(dtoAsset == null)
+            try
             {
+                // transfer id to dto
+                var dtoAsset = UOW.Assets.Get(assetId);
+                if (dtoAsset != null)
+                {
+                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+
+                    // get list of linked setting types
+                    var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
+
+                    // create & transfer values to vm
+                    var vmEdit = new List<EditViewModel>();
+                    foreach (var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
+                    {
+                        // transfer to dto
+                        var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
+                        var dtoAssetSetting = UOW.AssetSettings.GetActive(dtoAsset.Id, dtoSettingType.Id);
+                        
+                        // validate dto & update vm
+                        var vm = dtoAssetSetting == null
+                            ? new EditViewModel(new AssetSetting(), dtoAsset, dtoSettingType)
+                            : new EditViewModel(dtoAssetSetting, dtoAsset, dtoSettingType);
+                        vmEdit.Add(vm);
+                    }
+
+                    // display view
+                    return View("Edit", new EditLinkedSettingTypesViewModel(dtoAsset, dtoAssetType, vmEdit));
+                }
+                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
                 return RedirectToAction("Index", "Asset");
             }
-
-            var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
-
-            // get list of linked setting types
-            var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAll()
-                .Where(r => r.IsActive)
-                .Where(r => r.AssetTypeId == dtoAsset.AssetTypeId)
-                .ToList();
-
-            // create & transfer values to vm
-            var vmEdit = new List<EditViewModel>();
-            foreach (var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
+            catch (Exception)
             {
-                // transfer to dto
-                var dtoSettingType = UOW.SettingTypes.Get(dtoAssetTypeSettingType.SettingTypeId);
-                var dtoAssetSetting = UOW.AssetSettings.GetAll()
-                    .Where(r => r.IsActive)
-                    .Where(r => r.AssetId == dtoAsset.Id)
-                    .FirstOrDefault(r => r.SettingTypeId == dtoSettingType.Id);
-
-                // validate dto
-                if (dtoAssetSetting == null)
-                {
-                    vmEdit.Add(new EditViewModel(new AssetSetting(), dtoAsset, dtoSettingType));
-                }
-                else
-                {
-                    vmEdit.Add(new EditViewModel(dtoAssetSetting, dtoAsset, dtoSettingType));
-                }
+                TempData["ErrorMessage"] = "Encountered Problem";
+                return RedirectToAction("Index", "Asset");
             }
-
-            // display view
-            return View("Edit", new EditLinkedSettingTypesViewModel(dtoAsset, dtoAssetType, vmEdit));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(EditLinkedSettingTypesViewModel vmEditLinkedSettingTypes)
         {
-            // transfer vm to dto
-            foreach(var vmEdit in vmEditLinkedSettingTypes.EditViewModels)
+            try
             {
-                // new entry?
-                if(vmEdit.Id == 0)
+                if (ModelState.IsValid)
                 {
-                    // YES. Create record
-                    UOW.AssetSettings.Add(new AssetSetting()
+                    // transfer vm to dto
+                    foreach (var vmEdit in vmEditLinkedSettingTypes.EditViewModels)
                     {
-                        AssetId = vmEditLinkedSettingTypes.AssetId,
-                        SettingTypeId = vmEdit.SettingTypeId,
-                        Value = vmEdit.Value,
-                        IsActive = true
-                    });
+                        // new entry?
+                        if (vmEdit.Id == 0)
+                        {
+                            // YES. Create record
+                            UOW.AssetSettings.Add(new AssetSetting()
+                            {
+                                AssetId = vmEditLinkedSettingTypes.AssetId,
+                                SettingTypeId = vmEdit.SettingTypeId,
+                                Value = vmEdit.Value,
+                                IsActive = true
+                            });
+                        }
+                        else
+                        {
+                            var dtoAssetSetting = UOW.AssetSettings.Get(vmEdit.Id);
+                            dtoAssetSetting.Value = vmEdit.Value;
+                        }
+                    }
+
+                    // update db
+                    UOW.CommitTrans();
+
+                    // display view with message
+                    TempData["SuccessMessage"] = "Records updated";
+                    return RedirectToAction("Details", "Asset", new { id = vmEditLinkedSettingTypes.AssetId });
                 }
-                else
-                {
-                    var dtoAssetSetting = UOW.AssetSettings.Get(vmEdit.Id);
-                    dtoAssetSetting.Value = vmEdit.Value;
-                }
+                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+                return RedirectToAction("Index", "Asset");
             }
-
-            // update db
-            UOW.CommitTrans();
-
-            // display view with message
-            TempData["SuccessMessage"] = "Records updated";
-            return RedirectToAction("Details", "Asset", new { id = vmEditLinkedSettingTypes.AssetId });
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered Problem";
+                return RedirectToAction("Index", "Asset");
+            }
         }
+
+
     }
 }

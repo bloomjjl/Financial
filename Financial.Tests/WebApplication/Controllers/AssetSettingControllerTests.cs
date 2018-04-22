@@ -27,6 +27,7 @@ namespace Financial.Tests.WebApplication.Controllers
     [TestClass()]
     public class AssetSettingControllerTests : AssetSettingControllerTestsBase
     {
+        /*
         [TestMethod()]
         public void Index_Get_WhenProvidedAssetIdIsValid_ReturnRouteValues_Test()
         {
@@ -499,6 +500,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual(vmExpected.AssetId, routeResult.RouteValues["id"], "Route Id");
             Assert.AreEqual("Records updated", controller.TempData["SuccessMessage"].ToString(), "Message");
         }
+
+        */
 
 
     }

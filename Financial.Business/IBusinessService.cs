@@ -9,7 +9,9 @@ namespace Financial.Business
 {
     public interface IBusinessService : IDisposable
     {
+        IAssetService AssetService { get; }
         IAssetSettingService AssetSettingService { get; }
         IAssetTypeService AssetTypeService { get; }
+        ISelectListService SelectListService { get; }
     }
 }

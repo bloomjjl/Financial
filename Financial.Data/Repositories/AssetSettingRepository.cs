@@ -20,5 +20,15 @@ namespace Financial.Data.Repositories
         {
             get { return _context as FinancialDbContext; }
         }
+
+
+
+        public AssetSetting GetActive(int assetId, int settingTypeId)
+        {
+            return FinancialDbContext.AssetSettings
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetId == assetId)
+                .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
+        }
     }
 }

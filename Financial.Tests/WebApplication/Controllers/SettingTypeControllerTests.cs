@@ -56,7 +56,7 @@ namespace Financial.Tests.WebApplication.Controllers
         // Invalid Output Values
         // Invalid Returned Error Messages
 
-
+            /*
 
         [TestMethod()]
         public void Index_Get_WhenProvidedNoInputValues_ReturnRouteValues_Test()
@@ -415,6 +415,6 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Name", vmResult.Name, "Name");
             Assert.AreEqual(true, vmResult.IsActive, "IsActive");
         }
-
+        */
     }
 }

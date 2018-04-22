@@ -17,5 +17,16 @@ namespace Financial.Tests.Data.Repositories
         {
             _entities = entities as List<AssetSetting>;
         }
+
+
+
+
+        public AssetSetting GetActive(int assetId, int settingTypeId)
+        {
+            return _entities
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetId == assetId)
+                .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
+        }
     }
 }

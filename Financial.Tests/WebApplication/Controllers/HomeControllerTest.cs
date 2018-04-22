@@ -13,6 +13,7 @@ namespace Financial.Tests.WebApplication.Controllers
     [TestClass]
     public class HomeControllerTest
     {
+        /*
         [TestMethod]
         public void Index()
         {
@@ -51,5 +52,9 @@ namespace Financial.Tests.WebApplication.Controllers
             // Assert
             Assert.IsNotNull(result);
         }
+        */
+
+
+
     }
 }

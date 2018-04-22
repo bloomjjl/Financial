@@ -20,5 +20,24 @@ namespace Financial.Data.Repositories
         {
             get { return _context as FinancialDbContext; }
         }
+
+
+
+        public IEnumerable<AssetTransaction> GetAllActiveByDueDate()
+        {
+            return FinancialDbContext.AssetTransactions
+                .Where(r => r.IsActive)
+                .OrderBy(r => r.DueDate)
+                .ToList();
+        }
+
+        public IEnumerable<AssetTransaction> GetAllActiveByDescendingDueDate(int assetId)
+        {
+            return FinancialDbContext.AssetTransactions
+                .Where(r => r.IsActive)
+                .Where(r => r.AssetId == assetId)
+                .OrderByDescending(r => r.DueDate)
+                .ToList();
+        }
     }
 }

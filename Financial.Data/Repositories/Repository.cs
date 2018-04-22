@@ -23,12 +23,22 @@ namespace Financial.Data.Repositories
 
         public TEntity Get(int id)
         {
-            return _entities.Find(id);
+            return _entities.FirstOrDefault(r => r.Id == id);
+        }
+
+        public TEntity GetActive(int id)
+        {
+            return _entities.Where(r => r.IsActive).FirstOrDefault(r => r.Id == id);
         }
 
         public IEnumerable<TEntity> GetAll()
         {
             return _entities.ToList();
+        }
+
+        public IEnumerable<TEntity> GetAllActive()
+        {
+            return _entities.Where(r => r.IsActive).ToList();
         }
 
         public TEntity Find(Expression<Func<TEntity, bool>> predicate)

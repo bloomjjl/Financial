@@ -27,6 +27,7 @@ namespace Financial.Tests.WebApplication.Controllers
     [TestClass()]
     public class ParentChildRelationshipTypeControllerTests : ParentChildRelationshipTypeControllerTestsBase
     {
+        /*
         [TestMethod()]
         public void Index_Child_WhenProvidedRelationshipTypeIsValid_ReturnRouteValues_Test()
         {
@@ -854,6 +855,8 @@ namespace Financial.Tests.WebApplication.Controllers
             Assert.AreEqual("Delete", viewResult.ViewName, "View Name");
             Assert.IsInstanceOfType(viewResult.ViewData.Model, typeof(DeleteViewModel), "View Model");
         }
+        */
+
 
     }
 }

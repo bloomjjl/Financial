@@ -17,5 +17,14 @@ namespace Financial.Tests.Data.Repositories
         {
             _entities = entities as List<Asset>;
         }
+
+
+        public IEnumerable<Asset> GetAllActiveOrderedByName()
+        {
+            return _entities
+                .Where(r => r.IsActive)
+                .OrderBy(r => r.Name)
+                .ToList();
+        }
     }
 }

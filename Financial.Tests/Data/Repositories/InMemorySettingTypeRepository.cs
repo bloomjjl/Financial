@@ -18,5 +18,27 @@ namespace Financial.Tests.Data.Repositories
         {
             _entities = entities as List<SettingType>;
         }
+
+
+
+        public IEnumerable<SettingType> GetAllOrderedByName()
+        {
+            return _entities
+                .OrderBy(r => r.Name)
+                .ToList();
+        }
+
+        public int CountMatching(string name)
+        {
+            return _entities
+                .Count(r => r.Name == name);
+        }
+
+        public int CountMatching(int excludeId, string name)
+        {
+            return _entities
+                .Where(r => r.Id != excludeId)
+                .Count(r => r.Name == name);
+        }
     }
 }

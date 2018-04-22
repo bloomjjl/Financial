@@ -20,5 +20,30 @@ namespace Financial.Data.Repositories
         {
             get { return _context as FinancialDbContext; }
         }
+
+
+
+
+        public IEnumerable<SettingType> GetAllOrderedByName()
+        {
+            return FinancialDbContext.SettingTypes
+                .OrderBy(r => r.Name)
+                .ToList();
+        }
+
+        public int CountMatching(string name)
+        {
+            return FinancialDbContext.SettingTypes
+                .Count(r => r.Name == name);
+        }
+
+        public int CountMatching(int excludeId, string name)
+        {
+            return FinancialDbContext.SettingTypes
+                .Where(r => r.Id != excludeId)
+                .Count(r => r.Name == name);
+        }
+
+
     }
 }

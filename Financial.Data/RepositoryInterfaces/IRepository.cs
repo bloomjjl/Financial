@@ -12,6 +12,7 @@ namespace Financial.Data.RepositoryInterfaces
     {
         TEntity Get(int id);
         IEnumerable<TEntity> GetAll();
+        IEnumerable<TEntity> GetAllActive();
 
         TEntity Find(Expression<Func<TEntity, bool>> predicate);
         IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate);

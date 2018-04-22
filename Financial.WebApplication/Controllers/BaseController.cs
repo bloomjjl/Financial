@@ -17,11 +17,13 @@ namespace Financial.WebApplication.Controllers
         public BaseController()
         {
             _unitOfWork = new UnitOfWork();
+            _businessService = new BusinessService(_unitOfWork);
         }
 
         public BaseController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            _businessService = new BusinessService(_unitOfWork);
         }
 
         public IUnitOfWork UOW
