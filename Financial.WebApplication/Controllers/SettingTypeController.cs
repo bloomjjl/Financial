@@ -8,42 +8,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Financial.Business;
 
 namespace Financial.WebApplication.Controllers
 {
     public class SettingTypeController : BaseController
     {
-        public SettingTypeController()
+        private IUnitOfWork _unitOfWork;
+        private IBusinessService _businessService;
+
+
+        public SettingTypeController(IUnitOfWork unitOfWork, IBusinessService businessService)
             : base()
         {
-        }
-
-        public SettingTypeController(IUnitOfWork unitOfWork)
-            : base(unitOfWork)
-        {
+            _unitOfWork = unitOfWork;
+            _businessService = businessService;
         }
 
         [HttpGet]
         public ViewResult Index()
         {
-            // get messages from other controllers to display in view
-            if (TempData["SuccessMessage"] != null)
-            {
-                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
-            }
-            if (TempData["ErrorMessage"] != null)
-            {
-                ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-            }
-
             try
             {
-                // transfer dto to vm
-                var vmIndex = UOW.SettingTypes.GetAllOrderedByName()
+                // get messages from other controllers to display in view
+                if (TempData["SuccessMessage"] != null)
+                {
+                    ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+                }
+                if (TempData["ErrorMessage"] != null)
+                {
+                    ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+                }
+
+                // transfer bm to vm
+                var vmIndex = _businessService.SettingTypeService.GetListOfSettingTypes()
+                    .OrderBy(r => r.SettingTypeName)
                     .Select(r => new IndexViewModel(r))
                     .ToList();
 
-                // display view
                 return View("Index", vmIndex);
             }
             catch(Exception)
@@ -54,16 +56,17 @@ namespace Financial.WebApplication.Controllers
         }
 
         [HttpGet]
-        public ViewResult Create()
+        public ActionResult Create()
         {
-            // get messages from other controllers to display in view
-            if (TempData["SuccessMessage"] != null)
+            try
             {
-                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+                return View("Create");
             }
-
-            // display view
-            return View("Create");
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "SettingType");
+            }
         }
 
         [HttpPost]
@@ -72,34 +75,28 @@ namespace Financial.WebApplication.Controllers
         {
             try
             {
-                // validation
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    // check for duplicate
-                    var count = UOW.SettingTypes.CountMatching(vmCreate.Name);
-                    if (count == 0)
-                    {
-                        // transfer vm to dto
-                        var dtoSettingType = new SettingType()
-                        {
-                            Name = vmCreate.Name,
-                            IsActive = true
-                        };
+                    return RedirectToAction("Index", "SettingType");
+                }
 
-                        // update db
-                        UOW.SettingTypes.Add(dtoSettingType);
-                        UOW.CommitTrans();
+                // transfer vm to bm
+                var bmSettingType = new Business.Models.SettingType()
+                {
+                    SettingTypeName = vmCreate.Name,
+                };
 
-                        // display view with message
-                        TempData["SuccessMessage"] = "Record created";
-                        return RedirectToAction("CreateLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = dtoSettingType.Id });
-                    }
-                    // display view with message
-                    ViewData["ErrorMessage"] = "Record already exists";
+                // update db
+                bmSettingType.SettingTypeId = _businessService.SettingTypeService.AddSettingType(bmSettingType);
+                if (bmSettingType.SettingTypeId == 0)
+                {
+                    ViewData["ErrorMessage"] = "Name already exists";
                     return View("Create", vmCreate);
                 }
-                TempData["ErrorMessage"] = "Unable to create record. Try again.";
-                return RedirectToAction("Index", "SettingType");
+
+                // display View with message
+                TempData["SuccessMessage"] = "Setting Type Created";
+                return RedirectToAction("CreateLinkedAssetTypes", "AssetTypeSettingType", new { settingTypeId = bmSettingType.SettingTypeId });
             }
             catch (Exception)
             {
@@ -112,16 +109,17 @@ namespace Financial.WebApplication.Controllers
         public ActionResult Edit(int id)
         {
             try
-            { 
-                // transfer dto to vm
-                var dtoSettingType = UOW.SettingTypes.Get(id);
-                if (dtoSettingType != null)
+            {
+                // get bm
+                var bmSettingType = _businessService.SettingTypeService.GetSettingType(id);
+                if (bmSettingType == null)
                 {
-                    // display view
-                    return View("Edit", new EditViewModel(dtoSettingType));
+                    TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+                    return RedirectToAction("Index", "SettingType");
                 }
-                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
-                return RedirectToAction("Index", "SettingType");
+
+                // transfer bm to vm
+                return View("Edit", new EditViewModel(bmSettingType));
             }
             catch (Exception)
             {
@@ -136,30 +134,27 @@ namespace Financial.WebApplication.Controllers
         {
             try
             {
-                // validation
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    // check for duplicate
-                    var count = UOW.SettingTypes.CountMatching(vmEdit.Id, vmEdit.Name);
-                    if (count == 0)
-                    {
-                        // transfer vm to dto
-                        var dtoSettingType = UOW.SettingTypes.Get(vmEdit.Id);
-                        dtoSettingType.Name = vmEdit.Name;
-                        dtoSettingType.IsActive = vmEdit.IsActive;
-
-                        // update db
-                        UOW.CommitTrans();
-
-                        // display view with message
-                        TempData["SuccessMessage"] = "Record updated";
-                        return RedirectToAction("Index", "SettingType");
-                    }
-                    // display view with message
-                    ViewData["ErrorMessage"] = "Record already exists";
-                    return View("Edit", vmEdit);
+                    return RedirectToAction("Index", "SettingType");
                 }
-                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+
+                // transfer vm to bm
+                var bmSettingType = new Business.Models.SettingType()
+                {
+                    SettingTypeId = vmEdit.Id,
+                    SettingTypeName = vmEdit.Name,
+                };
+
+                // update db
+                var updated = _businessService.SettingTypeService.EditSettingType(bmSettingType);
+                if (!updated)
+                {
+                    TempData["ErrorMessage"] = "Problem updating record. Try again.";
+                    return RedirectToAction("Index", "SettingType");
+                }
+
+                TempData["SuccessMessage"] = "Record updated.";
                 return RedirectToAction("Index", "SettingType");
             }
             catch (Exception)
@@ -170,25 +165,29 @@ namespace Financial.WebApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult Details(int? id)
+        public ActionResult Details(int id)
         {
-            // get messages from other controllers to display in view
-            if (TempData["SuccessMessage"] != null)
-            {
-                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
-            }
-
             try
             {
-                // transfer dto to vm
-                var dtoSettingType = UOW.SettingTypes.Get(DataTypeUtility.GetIntegerFromString(id.ToString()));
-                if(dtoSettingType != null)
+                // get messages from other controllers to display in view
+                if (TempData["SuccessMessage"] != null)
                 {
-                    // display view
-                    return View("Details", new DetailsViewModel(dtoSettingType));
+                    ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                 }
-                TempData["ErrorMessage"] = "Unable to display record. Try again.";
-                return RedirectToAction("Index", "SettingType");
+                if (TempData["ErrorMessage"] != null)
+                {
+                    ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+                }
+
+                // transfer bm to vm
+                var bmSettingType = _businessService.SettingTypeService.GetSettingType(id);
+                if (bmSettingType == null)
+                {
+                    TempData["ErrorMessage"] = "Unable to display record. Try again.";
+                    return RedirectToAction("Index", "SettingType");
+                }
+
+                return View("Details", new DetailsViewModel(bmSettingType));
             }
             catch (Exception)
             {

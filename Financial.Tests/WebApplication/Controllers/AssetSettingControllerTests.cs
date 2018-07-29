@@ -6,19 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Financial.Core.Models;
-using Financial.Tests.Data.Repositories;
-using Financial.Tests.Data;
-using Financial.Tests.Data.Fakes;
+using Financial.WebApplication.Tests.Fakes.Repositories;
 using System.Web.Mvc;
 using Financial.WebApplication.Models.ViewModels.AssetSetting;
 
-namespace Financial.Tests.WebApplication.Controllers
+namespace Financial.WebApplication.Tests.WebApplication.Controllers
 {
     public class AssetSettingControllerTestsBase : ControllerTestsBase
     {
         public AssetSettingControllerTestsBase()
         {
-            _controller = new AssetSettingController(_unitOfWork);
+            _controller = new AssetSettingController(_unitOfWork, _businessService);
         }
 
         protected AssetSettingController _controller;
@@ -35,7 +33,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetSettings = new List<AssetSetting>() {
                 new AssetSetting() { Id = 10, AssetId = 1, SettingTypeId = 2, Value = "Setting Value", IsActive = true } }; 
             _unitOfWork.AssetSettings = new InMemoryAssetSettingRepository(_dataAssetSettings);
-            var controller = new AssetSettingController(_unitOfWork);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 1;
 
             // Act
@@ -69,8 +67,8 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true },
                 new AssetTypeSettingType() { Id = 51, AssetTypeId = 40, SettingTypeId = 31, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 20;
             int expectedCount = 1;
             var expectedSettingType = "SettingType 1";
@@ -125,8 +123,8 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true },
                 new AssetTypeSettingType() { Id = 51, AssetTypeId = 40, SettingTypeId = 31, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 20;
             int expectedCount = 1;
             var expectedAsset = "Asset";
@@ -161,8 +159,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 20;
             int expectedCount = 1;
             var expectedAsset = "Asset";
@@ -215,8 +213,8 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true },
                 new AssetTypeSettingType() { Id = 51, AssetTypeId = 40, SettingTypeId = 31, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             var vmExpected = new CreateLinkedSettingTypesViewModel() {
                 AssetId = 20,
                 CreateViewModels = new List<CreateViewModel>() {
@@ -257,8 +255,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true }};
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             var vmExpected = new CreateLinkedSettingTypesViewModel()
             {
                 AssetId = 20,
@@ -301,8 +299,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true }};
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 20;
 
             // Act
@@ -336,8 +334,8 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true },
                 new AssetTypeSettingType() { Id = 51, AssetTypeId = 40, SettingTypeId = 31, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 20;
             int expectedCount = 1;
 
@@ -371,8 +369,8 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true },
                 new AssetTypeSettingType() { Id = 51, AssetTypeId = 40, SettingTypeId = 31, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 20;
             int expectedCount = 1;
 
@@ -405,8 +403,8 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true },
                 new AssetTypeSettingType() { Id = 51, AssetTypeId = 40, SettingTypeId = 31, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             int assetId = 20;
             int expectedCount = 1;
 
@@ -437,8 +435,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true } };
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             var vmExpected = new EditLinkedSettingTypesViewModel()
             {
                 AssetId = 20,
@@ -480,8 +478,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
             var _dataAssetTypesSettingTypes = new List<AssetTypeSettingType>() {
                 new AssetTypeSettingType() { Id = 50, AssetTypeId = 40, SettingTypeId = 30, IsActive = true }};
-            _unitOfWork.AssetTypesSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
-            var controller = new AssetSettingController(_unitOfWork);
+            _unitOfWork.AssetTypeSettingTypes = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            var controller = new AssetSettingController(_unitOfWork, _businessService);
             var vmExpected = new EditLinkedSettingTypesViewModel()
             {
                 AssetId = 20,

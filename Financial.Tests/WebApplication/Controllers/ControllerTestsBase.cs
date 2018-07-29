@@ -6,13 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Financial.Core.Models;
-using Financial.Tests.Data.Repositories;
-using Financial.Tests.Data;
-using Financial.Tests.Data.Fakes;
+using Financial.WebApplication.Tests.Fakes.Repositories;
+using Financial.WebApplication.Tests.Fakes;
+using Financial.WebApplication.Tests.Fakes.Database;
 using System.Web.Mvc;
 using Financial.WebApplication.Models.ViewModels.Asset;
+using Financial.Business;
+using Financial.Business.ServiceInterfaces;
+using Financial.Business.Services;
+using Financial.WebApplication.Tests.Fakes.Services;
 
-namespace Financial.Tests.WebApplication.Controllers
+namespace Financial.WebApplication.Tests.WebApplication.Controllers
 {
     public class ControllerTestsBase
     {
@@ -24,8 +28,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _dataAssetSettings = FakeAssetSettings.InitialFakeAssetSettings().ToList();
             _dataAssetTransactions = FakeAssetTransactions.InitialFakeAssetTransactions().ToList();
             _dataAssetTypes = FakeAssetTypes.InitialFakeAssetTypes().ToList();
-            _dataAssetTypesRelationsihpTypes = FakeAssetTypesRelationshipTypes.InitialFakeAssetTypesRelationshipTypes().ToList();
-            _dataAssetTypesSettingTypes = FakeAssetTypesSettingTypes.InitialFakeAssetTypesSettingTypes().ToList();
+            _dataAssetTypeRelationsihpTypes = FakeAssetTypesRelationshipTypes.InitialFakeAssetTypesRelationshipTypes().ToList();
+            _dataAssetTypeSettingTypes = FakeAssetTypesSettingTypes.InitialFakeAssetTypesSettingTypes().ToList();
             _dataParentChildRelationshipTypes = FakeParentChildRelationshipTypes.InitialFakeParentChildRelationshipTypes().ToList();
             _dataRelationshipTypes = FakeRelationshipTypes.InitialFakeRelationshipTypes().ToList();
             _dataSettingTypes = FakeSettingTypes.InitialFakeSettingTypes().ToList();
@@ -39,8 +43,8 @@ namespace Financial.Tests.WebApplication.Controllers
             _repositoryAssetSetting = new InMemoryAssetSettingRepository(_dataAssetSettings);
             _repositoryAssetTransaction = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
             _repositoryAssetType = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            _repositoryAssetTypeRelationshipType = new InMemoryAssetTypeRelationshipTypeRepository(_dataAssetTypesRelationsihpTypes);
-            _repositoryAssetTypeSettingType = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypesSettingTypes);
+            _repositoryAssetTypeRelationshipType = new InMemoryAssetTypeRelationshipTypeRepository(_dataAssetTypeRelationsihpTypes);
+            _repositoryAssetTypeSettingType = new InMemoryAssetTypeSettingTypeRepository(_dataAssetTypeSettingTypes);
             _repositoryParentChildRelationshipType = new InMemoryParentChildRelationshipTypeRepository(_dataParentChildRelationshipTypes);
             _repositoryRelationshipType = new InMemoryRelationshipTypeRepository(_dataRelationshipTypes);
             _repositorySettingType = new InMemorySettingTypeRepository(_dataSettingTypes);
@@ -56,8 +60,8 @@ namespace Financial.Tests.WebApplication.Controllers
                 AssetSettings = _repositoryAssetSetting,
                 AssetTransactions = _repositoryAssetTransaction,
                 AssetTypes = _repositoryAssetType,
-                AssetTypesRelationshipTypes = _repositoryAssetTypeRelationshipType,
-                AssetTypesSettingTypes = _repositoryAssetTypeSettingType,
+                AssetTypeRelationshipTypes = _repositoryAssetTypeRelationshipType,
+                AssetTypeSettingTypes = _repositoryAssetTypeSettingType,
                 ParentChildRelationshipTypes = _repositoryParentChildRelationshipType,
                 RelationshipTypes = _repositoryRelationshipType,
                 SettingTypes = _repositorySettingType,
@@ -65,6 +69,10 @@ namespace Financial.Tests.WebApplication.Controllers
                 TransactionDescriptions = _repositoryTransactionDescription,
                 TransactionTypes = _repositoryTransactionType
             };
+
+            // Fake Business Service
+            _businessService = new BusinessService(_unitOfWork);
+            _assetTransactionService = new FakeAssetTransactionService(_unitOfWork);
         }
 
         protected IList<Asset> _dataAssets;
@@ -72,8 +80,8 @@ namespace Financial.Tests.WebApplication.Controllers
         protected IList<AssetSetting> _dataAssetSettings;
         protected IList<AssetTransaction> _dataAssetTransactions;
         protected IList<AssetType> _dataAssetTypes;
-        protected IList<AssetTypeRelationshipType> _dataAssetTypesRelationsihpTypes;
-        protected IList<AssetTypeSettingType> _dataAssetTypesSettingTypes;
+        protected IList<AssetTypeRelationshipType> _dataAssetTypeRelationsihpTypes;
+        protected IList<AssetTypeSettingType> _dataAssetTypeSettingTypes;
         protected IList<ParentChildRelationshipType> _dataParentChildRelationshipTypes;
         protected IList<RelationshipType> _dataRelationshipTypes;
         protected IList<SettingType> _dataSettingTypes;
@@ -96,6 +104,12 @@ namespace Financial.Tests.WebApplication.Controllers
         protected InMemoryTransactionTypeRepository _repositoryTransactionType;
 
         protected InMemoryUnitOfWork _unitOfWork;
+
+        protected IBusinessService _businessService;
+        protected FakeAssetTransactionService _assetTransactionService;
+        protected IAssetTypeService _assetTypeService;
+        protected IAssetTypeSettingTypeService _assetTypeSettingTypeService;
+
     }
 
 }

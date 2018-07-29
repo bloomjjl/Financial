@@ -8,6 +8,21 @@ namespace Financial.Business.Utilities
 {
     public class TransactionUtility
     {
+        public static int TransactionTypeIdForExpense = 1;
+        public static int TransactionTypeIdForIncome = 2;
+
+
+        public static decimal FormatAmount(int TransactionTypeId, decimal amount)
+        {
+            if(TransactionTypeId == TransactionTypeIdForExpense)
+            {
+                return amount * -1;
+            }
+
+            return amount;
+        }
+
+        /*
         public static decimal CalculateTransaction(decimal initialBalance, decimal transactionAmount, string transactionType)
         {
             if (transactionType == "Income")
@@ -35,6 +50,6 @@ namespace Financial.Business.Utilities
                 ? string.Empty
                 : note;
         }
-
+        */
     }
 }

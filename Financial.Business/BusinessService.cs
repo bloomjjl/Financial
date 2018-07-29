@@ -13,12 +13,6 @@ namespace Financial.Business
     {
         private IUnitOfWork _unitOfWork;
 
-        public BusinessService()
-        {
-            _unitOfWork = new UnitOfWork();
-            SetServices();
-        }
-
         public BusinessService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -30,20 +24,16 @@ namespace Financial.Business
             AssetService = new AssetService(_unitOfWork);
             AssetSettingService = new AssetSettingService(_unitOfWork);
             AssetTypeService = new AssetTypeService(_unitOfWork);
-            SelectListService = new SelectListService(_unitOfWork);
+            AssetTypeSettingTypeService = new AssetTypeSettingTypeService(_unitOfWork);
+            SettingTypeService = new SettingTypeService(_unitOfWork);
         }
 
 
         public IAssetService AssetService { get; private set; }
         public IAssetSettingService AssetSettingService { get; private set; }
         public IAssetTypeService AssetTypeService { get; private set; }
-        public ISelectListService SelectListService { get; private set; }
+        public IAssetTypeSettingTypeService AssetTypeSettingTypeService { get; private set; }
+        public ISettingTypeService SettingTypeService { get; private set; }
 
-
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

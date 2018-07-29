@@ -15,13 +15,17 @@ namespace Financial.Business.Utilities
             return integerValue;
         }
 
-        public static string GetDateValidatedToString(DateTime date)
+        public static string GetDateValidatedToShortDateString(DateTime? date)
         {
             var formatedDate = string.Empty;
 
-            if (date > new DateTime(0001, 1, 1))
+            if (date != null)
             {
-                formatedDate = date.ToString("MM/dd/yyyy");
+                var validDate = (DateTime)date;
+                if (validDate > new DateTime(0001, 1, 1))
+                {
+                    formatedDate = validDate.ToString("MM/dd/yyyy");
+                }
             }
 
             return formatedDate;

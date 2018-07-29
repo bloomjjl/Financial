@@ -7,35 +7,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Financial.Business;
 
 namespace Financial.WebApplication.Controllers
 {
     public class ParentChildRelationshipTypeController : BaseController
     {
-        public ParentChildRelationshipTypeController()
+        private IUnitOfWork _unitOfWork;
+        private IBusinessService _businessService;
+
+
+        public ParentChildRelationshipTypeController(IUnitOfWork unitOfWork, IBusinessService businessService)
             : base()
         {
-        }
-
-        public ParentChildRelationshipTypeController(IUnitOfWork unitOfWork)
-            : base(unitOfWork)
-        {
+            _unitOfWork = unitOfWork;
+            _businessService = businessService;
         }
 
         [ChildActionOnly]
         public ActionResult Index(int relationshipTypeId)
         {
             //transfer dto for id
-            var dtoSuppliedRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
+            var dtoSuppliedRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
 
             // transfer db for supplied ParentId
-            var dbParentRelationshipTypes = UOW.ParentChildRelationshipTypes.GetAll()
+            var dbParentRelationshipTypes = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.ParentRelationshipTypeId == relationshipTypeId)
                 .ToList();
             
             // transfer db for supplied ChildId
-            var dbChildRelationshipTypes = UOW.ParentChildRelationshipTypes.GetAll()
+            var dbChildRelationshipTypes = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.ChildRelationshipTypeId == relationshipTypeId)
                 .ToList();
@@ -44,16 +46,16 @@ namespace Financial.WebApplication.Controllers
             var vmIndex = new List<IndexViewModel>();
             foreach(var dtoParentChildRelationshipType in dbParentRelationshipTypes)
             {
-                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+                var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+                var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
                 vmIndex.Add(new IndexViewModel(dtoParentChildRelationshipType, dtoSuppliedRelationshipType, dtoParentRelationshipType, dtoChildRelationshipType));
             }
 
             // tranfer dbChild to vm
             foreach (var dtoParentChildRelationshipType in dbChildRelationshipTypes)
             {
-                var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-                var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+                var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+                var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
                 vmIndex.Add(new IndexViewModel(dtoParentChildRelationshipType, dtoSuppliedRelationshipType, dtoParentRelationshipType, dtoChildRelationshipType));
             }
 
@@ -65,7 +67,7 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Create(int relationshipTypeId)
         {
             // transfer dto for id
-            var dtoSuppliedRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
+            var dtoSuppliedRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
 
             // transfer db to sli
             List<SelectListItem> sliRelationshipTypes = GetDropDownListForRelationshipTypes(relationshipTypeId, null);
@@ -87,11 +89,11 @@ namespace Financial.WebApplication.Controllers
             }
 
             // link duplicated?
-            var countExistingParentLinks = UOW.ParentChildRelationshipTypes.GetAll()
+            var countExistingParentLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.ParentRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
                 .Where(r => r.ChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
-            var countExistingChildLinks = UOW.ParentChildRelationshipTypes.GetAll()
+            var countExistingChildLinks = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.ChildRelationshipTypeId == vmCreate.SuppliedRelationshipTypeId)
                 .Where(r => r.ParentRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmCreate.SelectedLinkedRelationshipType))
                 .Count(r => r.IsActive);
@@ -121,7 +123,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            UOW.ParentChildRelationshipTypes.Add(new ParentChildRelationshipType()
+            _unitOfWork.ParentChildRelationshipTypes.Add(new ParentChildRelationshipType()
             {
                 ParentRelationshipTypeId = parentRelationshipType,
                 ChildRelationshipTypeId = childRelationshipType,
@@ -129,7 +131,7 @@ namespace Financial.WebApplication.Controllers
             });
 
             // update db
-            UOW.CommitTrans();
+            _unitOfWork.CommitTrans();
 
             // display view
             return RedirectToAction("Details", "RelationshipType", new { id = vmCreate.SuppliedRelationshipTypeId });
@@ -139,8 +141,8 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Edit(int id, int relationshipTypeId)
         {
             // transfer dto for id
-            var dtoSuppliedParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(id);
-            var dtoSuppliedRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
+            var dtoSuppliedParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(id);
+            var dtoSuppliedRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
 
             // transfer levels to sli
             var selectedRelationshipLevelId = dtoSuppliedParentChildRelationshipType.ParentRelationshipTypeId == relationshipTypeId ?
@@ -166,12 +168,12 @@ namespace Financial.WebApplication.Controllers
             }
 
             // duplicated relationship?
-            var countExistingParentChildRelationship = UOW.ParentChildRelationshipTypes.GetAll()
+            var countExistingParentChildRelationship = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
                 .Where(r => r.ParentRelationshipTypeId == vmEdit.RelationshipTypeId)
                 .Where(r => r.ChildRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedRelationshipType))
                 .Count(r => r.IsActive);
-            var countExistingChildParentRelationship = UOW.ParentChildRelationshipTypes.GetAll()
+            var countExistingChildParentRelationship = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                 .Where(r => r.Id != vmEdit.Id)
                 .Where(r => r.ChildRelationshipTypeId == vmEdit.RelationshipTypeId)
                 .Where(r => r.ParentRelationshipTypeId == Business.Utilities.DataTypeUtility.GetIntegerFromString(vmEdit.SelectedRelationshipType))
@@ -189,7 +191,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(vmEdit.Id);
+            var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(vmEdit.Id);
             if(vmEdit.SelectedRelationshipLevel == "Parent-Child")
             {
                 dtoParentChildRelationshipType.ParentRelationshipTypeId = vmEdit.RelationshipTypeId;
@@ -202,7 +204,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // update db
-            UOW.CommitTrans();
+            _unitOfWork.CommitTrans();
 
             // display view
             return RedirectToAction("Details", "RelationshipType", new { id = vmEdit.RelationshipTypeId });
@@ -212,10 +214,10 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Delete(int id, int relationshipTypeId)
         {
             // transfer values to dto
-            var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(id);
-            var dtoRelationshipType = UOW.RelationshipTypes.Get(relationshipTypeId);
-            var dtoParentRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
-            var dtoChildRelationshipType = UOW.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
+            var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(id);
+            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(relationshipTypeId);
+            var dtoParentRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ParentRelationshipTypeId);
+            var dtoChildRelationshipType = _unitOfWork.RelationshipTypes.Get(dtoParentChildRelationshipType.ChildRelationshipTypeId);
             
             // display view
             return View("Delete", new DeleteViewModel(dtoParentChildRelationshipType, dtoRelationshipType, dtoParentRelationshipType, dtoChildRelationshipType));
@@ -230,11 +232,11 @@ namespace Financial.WebApplication.Controllers
             }
 
             // update dto
-            var dtoParentChildRelationshipType = UOW.ParentChildRelationshipTypes.Get(vmDelete.Id);
+            var dtoParentChildRelationshipType = _unitOfWork.ParentChildRelationshipTypes.Get(vmDelete.Id);
             dtoParentChildRelationshipType.IsActive = false;
 
             // update db
-            UOW.CommitTrans();
+            _unitOfWork.CommitTrans();
 
             // display view
             return RedirectToAction("Details", "RelationshipType", new { id = vmDelete.RelationshipTypeId });
@@ -247,7 +249,7 @@ namespace Financial.WebApplication.Controllers
             int.TryParse(selectedId.ToString(), out intSelectedId);
 
             // transfer db
-            var dbRelationshipTypes = UOW.RelationshipTypes.GetAll()
+            var dbRelationshipTypes = _unitOfWork.RelationshipTypes.GetAll()
                 .Where(r => r.IsActive)
                 .Where(r => r.Id != relationshipTypeId)
                 .ToList();
@@ -256,13 +258,13 @@ namespace Financial.WebApplication.Controllers
             var sliRelationshipTypes = new List<SelectListItem>();
             foreach (var dtoRelationshipType in dbRelationshipTypes)
             {
-                var countLinkedParentRelationships = UOW.ParentChildRelationshipTypes.GetAll()
+                var countLinkedParentRelationships = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                     .Where(r => r.ParentRelationshipTypeId == relationshipTypeId)
                     .Where(r => r.ChildRelationshipTypeId == dtoRelationshipType.Id)
                     .Where(r => r.ParentRelationshipTypeId != selectedId)
                     .Where(r => r.ChildRelationshipTypeId != selectedId)
                     .Count(r => r.IsActive);
-                var countLinkedChildRelationships = UOW.ParentChildRelationshipTypes.GetAll()
+                var countLinkedChildRelationships = _unitOfWork.ParentChildRelationshipTypes.GetAll()
                     .Where(r => r.ChildRelationshipTypeId == relationshipTypeId)
                     .Where(r => r.ParentRelationshipTypeId == dtoRelationshipType.Id)
                     .Where(r => r.ChildRelationshipTypeId != selectedId)

@@ -1,4 +1,6 @@
-﻿using Financial.WebApplication.Models.ViewModels.TransactionCategory;
+﻿using Financial.Business;
+using Financial.Data;
+using Financial.WebApplication.Models.ViewModels.TransactionCategory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,18 @@ namespace Financial.WebApplication.Controllers
 {
     public class TransactionCategoryController : BaseController
     {
+        private IUnitOfWork _unitOfWork;
+        private IBusinessService _businessService;
+
+
+        public TransactionCategoryController(IUnitOfWork unitOfWork, IBusinessService businessService)
+            : base()
+        {
+            _unitOfWork = unitOfWork;
+            _businessService = businessService;
+        }
+
+
         [HttpGet]
         public ActionResult Index()
         {
@@ -23,7 +37,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer dto to vm
-            var vmIndex = UOW.TransactionCategories.GetAll()
+            var vmIndex = _unitOfWork.TransactionCategories.GetAll()
                 .Where(r => r.IsActive)
                 .Select(r => new IndexViewModel(r))
                 .OrderBy(r => r.Name)
@@ -50,14 +64,14 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            UOW.TransactionCategories.Add(new Core.Models.TransactionCategory()
+            _unitOfWork.TransactionCategories.Add(new Core.Models.TransactionCategory()
             {
                 Name = vmCreate.Name,
                 IsActive = true
             });
 
             // update db
-            UOW.CommitTrans();
+            _unitOfWork.CommitTrans();
 
             // display view with message
             TempData["SuccessMessage"] = "New Category Added";
@@ -68,7 +82,7 @@ namespace Financial.WebApplication.Controllers
         public ActionResult Edit(int id)
         {
             // transfer id to dto 
-            var dtoTransactionCategory = UOW.TransactionCategories.Get(id);
+            var dtoTransactionCategory = _unitOfWork.TransactionCategories.Get(id);
 
             // validate dto
             if(dtoTransactionCategory == null)
@@ -86,11 +100,11 @@ namespace Financial.WebApplication.Controllers
         public ActionResult Edit(EditViewModel vmEdit)
         {
             // transfer vm to dto
-            var dtoTransactionCategory = UOW.TransactionCategories.Get(vmEdit.Id);
+            var dtoTransactionCategory = _unitOfWork.TransactionCategories.Get(vmEdit.Id);
             dtoTransactionCategory.Name = vmEdit.Name;
 
             // update db
-            UOW.CommitTrans();
+            _unitOfWork.CommitTrans();
 
             // display view with message
             TempData["SuccessMessage"] = "Record updated.";

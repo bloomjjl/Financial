@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Financial.Business.Models;
 
 namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
 {
@@ -13,7 +14,24 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         {
 
         }
-
+        public IndexLinkedSettingTypesViewModel(Business.Models.SettingType bmSettingType)
+        {
+            Id = bmSettingType.AssetTypeSettingTypeId;
+            //AssetTypeId = dtoAssetTypeSettingType.AssetTypeId;
+            //IsActive = dtoAssetTypeSettingType.IsActive;
+            SettingTypeId = bmSettingType.SettingTypeId;
+            SettingTypeName = bmSettingType.SettingTypeName;
+            //SettingTypeIsActive = dtoSettingType.IsActive;
+        }
+        public IndexLinkedSettingTypesViewModel(Business.Models.AssetType bmAssetType)
+        {
+            Id = bmAssetType.AssetTypeSettingTypeId;
+            //AssetTypeId = dtoAssetTypeSettingType.AssetTypeId;
+            //IsActive = dtoAssetTypeSettingType.IsActive;
+            AssetTypeId = bmAssetType.AssetTypeId;
+            AssetTypeName = bmAssetType.AssetTypeName;
+            //SettingTypeIsActive = dtoSettingType.IsActive;
+        }
         public IndexLinkedSettingTypesViewModel(Core.Models.SettingType dtoSettingType,
             Core.Models.AssetTypeSettingType dtoAssetTypeSettingType)
         {
@@ -28,6 +46,9 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         public int Id { get; set; }
 
         public int AssetTypeId { get; set; }
+
+        [Display(Name = "Asset Type")]
+        public string AssetTypeName { get; set; }
 
         public int SettingTypeId { get; set; }
 

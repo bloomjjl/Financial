@@ -32,8 +32,8 @@ namespace Financial.Data
             AssetRelationships = new AssetRelationshipRepository(_context);
             Assets = new AssetRepository(_context);
             AssetTransactions = new AssetTransactionRepository(_context);
-            AssetTypesSettingTypes = new AssetTypeSettingTypeRepository(_context);
-            AssetTypesRelationshipTypes = new AssetTypeRelationshipTypeRepository(_context);
+            AssetTypeSettingTypes = new AssetTypeSettingTypeRepository(_context);
+            AssetTypeRelationshipTypes = new AssetTypeRelationshipTypeRepository(_context);
             AssetTypes = new AssetTypeRepository(_context);
             ParentChildRelationshipTypes = new ParentChildRelationshipTypeRepository(_context);
             RelationshipTypes = new RelationshipTypeRepository(_context);
@@ -47,8 +47,8 @@ namespace Financial.Data
         public IAssetRelationshipRepository AssetRelationships { get; private set; }
         public IAssetRepository Assets { get; private set; }
         public IAssetTransactionRepository AssetTransactions { get; private set; }
-        public IAssetTypeSettingTypeRepository AssetTypesSettingTypes { get; private set; }
-        public IAssetTypeRelationshipTypeRepository AssetTypesRelationshipTypes { get; private set; }
+        public IAssetTypeSettingTypeRepository AssetTypeSettingTypes { get; private set; }
+        public IAssetTypeRelationshipTypeRepository AssetTypeRelationshipTypes { get; private set; }
         public IAssetTypeRepository AssetTypes { get; private set; }
         public IParentChildRelationshipTypeRepository ParentChildRelationshipTypes { get; set; }
         public IRelationshipTypeRepository RelationshipTypes { get; private set; }

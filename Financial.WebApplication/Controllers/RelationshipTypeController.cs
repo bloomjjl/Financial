@@ -7,19 +7,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Financial.Business;
 
 namespace Financial.WebApplication.Controllers
 {
     public class RelationshipTypeController : BaseController
     {
-        public RelationshipTypeController()
+        private IUnitOfWork _unitOfWork;
+        private IBusinessService _businessService;
+
+
+        public RelationshipTypeController(IUnitOfWork unitOfWork, IBusinessService businessService)
             : base()
         {
-        }
-
-        public RelationshipTypeController(IUnitOfWork unitOfWork)
-            : base(unitOfWork)
-        {
+            _unitOfWork = unitOfWork;
+            _businessService = businessService;
         }
 
         [HttpGet]
@@ -36,7 +38,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer dto to vm
-            var vmIndex = UOW.RelationshipTypes.GetAll()
+            var vmIndex = _unitOfWork.RelationshipTypes.GetAll()
                 .Select(r => new IndexViewModel(r))
                 .ToList();
 
@@ -67,7 +69,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // check for duplicate
-            var count = UOW.RelationshipTypes.GetAll()
+            var count = _unitOfWork.RelationshipTypes.GetAll()
                 .Count(r => r.Name == vmCreate.Name);
             if (count > 0)
             {
@@ -77,14 +79,14 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            UOW.RelationshipTypes.Add(new RelationshipType()
+            _unitOfWork.RelationshipTypes.Add(new RelationshipType()
             {
                 Name = vmCreate.Name,
                 IsActive = true
             });
 
             // update db
-            UOW.CommitTrans();
+            _unitOfWork.CommitTrans();
 
             // display view with message
             TempData["SuccessMessage"] = "Record created";
@@ -95,7 +97,7 @@ namespace Financial.WebApplication.Controllers
         public ViewResult Edit(int id)
         {
             // transfer dto to vm
-            var vmEdit = UOW.RelationshipTypes.GetAll()
+            var vmEdit = _unitOfWork.RelationshipTypes.GetAll()
                 .Select(r => new EditViewModel(r))
                 .FirstOrDefault(r => r.Id == id);
 
@@ -113,7 +115,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // check for duplicate
-            var count = UOW.RelationshipTypes.GetAll()
+            var count = _unitOfWork.RelationshipTypes.GetAll()
                 .Where(r => r.Name == vmEdit.Name)
                 .Count(r => r.Id != vmEdit.Id);
             if(count > 0)
@@ -124,12 +126,12 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer vm to dto
-            var dtoRelationshipType = UOW.RelationshipTypes.Get(vmEdit.Id);
+            var dtoRelationshipType = _unitOfWork.RelationshipTypes.Get(vmEdit.Id);
             dtoRelationshipType.Name = vmEdit.Name;
             dtoRelationshipType.IsActive = vmEdit.IsActive;
 
             // update db
-            UOW.CommitTrans();
+            _unitOfWork.CommitTrans();
 
             // display view with message
             TempData["SuccessMessage"] = "Record updated";
@@ -150,7 +152,7 @@ namespace Financial.WebApplication.Controllers
             }
 
             // transfer dto to vm
-            var vmDetails = UOW.RelationshipTypes.GetAll()
+            var vmDetails = _unitOfWork.RelationshipTypes.GetAll()
                 .Select(r => new DetailsViewModel(r))
                 .FirstOrDefault(r => r.Id == id);
 

@@ -11,6 +11,7 @@ namespace Financial.Data.RepositoryInterfaces
     {
         AssetType GetActive(int id);
         IEnumerable<AssetType> GetAllOrderedByName();
+        IEnumerable<AssetType> GetAllActiveOrderedByName();
         int CountMatching(string name);
         int CountMatching(int excludeId, string name);
     }

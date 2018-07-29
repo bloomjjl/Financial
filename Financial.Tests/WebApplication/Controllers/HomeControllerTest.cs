@@ -5,10 +5,10 @@ using System.Text;
 using System.Web.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Financial;
-using Financial.Tests.WebApplication.Controllers;
+using Financial.WebApplication.Tests.WebApplication.Controllers;
 using Financial.WebApplication.Controllers;
 
-namespace Financial.Tests.WebApplication.Controllers
+namespace Financial.WebApplication.Tests.WebApplication.Controllers
 {
     [TestClass]
     public class HomeControllerTest

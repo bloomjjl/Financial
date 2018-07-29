@@ -12,12 +12,10 @@ namespace Financial.WebApplication.Models.ViewModels.AssetType
         public DetailsViewModel()
         {
         }
-
-        public DetailsViewModel(Core.Models.AssetType dtoAssetType)
+        public DetailsViewModel(Business.Models.AssetType bmAssetType)
         {
-            Id = dtoAssetType.Id;
-            Name = dtoAssetType.Name;
-            IsActive = dtoAssetType.IsActive;
+            Id = bmAssetType.AssetTypeId;
+            Name = bmAssetType.AssetTypeName;
         }
 
         public int Id { get; set; }

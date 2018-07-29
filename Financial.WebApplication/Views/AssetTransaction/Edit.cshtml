@@ -7,7 +7,7 @@
 <h2>Asset</h2>
 
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Edit", "AssetTransaction", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
     

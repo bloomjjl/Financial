@@ -1,45 +1,41 @@
-﻿using Financial.Business.Models.BusinessModels;
-using Financial.Business.Utilities;
-using Financial.Core;
-using Financial.WebApplication.Models.ViewModels.AssetTypeSettingType;
-using Financial.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Financial.Business;
+//using Financial.Business.Models.BusinessModels;
+using Financial.Business.Utilities;
+using Financial.WebApplication.Models.ViewModels.AssetTypeSettingType;
+using Financial.Data;
+using Financial.Business.Models;
+using Financial.Business.ServiceInterfaces;
 
 namespace Financial.WebApplication.Controllers
 {
     public class AssetTypeSettingTypeController : BaseController
     {
-        public AssetTypeSettingTypeController()
+        private IUnitOfWork _unitOfWork;
+        private IAssetTypeSettingTypeService _assetTypeSettingTypeService;
+        
+        public AssetTypeSettingTypeController(IUnitOfWork unitOfWork, IAssetTypeSettingTypeService assetTypeSettingTypeService)
             : base()
         {
-        }
-
-        public AssetTypeSettingTypeController(IUnitOfWork unitOfWork)
-            : base(unitOfWork)
-        {
+            _unitOfWork = unitOfWork;
+            _assetTypeSettingTypeService = assetTypeSettingTypeService;
         }
 
         [ChildActionOnly]
         public ActionResult IndexLinkedSettingTypes(int assetTypeId)
         {
             try
-            { 
-                // transfer dto to vm
-                var vmIndexLinkedSettingTypes = new List<IndexLinkedSettingTypesViewModel>();
-                var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(assetTypeId);
-                foreach (var dtoATST in dbAssetTypeSettingTypes)
-                {
-                    var dtoSettingType = UOW.SettingTypes.GetActive(dtoATST.SettingTypeId);
-                    if (dtoSettingType != null)
-                    {
-                        vmIndexLinkedSettingTypes.Add(new IndexLinkedSettingTypesViewModel(dtoSettingType, dtoATST));
-                    }
-                }
-                // display view
+            {
+                // transfer bm to vm
+                var vmIndexLinkedSettingTypes = _assetTypeSettingTypeService.GetListOfLinkedSettingTypes(assetTypeId)
+                    .OrderBy(r => r.SettingTypeName)
+                    .Select(r => new IndexLinkedSettingTypesViewModel(r))
+                    .ToList();
+
                 return PartialView("_IndexLinkedSettingTypes", vmIndexLinkedSettingTypes);
             }
             catch (Exception)
@@ -53,20 +49,13 @@ namespace Financial.WebApplication.Controllers
         public ActionResult IndexLinkedAssetTypes(int settingTypeId)
         {
             try
-            { 
-                // transfer dto to vm
-                var vmIndexLinkedAssetTypes = new List<IndexLinkedAssetTypesViewModel>();
-                var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForSettingType(settingTypeId);
-                foreach (var dtoATST in dbAssetTypeSettingTypes)
-                {
-                    var dtoAssetType = UOW.AssetTypes.GetActive(dtoATST.AssetTypeId);
-                    if (dtoAssetType != null)
-                    {
-                        vmIndexLinkedAssetTypes.Add(new IndexLinkedAssetTypesViewModel(dtoAssetType, dtoATST));
-                    }
-                }
+            {
+                // transfer bm to vm
+                var vmIndexLinkedAssetTypes = _assetTypeSettingTypeService.GetListOfLinkedAssetTypes(settingTypeId)
+                    .OrderBy(r => r.AssetTypeName)
+                    .Select(r => new IndexLinkedSettingTypesViewModel(r))
+                    .ToList();
 
-                // display view
                 return PartialView("_IndexLinkedAssetTypes", vmIndexLinkedAssetTypes);
             }
             catch (Exception)
@@ -79,27 +68,31 @@ namespace Financial.WebApplication.Controllers
         [HttpGet]
         public ActionResult CreateLinkedSettingTypes(int assetTypeId)
         {
-            // get messages from other controllers to display in view
-            if (TempData["SuccessMessage"] != null)
-            {
-                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
-            }
-
             try
-            { 
-                // transfer dto to vm
-                var dtoAssetType = UOW.AssetTypes.Get(assetTypeId);
-                if (dtoAssetType != null)
+            {
+                // get messages from other controllers to display in view
+                if (TempData["SuccessMessage"] != null)
                 {
-                    var atstLinks = UOW.SettingTypes.GetAllActive()
-                        .Select(r => new LinkedAssetTypeSettingType(dtoAssetType, r))
-                        .ToList();
-
-                    // display view
-                    return View("CreateLinkedSettingTypes", new CreateLinkedSettingTypesViewModel(dtoAssetType, atstLinks));
+                    ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                 }
-                TempData["ErrorMessage"] = "Unable to create record. Try again.";
-                return RedirectToAction("Index", "AssetType");
+                if (TempData["ErrorMessage"] != null)
+                {
+                    ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+                }
+
+                // get bm for supplied id
+                var bmAssetType = _assetTypeSettingTypeService.CreateLinkedSettingTypesGetModel(assetTypeId);
+                if(bmAssetType == null)
+                {
+                    TempData["ErrorMessage"] = "Unable to create record. Try again.";
+                    return RedirectToAction("Index", "AssetType");
+                }
+
+                // get bm for linked setting types
+                var bmSettingTypes = _assetTypeSettingTypeService.GetListOfSettingTypesWithLinkedAssetType(bmAssetType.AssetTypeId);
+
+                // transfer bm to vm
+                return View("CreateLinkedSettingTypes", new CreateLinkedSettingTypesViewModel(bmAssetType, bmSettingTypes));
             }
             catch (Exception)
             {
@@ -113,22 +106,36 @@ namespace Financial.WebApplication.Controllers
         public ActionResult CreateLinkedSettingTypes(CreateLinkedSettingTypesViewModel vmCreateLinkedSettingTypes)
         {
             try
-            { 
+            {
+                if (!ModelState.IsValid)
+                {
+                    return RedirectToAction("Index", "AssetType");
+                }
+
+                // transfer vm to bm
+                foreach(var vmSettingType in vmCreateLinkedSettingTypes.SettingTypes)
+                {
+
+                }
+
+
+
+
                 if (ModelState.IsValid)
                 {
                     // transfer vm to db
                     foreach (var atstLink in vmCreateLinkedSettingTypes.LinkedAssetTypeSettingTypes)
                     {
-                        UOW.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
+                        _unitOfWork.AssetTypeSettingTypes.Add(new Core.Models.AssetTypeSettingType()
                         {
                             AssetTypeId = atstLink.AssetTypeId,
                             SettingTypeId = atstLink.SettingTypeId,
-                            IsActive = atstLink.IsActive
+                            //IsActive = atstLink.IsActive
                         });
                     }
 
                     // complete db update
-                    UOW.CommitTrans();
+                    _unitOfWork.CommitTrans();
 
                     // display view with message
                     TempData["SuccessMessage"] = "Linked setting types created.";
@@ -156,15 +163,17 @@ namespace Financial.WebApplication.Controllers
             try
             { 
                 // transfer dto to vm
-                var dtoSettingType = UOW.SettingTypes.Get(DataTypeUtility.GetIntegerFromString(settingTypeId.ToString()));
+                var dtoSettingType = _unitOfWork.SettingTypes.Get(DataTypeUtility.GetIntegerFromString(settingTypeId.ToString()));
                 if (dtoSettingType != null)
                 {
-                    var atstLinks = UOW.AssetTypes.GetAllActive()
-                        .Select(r => new LinkedAssetTypeSettingType(r, dtoSettingType))
+                    /*
+                    var atstLinks = _unitOfWork.AssetTypes.GetAllActive()
+                        .Select(r => new AssetTypeSettingType(r, dtoSettingType))
                         .ToList();
-
+                    */
                     // display view
-                    return View("CreateLinkedAssetTypes", new CreateLinkedAssetTypesViewModel(dtoSettingType, atstLinks));
+                    //return View("CreateLinkedAssetTypes", new CreateLinkedAssetTypesViewModel(dtoSettingType, atstLinks));
+                    return View("CreateLinkedAssetTypes", new CreateLinkedAssetTypesViewModel());
                 }
                 TempData["ErrorMessage"] = "Unable to create record. Try again.";
                 return RedirectToAction("Index", "SettingType");
@@ -187,16 +196,16 @@ namespace Financial.WebApplication.Controllers
                     // transfer vm to db
                     foreach (var atstLink in vmCreateLinkedAssetTypes.LinkedAssetTypeSettingTypes)
                     {
-                        UOW.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
+                        _unitOfWork.AssetTypeSettingTypes.Add(new Core.Models.AssetTypeSettingType()
                         {
                             AssetTypeId = atstLink.AssetTypeId,
                             SettingTypeId = atstLink.SettingTypeId,
-                            IsActive = atstLink.IsActive
+                            //IsActive = atstLink.IsActive
                         });
                     }
 
                     // complete db update
-                    UOW.CommitTrans();
+                    _unitOfWork.CommitTrans();
 
                     // display view with message
                     TempData["SuccessMessage"] = "Linked asset types created";
@@ -217,27 +226,45 @@ namespace Financial.WebApplication.Controllers
         {
             try
             {
+                // transfer dto to bm
+                var bmAssetType = _assetTypeSettingTypeService.EditLinkedSettingTypesGetModel(assetTypeId);
+                if(bmAssetType == null)
+                {
+                    TempData["ErrorMessage"] = "Problem displaying asset type";
+                    return RedirectToAction("Index", "AssetType");
+                }
+
+                //var bmSettingTypes = _businessService.AssetTypeSettingTypeService.GetListOfSettingTypesWithLinkedAssetType(assetTypeId);
+
+                return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel(bmAssetType));
+
+
+                /*
                 // transfer dto for Id
-                var dtoAssetType = UOW.AssetTypes.Get(assetTypeId);
+                var dtoAssetType = _unitOfWork.AssetTypes.Get(assetTypeId);
                 if (dtoAssetType != null)
                 {
+                    
                     // get list of all active setting types
-                    var atstLinks = new List<LinkedAssetTypeSettingType>();
-                    var dbSettingTypes = UOW.SettingTypes.GetAllActive();
+                    var atstLinks = new List<AssetTypeSettingType>();
+                    var dbSettingTypes = _unitOfWork.SettingTypes.GetAllActive();
                     foreach (var dtoSettingType in dbSettingTypes)
                     {
                         // transfer dto to vm
-                        var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.Get(dtoAssetType.Id, dtoSettingType.Id);
+                        var dtoAssetTypeSettingType = _unitOfWork.AssetTypesSettingTypes.Get(dtoAssetType.Id, dtoSettingType.Id);
                         var link = dtoAssetTypeSettingType != null
-                            ? new LinkedAssetTypeSettingType(dtoAssetTypeSettingType, dtoAssetType, dtoSettingType)
-                            : new LinkedAssetTypeSettingType(new Core.Models.AssetTypeSettingType(), dtoAssetType, dtoSettingType);
+                            ? new AssetTypeSettingType(dtoAssetTypeSettingType, dtoAssetType, dtoSettingType)
+                            : new AssetTypeSettingType(new Core.Models.AssetTypeSettingType(), dtoAssetType, dtoSettingType);
                         atstLinks.Add(link);
                     }
+                    
                     // display view
-                    return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel(dtoAssetType, atstLinks));
+                    //return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel(dtoAssetType, atstLinks));
+                    return View("EditLinkedSettingTypes", new EditLinkedSettingTypesViewModel());
                 }
                 TempData["ErrorMessage"] = "Unable to edit record. Try again.";
                 return RedirectToAction("Index", "AssetType");
+                */
             }
             catch (Exception)
             {
@@ -254,10 +281,11 @@ namespace Financial.WebApplication.Controllers
             { 
                 if (ModelState.IsValid)
                 {
+                    /*
                     foreach (var atstLink in vmEditLinks.LinkedAssetTypeSettingTypes)
                     {
                         // transfer vm to dto
-                        var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.Get(atstLink.Id);
+                        var dtoAssetTypeSettingType = _unitOfWork.AssetTypesSettingTypes.Get(atstLink.Id);
                         if (dtoAssetTypeSettingType != null)
                         {
                             // update dto
@@ -266,7 +294,7 @@ namespace Financial.WebApplication.Controllers
                         else if(atstLink.Id == 0)
                         {
                             // create new dto
-                            UOW.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
+                            _unitOfWork.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
                             {
                                 AssetTypeId = atstLink.AssetTypeId,
                                 SettingTypeId = atstLink.SettingTypeId,
@@ -276,8 +304,8 @@ namespace Financial.WebApplication.Controllers
                     }
 
                     // complete db update
-                    UOW.CommitTrans();
-
+                    _unitOfWork.CommitTrans();
+                    */
                     // display view with message
                     TempData["SuccessMessage"] = "Linked setting types updated.";
                     return RedirectToAction("Details", "AssetType", new { id = vmEditLinks.AssetTypeId });
@@ -292,30 +320,50 @@ namespace Financial.WebApplication.Controllers
             }
         }
 
+        [ChildActionOnly]
+        public ActionResult IndexSettingTypesForAssetType(int assetTypeId)
+        {
+            try
+            {
+                var vmIndex = _assetTypeSettingTypeService.GetListOfSettingTypesWithLinkedAssetType(assetTypeId)
+                    .Select(st => new IndexSettingTypesForAssetTypeViewModel(assetTypeId, st))
+                    .ToList();
+
+                return PartialView("_IndexSettingTypesForAssetType", vmIndex);
+            }
+            catch (Exception)
+            {
+                return PartialView("_IndexSettingTypesForAssetType", new List<IndexSettingTypesForAssetTypeViewModel>());
+            }
+        }
+
         [HttpGet]
         public ActionResult EditLinkedAssetTypes(int settingTypeId)
         {
             try
             { 
                 // transfer dto for id
-                var dtoSettingType = UOW.SettingTypes.Get(settingTypeId);
+                var dtoSettingType = _unitOfWork.SettingTypes.Get(settingTypeId);
                 if (dtoSettingType != null)
                 {
+                    /*
                     // get list of all active asset types
-                    var atstLinks = new List<LinkedAssetTypeSettingType>();
-                    var dbAssetTypes = UOW.AssetTypes.GetAllActive();
+                    var atstLinks = new List<AssetTypeSettingType>();
+                    var dbAssetTypes = _unitOfWork.AssetTypes.GetAllActive();
                     foreach (var dtoAssetType in dbAssetTypes)
                     {
                         // transfer dto to vm
-                        var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.Get(dtoAssetType.Id, dtoSettingType.Id);
+                        var dtoAssetTypeSettingType = _unitOfWork.AssetTypesSettingTypes.Get(dtoAssetType.Id, dtoSettingType.Id);
                         var link = dtoAssetTypeSettingType != null
-                            ? new LinkedAssetTypeSettingType(dtoAssetTypeSettingType, dtoAssetType, dtoSettingType)
-                            : new LinkedAssetTypeSettingType(new Core.Models.AssetTypeSettingType(), dtoAssetType, dtoSettingType);
+                            ? new AssetTypeSettingType(dtoAssetTypeSettingType, dtoAssetType, dtoSettingType)
+                            : new AssetTypeSettingType(new Core.Models.AssetTypeSettingType(), dtoAssetType, dtoSettingType);
                         atstLinks.Add(link);
                     }
+                    */
 
                     // display view
-                    return View("EditLinkedAssetTypes", new EditLinkedAssetTypesViewModel(dtoSettingType, atstLinks));
+                    //return View("EditLinkedAssetTypes", new EditLinkedAssetTypesViewModel(dtoSettingType, atstLinks));
+                    return View("EditLinkedAssetTypes", new EditLinkedAssetTypesViewModel());
                 }
                 TempData["ErrorMessage"] = "Unable to edit record. Try again.";
                 return RedirectToAction("Index", "SettingType");
@@ -335,11 +383,12 @@ namespace Financial.WebApplication.Controllers
             { 
                 if(ModelState.IsValid)
                 { 
+                    /*
                     // transfer vm to dto
                     foreach(var atstLink in vmEditLinkedAssetTypes.LinkedAssetTypeSettingTypes)
                     {
                         // transfer vm to dto
-                        var dtoAssetTypeSettingType = UOW.AssetTypesSettingTypes.Get(atstLink.Id);
+                        var dtoAssetTypeSettingType = _unitOfWork.AssetTypesSettingTypes.Get(atstLink.Id);
                         if (dtoAssetTypeSettingType != null)
                         {
                             // update dto
@@ -348,7 +397,7 @@ namespace Financial.WebApplication.Controllers
                         else if (atstLink.Id == 0)
                         {
                             // create new dto
-                            UOW.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
+                            _unitOfWork.AssetTypesSettingTypes.Add(new Core.Models.AssetTypeSettingType()
                             {
                                 AssetTypeId = atstLink.AssetTypeId,
                                 SettingTypeId = atstLink.SettingTypeId,
@@ -358,8 +407,8 @@ namespace Financial.WebApplication.Controllers
                     }
 
                     // update db
-                    UOW.CommitTrans();
-
+                    _unitOfWork.CommitTrans();
+                    */
                     // display view with message
                     TempData["SuccessMessage"] = "Linked asset types updated.";
                     return RedirectToAction("Details", "SettingType", new { id = vmEditLinkedAssetTypes.SettingTypeId });

@@ -7,7 +7,7 @@ using System.Web.Mvc;
 
 namespace Financial.Business.ServiceInterfaces
 {
-    public interface ISelectListService : IDisposable
+    public interface ISelectListService
     {
         List<SelectListItem> TransactionCategories(string selectedId);
         List<SelectListItem> TransactionDescriptions(string selectedId);

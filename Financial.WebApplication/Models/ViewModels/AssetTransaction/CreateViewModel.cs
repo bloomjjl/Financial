@@ -11,7 +11,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
     public class CreateViewModel
     {
         public CreateViewModel() { }
-
+        /*
         public CreateViewModel(Core.Models.Asset dtoAsset,string assetNameAdditionalInformaiton,
             Core.Models.AssetType dtoAssetType, DateTime date,
             List<SelectListItem> sliTransactionTypes, List<SelectListItem> sliTransactionCategories)
@@ -22,6 +22,17 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
             DueDate = date.ToString("MM/dd/yyyy");
             TransactionTypes = sliTransactionTypes;
             TransactionCategories = sliTransactionCategories;
+        }*/
+        public CreateViewModel(Business.Models.AssetTransaction bmAssetTransaction)
+        {
+            AssetId = bmAssetTransaction.AssetId;
+            AssetName = bmAssetTransaction.AssetName;
+            Assets = bmAssetTransaction.AssetSelectList;
+            AssetTypeName = bmAssetTransaction.AssetTypeName;
+            TransactionTypes = bmAssetTransaction.TransactionTypeSelectList;
+            SelectedTransactionTypeId = bmAssetTransaction.TransactionTypeId.ToString();
+            TransactionCategories = bmAssetTransaction.TransactionCategorySelectList;
+            SelectedTransactionCategoryId = bmAssetTransaction.TransactionCategoryId.ToString();
         }
 
         public int AssetId { get; set; }
@@ -34,13 +45,17 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
         [Required]
         [Display(Name = "Due")]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string DueDate { get; set; }
+        public DateTime DueDate { get; set; }
         [Display(Name = "Cleared")]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string ClearDate { get; set; }
+        public DateTime ClearDate { get; set; }
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }
+        [Required]
+        [Display(Name = "Asset")]
+        public string SelectedAssetId { get; set; }
+        public IEnumerable<SelectListItem> Assets { get; set; }
         [Required]
         [Display(Name = "Type")]
         public string SelectedTransactionTypeId { get; set; }

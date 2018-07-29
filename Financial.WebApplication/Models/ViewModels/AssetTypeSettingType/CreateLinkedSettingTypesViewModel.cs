@@ -1,10 +1,10 @@
-﻿using Financial.Business.Models.BusinessModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Financial.Business.Models;
 
 namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
 {
@@ -14,13 +14,12 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         {
 
         }
-
-        public CreateLinkedSettingTypesViewModel(Core.Models.AssetType dtoAssetType, 
-            List<LinkedAssetTypeSettingType> atstLinks)
+        public CreateLinkedSettingTypesViewModel(Business.Models.AssetType bmAssetType,
+            List<Business.Models.SettingType> bmSettingTypes)
         {
-            AssetTypeId = dtoAssetType.Id;
-            AssetTypeName = dtoAssetType.Name;
-            LinkedAssetTypeSettingTypes = atstLinks; 
+            AssetTypeId = bmAssetType.AssetTypeId;
+            AssetTypeName = bmAssetType.AssetTypeName;
+            SettingTypes = bmSettingTypes;
         }
 
         public int AssetTypeId { get; set; }
@@ -28,6 +27,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         [Display(Name = "Asset Type")]
         public string AssetTypeName { get; set; }
 
-        public List<LinkedAssetTypeSettingType> LinkedAssetTypeSettingTypes { get; set; }
+        public List<Business.Models.AssetTypeSettingType> LinkedAssetTypeSettingTypes { get; set; }
+        public List<Business.Models.SettingType> SettingTypes { get; set; }
     }
 }

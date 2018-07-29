@@ -66,10 +66,5 @@ namespace Financial.Business.Services
         }
 
 
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -12,23 +12,21 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
     {
         public EditViewModel() { }
 
-        public EditViewModel(Core.Models.AssetTransaction dtoAssetTransaction,
-            Core.Models.Asset dtoAsset, Core.Models.AssetType dtoAssetType,
-            List<SelectListItem> sliTransactionTypes, List<SelectListItem> sliTransactionCategories)
+        public EditViewModel(Business.Models.AssetTransaction bmAssetTransaction)
         {
-            Id = dtoAssetTransaction.Id;
-            AssetId = dtoAsset.Id;
-            AssetName = dtoAsset.Name;
-            AssetTypeName = dtoAssetType.Name;
-            DueDate = dtoAssetTransaction.DueDate.ToString("MM/dd/yyyy");
-            ClearDate = dtoAssetTransaction.ClearDate.ToString("MM/dd/yyyy");
-            CheckNumber = dtoAssetTransaction.CheckNumber;
-            Amount = dtoAssetTransaction.Amount;
-            Note = dtoAssetTransaction.Note;
-            TransactionTypes = sliTransactionTypes;
-            SelectedTransactionTypeId = dtoAssetTransaction.TransactionTypeId.ToString();
-            TransactionCategories = sliTransactionCategories;
-            SelectedTransactionCategoryId = dtoAssetTransaction.TransactionCategoryId.ToString();
+            Id = bmAssetTransaction.AssetTransactionId;
+            AssetId = bmAssetTransaction.AssetId;
+            AssetName = bmAssetTransaction.AssetName;
+            AssetTypeName = bmAssetTransaction.AssetTypeName;
+            DueDate = bmAssetTransaction.DueDate;
+            ClearDate = bmAssetTransaction.ClearDate;
+            CheckNumber = bmAssetTransaction.CheckNumber;
+            Amount = bmAssetTransaction.Amount;
+            Note = bmAssetTransaction.Note;
+            TransactionTypes = bmAssetTransaction.TransactionTypeSelectList;
+            SelectedTransactionTypeId = bmAssetTransaction.SelectedTransactionTypeId;
+            TransactionCategories = bmAssetTransaction.TransactionCategorySelectList;
+            SelectedTransactionCategoryId = bmAssetTransaction.SelectedTransactionCategoryId;
         }
 
 
@@ -42,11 +40,11 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
         public string CheckNumber { get; set; }
         [Required]
         [Display(Name = "Due")]
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string DueDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime DueDate { get; set; }
         [Display(Name = "Cleared")]
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string ClearDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime ClearDate { get; set; }
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }

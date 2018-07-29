@@ -7,19 +7,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Financial.Business;
 
 namespace Financial.WebApplication.Controllers
 {
     public class AssetSettingController : BaseController
     {
-        public AssetSettingController()
+        private IUnitOfWork _unitOfWork;
+        private IBusinessService _businessService;
+
+        public AssetSettingController(IUnitOfWork unitOfWork, IBusinessService businessService)
             : base()
         {
-        }
-
-        public AssetSettingController(IUnitOfWork unitOfWork)
-            : base(unitOfWork)
-        {
+            _unitOfWork = unitOfWork;
+            _businessService = businessService;
         }
 
         [HttpGet]
@@ -28,18 +29,18 @@ namespace Financial.WebApplication.Controllers
             try
             {
                 // transfer id to dto
-                var dtoAsset = UOW.Assets.Get(assetId);
+                var dtoAsset = _unitOfWork.Assets.Get(assetId);
                 if (dtoAsset != null)
                 {
                     // get list of linked setting types
-                    var dbAssetSettings = UOW.AssetSettings.GetAllActiveForAsset(dtoAsset.Id);
+                    var dbAssetSettings = _unitOfWork.AssetSettings.GetAllActiveForAsset(dtoAsset.Id);
 
                     // create & transfer values to vm
                     var vmIndex = new List<IndexViewModel>();
                     foreach (var dtoAssetSetting in dbAssetSettings)
                     {
                         // transfer to dto
-                        var dtoSettingType = UOW.SettingTypes.GetActive(dtoAssetSetting.SettingTypeId);
+                        var dtoSettingType = _unitOfWork.SettingTypes.GetActive(dtoAssetSetting.SettingTypeId);
 
                         // validate dto & update vm
                         var vm = dtoAssetSetting == null 
@@ -71,17 +72,17 @@ namespace Financial.WebApplication.Controllers
             try
             {
                 // transfer id to dto
-                var dtoAsset = UOW.Assets.Get(assetId);
+                var dtoAsset = _unitOfWork.Assets.Get(assetId);
                 if (dtoAsset != null)
                 {
-                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+                    var dtoAssetType = _unitOfWork.AssetTypes.Get(dtoAsset.AssetTypeId);
 
                     // transfer dto to vm
                     var vmCreate = new List<CreateViewModel>();
-                    var dbATST = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
+                    var dbATST = _unitOfWork.AssetTypeSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
                     foreach(var dtoATST in dbATST)
                     {
-                        var dtoSettingType = UOW.SettingTypes.GetActive(dtoATST.SettingTypeId);
+                        var dtoSettingType = _unitOfWork.SettingTypes.GetActive(dtoATST.SettingTypeId);
                         if (dtoSettingType != null)
                         {
                             vmCreate.Add(new CreateViewModel(dtoAsset, dtoSettingType));
@@ -115,7 +116,7 @@ namespace Financial.WebApplication.Controllers
                         // transfer vm to dto
                         foreach (var vm in vmCreate.CreateViewModels)
                         {
-                            UOW.AssetSettings.Add(new AssetSetting()
+                            _unitOfWork.AssetSettings.Add(new AssetSetting()
                             {
                                 AssetId = vm.AssetId,
                                 SettingTypeId = vm.SettingTypeId,
@@ -125,7 +126,7 @@ namespace Financial.WebApplication.Controllers
                         }
 
                         // update db
-                        UOW.CommitTrans();
+                        _unitOfWork.CommitTrans();
 
                         // display view with message
                         TempData["SuccessMessage"] = "Records created";
@@ -150,23 +151,23 @@ namespace Financial.WebApplication.Controllers
             try
             {
                 // transfer id to dto
-                var dtoAsset = UOW.Assets.Get(assetId);
+                var dtoAsset = _unitOfWork.Assets.Get(assetId);
                 if (dtoAsset != null)
                 {
-                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+                    var dtoAssetType = _unitOfWork.AssetTypes.Get(dtoAsset.AssetTypeId);
 
                     // get list of linked setting types
-                    var dbAssetTypeSettingTypes = UOW.AssetTypesSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
+                    var dbAssetTypeSettingTypes = _unitOfWork.AssetTypeSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
 
                     // create & transfer values to vm
                     var vmEdit = new List<EditViewModel>();
                     foreach (var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
                     {
                         // transfer to dto
-                        var dtoSettingType = UOW.SettingTypes.GetActive(dtoAssetTypeSettingType.SettingTypeId);
+                        var dtoSettingType = _unitOfWork.SettingTypes.GetActive(dtoAssetTypeSettingType.SettingTypeId);
                         if (dtoSettingType != null)
                         {
-                            var dtoAssetSetting = UOW.AssetSettings.GetActive(dtoAsset.Id, dtoSettingType.Id);
+                            var dtoAssetSetting = _unitOfWork.AssetSettings.GetActive(dtoAsset.Id, dtoSettingType.Id);
                             if (dtoAssetSetting != null)
                             {
                                 vmEdit.Add(new EditViewModel(dtoAssetSetting, dtoAsset, dtoSettingType));
@@ -202,7 +203,7 @@ namespace Financial.WebApplication.Controllers
                         if (vmEdit.Id == 0)
                         {
                             // YES. Create record
-                            UOW.AssetSettings.Add(new AssetSetting()
+                            _unitOfWork.AssetSettings.Add(new AssetSetting()
                             {
                                 AssetId = vmEditLinkedSettingTypes.AssetId,
                                 SettingTypeId = vmEdit.SettingTypeId,
@@ -212,13 +213,13 @@ namespace Financial.WebApplication.Controllers
                         }
                         else
                         {
-                            var dtoAssetSetting = UOW.AssetSettings.Get(vmEdit.Id);
+                            var dtoAssetSetting = _unitOfWork.AssetSettings.Get(vmEdit.Id);
                             dtoAssetSetting.Value = vmEdit.Value;
                         }
                     }
 
                     // update db
-                    UOW.CommitTrans();
+                    _unitOfWork.CommitTrans();
 
                     // display view with message
                     TempData["SuccessMessage"] = "Records updated";

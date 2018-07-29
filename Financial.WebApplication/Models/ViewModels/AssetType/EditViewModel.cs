@@ -12,13 +12,20 @@ namespace Financial.WebApplication.Models.ViewModels.AssetType
         public EditViewModel()
         {
         }
-
+        public EditViewModel(Business.Models.AssetType bmAssetType)
+        {
+            Id = bmAssetType.AssetTypeId;
+            Name = bmAssetType.AssetTypeName;
+            //IsActive = dtoAssetType.IsActive;
+        }
+        /*
         public EditViewModel(Core.Models.AssetType dtoAssetType)
         {
             Id = dtoAssetType.Id;
             Name = dtoAssetType.Name;
             IsActive = dtoAssetType.IsActive;
         }
+        */
 
         public int Id { get; set; }
         [Required]

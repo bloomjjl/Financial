@@ -25,7 +25,13 @@ namespace Financial.Data.Repositories
 
 
 
-
+        public IEnumerable<AssetType> GetAllActiveOrderedByName()
+        {
+            return FinancialDbContext.AssetTypes
+                .Where(r => r.IsActive)
+                .OrderBy(r => r.Name)
+                .ToList();
+        }
         public IEnumerable<AssetType> GetAllOrderedByName()
         {
             return FinancialDbContext.AssetTypes

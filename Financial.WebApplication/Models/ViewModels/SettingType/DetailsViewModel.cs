@@ -14,11 +14,11 @@ namespace Financial.WebApplication.Models.ViewModels.SettingType
 
         }
 
-        public DetailsViewModel(Core.Models.SettingType dtoSettingType)
+        public DetailsViewModel(Business.Models.SettingType bmSettingType)
         {
-            Id = dtoSettingType.Id;
-            Name = dtoSettingType.Name;
-            IsActive = dtoSettingType.IsActive;
+            Id = bmSettingType.SettingTypeId;
+            Name = bmSettingType.SettingTypeName;
+            //IsActive = bmSettingType.IsActive;
         }
 
 

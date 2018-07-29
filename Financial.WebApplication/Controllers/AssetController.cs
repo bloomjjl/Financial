@@ -14,14 +14,14 @@ namespace Financial.WebApplication.Controllers
 {
     public class AssetController : BaseController
     {
-        public AssetController()
+        private IUnitOfWork _unitOfWork;
+        private IBusinessService _businessService;
+
+        public AssetController(IUnitOfWork unitOfWork, IBusinessService businessService)
             : base()
         {
-        }
-
-        public AssetController(IUnitOfWork unitOfWork)
-            : base(unitOfWork)
-        {
+            _unitOfWork = unitOfWork;
+            _businessService = businessService;
         }
 
         [HttpGet]
@@ -40,14 +40,14 @@ namespace Financial.WebApplication.Controllers
             try
             {
                 // transfer dto to vm
-                var dbAssets = UOW.Assets.GetAll()
+                var dbAssets = _unitOfWork.Assets.GetAll()
                     .Where(r => r.IsActive);
 
                 var vmIndex = new List<IndexViewModel>();
                 foreach(var dtoAsset in dbAssets)
                 {
-                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
-                    var assetNameAdditionalInformaiton = BS.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
+                    var dtoAssetType = _unitOfWork.AssetTypes.Get(dtoAsset.AssetTypeId);
+                    var assetNameAdditionalInformaiton = _businessService.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
 
                     vmIndex.Add(new IndexViewModel(dtoAsset, assetNameAdditionalInformaiton, dtoAssetType));
                 }
@@ -68,7 +68,7 @@ namespace Financial.WebApplication.Controllers
             try
             {
                 // transfer dto to sli
-                var sliAssetTypes = BS.AssetTypeService.GetAssetTypesDropDownList(null);
+                var sliAssetTypes = _businessService.AssetTypeService.GetAssetTypesDropDownList(null);
 
                 // display view
                 return View("Create", new CreateViewModel(sliAssetTypes));
@@ -95,10 +95,10 @@ namespace Financial.WebApplication.Controllers
                         Name = vmCreate.AssetName,
                         IsActive = true
                     };
-                    UOW.Assets.Add(dtoAsset);
+                    _unitOfWork.Assets.Add(dtoAsset);
 
                     // update db
-                    UOW.CommitTrans();
+                    _unitOfWork.CommitTrans();
 
                     // display view
                     TempData["SuccessMessage"] = "Asset Created";
@@ -120,10 +120,10 @@ namespace Financial.WebApplication.Controllers
             try
             { 
                 // transfer id to dto
-                var dtoAsset = UOW.Assets.Get(id);
+                var dtoAsset = _unitOfWork.Assets.Get(id);
                 if (dtoAsset != null)
                 {
-                    var sliAssetTypes = BS.AssetTypeService.GetAssetTypesDropDownList(dtoAsset.AssetTypeId);
+                    var sliAssetTypes = _businessService.AssetTypeService.GetAssetTypesDropDownList(dtoAsset.AssetTypeId);
 
                     // display view
                     return View("Edit", new EditViewModel(dtoAsset, sliAssetTypes));
@@ -145,14 +145,14 @@ namespace Financial.WebApplication.Controllers
             try
             { 
                 // transfer vm to dto
-                var dtoAsset = UOW.Assets.Get(vmEdit.Id);
+                var dtoAsset = _unitOfWork.Assets.Get(vmEdit.Id);
                 if (dtoAsset != null)
                 {
                     dtoAsset.Name = vmEdit.Name;
                     dtoAsset.AssetTypeId = DataTypeUtility.GetIntegerFromString(vmEdit.SelectedAssetTypeId);
 
                     // update db
-                    UOW.CommitTrans();
+                    _unitOfWork.CommitTrans();
 
                     // display view with message
                     TempData["SuccessMessage"] = "Record updated.";
@@ -180,10 +180,10 @@ namespace Financial.WebApplication.Controllers
             try
             { 
                 // transfer id to dto
-                var dtoAsset = UOW.Assets.Get(id);
+                var dtoAsset = _unitOfWork.Assets.Get(id);
                 if (dtoAsset != null)
                 {
-                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+                    var dtoAssetType = _unitOfWork.AssetTypes.Get(dtoAsset.AssetTypeId);
 
                     // display view with message
                     return View("Details", new DetailsViewModel(dtoAsset, dtoAssetType));
@@ -204,10 +204,10 @@ namespace Financial.WebApplication.Controllers
             try
             { 
                 // transfer id to dto
-                var dtoAsset = UOW.Assets.Get(id);
+                var dtoAsset = _unitOfWork.Assets.Get(id);
                 if (dtoAsset != null)
                 {
-                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
+                    var dtoAssetType = _unitOfWork.AssetTypes.Get(dtoAsset.AssetTypeId);
 
                     // display view
                     return View("Delete", new DeleteViewModel(dtoAsset, dtoAssetType));
@@ -229,13 +229,13 @@ namespace Financial.WebApplication.Controllers
             try
             { 
                 // transfer vm to dto
-                var dtoAsset = UOW.Assets.Get(vmDelete.Id);
+                var dtoAsset = _unitOfWork.Assets.Get(vmDelete.Id);
                 if (dtoAsset != null)
                 {
                     dtoAsset.IsActive = false;
 
                     // update db
-                    UOW.CommitTrans();
+                    _unitOfWork.CommitTrans();
 
                     // display view with message
                     TempData["SuccessMessage"] = "Record Deleted";

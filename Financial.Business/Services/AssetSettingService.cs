@@ -41,9 +41,5 @@ namespace Financial.Business.Services
             return additionalInformation;
         }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

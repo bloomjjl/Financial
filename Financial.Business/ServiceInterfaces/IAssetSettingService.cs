@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Financial.Business.ServiceInterfaces
 {
-    public interface IAssetSettingService : IDisposable
+    public interface IAssetSettingService
     {
         string GetAccountIdentificationInformation(Core.Models.Asset dtoAsset);
     }

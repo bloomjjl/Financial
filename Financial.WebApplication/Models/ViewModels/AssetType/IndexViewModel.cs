@@ -12,7 +12,12 @@ namespace Financial.WebApplication.Models.ViewModels.AssetType
         public IndexViewModel()
         {
         }
-
+        public IndexViewModel(Business.Models.AssetType bmAssetType)
+        {
+            Id = bmAssetType.AssetTypeId;
+            Name = bmAssetType.AssetTypeName;
+            //IsActive = dtoAssetType.IsActive;
+        }
         public IndexViewModel(Core.Models.AssetType dtoAssetType)
         {
             Id = dtoAssetType.Id;

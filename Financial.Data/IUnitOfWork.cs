@@ -13,8 +13,8 @@ namespace Financial.Data
         IAssetRelationshipRepository AssetRelationships { get; }
         IAssetRepository Assets { get; }
         IAssetTransactionRepository AssetTransactions { get; }
-        IAssetTypeSettingTypeRepository AssetTypesSettingTypes { get; }
-        IAssetTypeRelationshipTypeRepository AssetTypesRelationshipTypes { get; }
+        IAssetTypeSettingTypeRepository AssetTypeSettingTypes { get; }
+        IAssetTypeRelationshipTypeRepository AssetTypeRelationshipTypes { get; }
         IAssetTypeRepository AssetTypes { get; }
         IParentChildRelationshipTypeRepository ParentChildRelationshipTypes { get; set; }
         IRelationshipTypeRepository RelationshipTypes { get; }

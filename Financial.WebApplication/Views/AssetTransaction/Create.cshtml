@@ -19,20 +19,28 @@
         @Html.HiddenFor(model => model.AssetId)
 
         <div class="form-group">
+            @Html.LabelFor(model => model.SelectedAssetId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedAssetId, Model.Assets, "-- Select an Asset --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.SelectedAssetId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        @*
+        <div class="form-group">
             @Html.LabelFor(model => model.AssetName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.Label(Model.AssetName, new { @class = "control-label text-muted" })
                 @Html.ValidationMessageFor(model => model.AssetName, "", new { @class = "text-danger" })
             </div>
-        </div>
-
+        </div>*@
+        @*
         <div class="form-group">
             @Html.LabelFor(model => model.AssetTypeName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.Label(Model.AssetTypeName, new { @class = "control-label text-muted" })
                 @Html.ValidationMessageFor(model => model.AssetTypeName, "", new { @class = "text-danger" })
             </div>
-        </div>
+        </div>*@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
@@ -51,7 +59,7 @@
                 @Html.ValidationMessageFor(model => model.CheckNumber, "", new { @class = "text-danger" })
             </div>
         </div>
-
+        
         <div class="form-group">
             @Html.LabelFor(model => model.SelectedTransactionTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -59,7 +67,7 @@
                 @Html.ValidationMessageFor(model => model.SelectedTransactionTypeId, "", new { @class = "text-danger" })
             </div>
         </div>
-
+        
         <div class="form-group">
             @Html.LabelFor(model => model.SelectedTransactionCategoryId, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">

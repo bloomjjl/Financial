@@ -5,20 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financial.Tests.Data.Fakes;
-using Financial.Tests.Data.Repositories;
-using Financial.Tests.Data;
+using Financial.WebApplication.Tests.Fakes.Repositories;
 using Financial.Core.Models;
 using Financial.WebApplication.Models.ViewModels.SettingType;
 using System.Web.Mvc;
 
-namespace Financial.Tests.WebApplication.Controllers
+namespace Financial.WebApplication.Tests.WebApplication.Controllers
 {
     public class SettingTypeControllerTestsBase : ControllerTestsBase
     {
         public SettingTypeControllerTestsBase()
         {
-            _controller = new SettingTypeController(_unitOfWork);
+            _controller = new SettingTypeController(_unitOfWork, _businessService);
         }
 
         protected SettingTypeController _controller;
@@ -80,7 +78,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 new SettingType() { Id = 10, Name = "Name 1", IsActive = true }, // count
                 new SettingType() { Id = 11, Name = "Name 2", IsActive = false }}; // count
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            var controller = new SettingTypeController(_unitOfWork);
+            var controller = new SettingTypeController(_unitOfWork, _businessService);
             int expectedCount = 2;
 
             // Act
@@ -160,7 +158,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Arrange
             var _dataSettingTypes = new List<SettingType>(); // clear records
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            var controller = new SettingTypeController(_unitOfWork);
+            var controller = new SettingTypeController(_unitOfWork, _businessService);
             var vmexpected = new CreateViewModel()
             {
                 Name = "New Name"
@@ -183,7 +181,7 @@ namespace Financial.Tests.WebApplication.Controllers
             // Arrange
             var _dataSettingTypes = new List<SettingType>(); // clear records
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            var controller = new SettingTypeController(_unitOfWork);
+            var controller = new SettingTypeController(_unitOfWork, _businessService);
             var vmCreate = new CreateViewModel()
             {
                 Name = "New Name"
@@ -227,7 +225,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataSettingTypes = new List<SettingType>() {
                 new SettingType() { Id = 10, Name = "Existing Name", IsActive = true } }; 
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
+            SettingTypeController controller = new SettingTypeController(_unitOfWork, _businessService);
             var vmExpected = new CreateViewModel()
             {
                 Name = "Existing Name"
@@ -270,7 +268,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataSettingTypes = new List<SettingType>() {
                 new SettingType() { Id = 10, Name = "Name", IsActive = true }};
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            var controller = new SettingTypeController(_unitOfWork);
+            var controller = new SettingTypeController(_unitOfWork, _businessService);
             int id = 10;
 
             // Act
@@ -356,7 +354,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 new SettingType() { Id = 10, Name = "Update Name", IsActive = true },
                 new SettingType() { Id = 11, Name = "Existing Name", IsActive = true }}; 
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            SettingTypeController controller = new SettingTypeController(_unitOfWork);
+            SettingTypeController controller = new SettingTypeController(_unitOfWork, _businessService);
             EditViewModel vmExpected = new EditViewModel()
             {
                 Id = 10,
@@ -401,7 +399,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataSettingTypes = new List<SettingType>() {
                 new SettingType() { Id = 10, Name = "Name", IsActive = true }};
             _unitOfWork.SettingTypes = new InMemorySettingTypeRepository(_dataSettingTypes);
-            var controller = new SettingTypeController(_unitOfWork);
+            var controller = new SettingTypeController(_unitOfWork, _businessService);
             int id = 10;
 
             // Act

@@ -44,6 +44,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\CommonServiceLocator.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -101,6 +105,38 @@
     </Reference>
     <Reference Include="System.Web.Optimization">
       <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Abstractions, Version=3.3.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Configuration, Version=5.2.1.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.8.6.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\Unity.Container.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Interception, Version=5.5.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\Unity.Interception.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Interception.Configuration, Version=5.1.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\Unity.Interception.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Mvc5, Version=1.3.0.0, Culture=neutral, PublicKeyToken=43da31bc42a85347, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Mvc5.1.3.0\lib\net45\Unity.Mvc5.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.RegistrationByConvention, Version=2.1.5.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\Unity.RegistrationByConvention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.ServiceLocation, Version=2.1.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.6\lib\net45\Unity.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
@@ -167,6 +203,7 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AssetController.cs" />
     <Compile Include="Controllers\AssetSettingController.cs" />
@@ -193,6 +230,7 @@
     <Compile Include="Models\ViewModels\AssetSetting\EditViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetSetting\IndexViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetTransaction\CreateViewModel.cs" />
+    <Compile Include="Models\ViewModels\AssetTransaction\DeleteViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetTransaction\DisplayForAssetViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetTransaction\EditAssetViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetTransaction\EditViewModel.cs" />
@@ -211,6 +249,7 @@
     <Compile Include="Models\ViewModels\AssetTypeSettingType\EditViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetTypeSettingType\IndexLinkedAssetTypesViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetTypeSettingType\IndexLinkedSettingTypesViewModel.cs" />
+    <Compile Include="Models\ViewModels\AssetTypeSettingType\IndexSettingTypesForAssetTypeViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetType\CreateViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetType\DetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\AssetType\EditViewModel.cs" />
@@ -435,6 +474,7 @@
     <Content Include="Views\AssetTransaction\EditAsset.cshtml" />
     <Content Include="Views\AssetTransaction\_Chart.cshtml" />
     <Content Include="Views\AssetTransaction\_ChartView.cshtml" />
+    <Content Include="Views\AssetTransaction\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -450,15 +490,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Financial.Business\Financial.Business.csproj">
-      <Project>{CDE3D320-F868-482B-8990-186E455B2C9F}</Project>
+      <Project>{cde3d320-f868-482b-8990-186e455b2c9f}</Project>
       <Name>Financial.Business</Name>
     </ProjectReference>
     <ProjectReference Include="..\Financial.Core\Financial.Core.csproj">
-      <Project>{B454AEF2-D9B8-45C0-AE22-AEAD2DE95567}</Project>
+      <Project>{b454aef2-d9b8-45c0-ae22-aead2de95567}</Project>
       <Name>Financial.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Financial.Data\Financial.Data.csproj">
-      <Project>{FDE8B572-92AF-410F-B420-DF75C06BA734}</Project>
+      <Project>{fde8b572-92af-410f-b420-df75c06ba734}</Project>
       <Name>Financial.Data</Name>
     </ProjectReference>
   </ItemGroup>

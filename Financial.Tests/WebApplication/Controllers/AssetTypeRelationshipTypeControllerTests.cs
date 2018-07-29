@@ -6,20 +6,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Financial.Core.Models;
-using Financial.Tests.Data.Repositories;
-using Financial.Tests.Data;
-using Financial.Tests.Data.Fakes;
+using Financial.WebApplication.Tests.Fakes.Repositories;
 using System.Web.Mvc;
 using Financial.WebApplication.Models.ViewModels.AssetTypeRelationshipType;
 
-namespace Financial.Tests.WebApplication.Controllers
+namespace Financial.WebApplication.Tests.WebApplication.Controllers
 {
     public class AssetTypeRelationshipTypeControllerTestsBase : ControllerTestsBase
     {
         public AssetTypeRelationshipTypeControllerTestsBase()
         {
             // Controller
-            _controller = new AssetTypeRelationshipTypeController(_unitOfWork);
+            _controller = new AssetTypeRelationshipTypeController(_unitOfWork, _businessService);
         }
 
         protected AssetTypeRelationshipTypeController _controller;

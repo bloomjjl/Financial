@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Financial.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,19 +12,16 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
     {
         public IndexViewModel() { }
 
-        public IndexViewModel(int index, Core.Models.AssetTransaction dtoAssetTransaction, 
-            string clearDate, Core.Models.Asset dtoAsset, string assetNameAdditionalInformaiton, 
-            string transactionType, decimal total)
+        public IndexViewModel(Business.Models.AssetTransaction bmAssetTransaction)
         {
-            Index = index;
-            Id = dtoAssetTransaction.Id;
-            AssetId = dtoAsset.Id;
-            AssetName = dtoAsset.Name + assetNameAdditionalInformaiton;
-            DueDate = dtoAssetTransaction.DueDate.ToString("MM/dd/yyyy");
-            ClearDate = clearDate;
-            TransactionType = transactionType;
-            Amount = dtoAssetTransaction.Amount;
-            Total = total;
+            Id = bmAssetTransaction.AssetTransactionId;
+            AssetId = bmAssetTransaction.AssetId;
+            AssetName = bmAssetTransaction.AssetName;
+            DueDate = bmAssetTransaction.DueDate;
+            ClearDate = bmAssetTransaction.ClearDate;
+            TransactionType = bmAssetTransaction.TransactionTypeName;
+            Amount = bmAssetTransaction.Amount;
+            Note = bmAssetTransaction.Note;
         }
 
         public int Index { get; set; }
@@ -33,11 +31,11 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
         public string AssetName { get; set; }
         [Required]
         [Display(Name = "Due")]
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string DueDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime DueDate { get; set; }
         [Display(Name = "Cleared")]
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public string ClearDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime ClearDate { get; set; }
         public string TransactionType { get; set; }
         public string Income { get; set; }
         public string Expense { get; set; }
@@ -46,6 +44,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTransaction
         [Display(Name = "Balance")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:c}")]
         public decimal Total { get; set; }
+        public string Note { get; set; }
 
     }
 }

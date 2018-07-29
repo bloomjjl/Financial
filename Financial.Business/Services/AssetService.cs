@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Financial.Business.Models;
 
 namespace Financial.Business.Services
 {
@@ -42,16 +43,12 @@ namespace Financial.Business.Services
                 {
                     Value = dtoAsset.Id.ToString(),
                     Selected = dtoAsset.Id.ToString() == selectedId,
-                    Text = assetName + assetNameInformation
+                    Text = string.Format("{0}{1}", assetName, assetNameInformation)
                 });
             }
-            return new List<SelectListItem>();
+            return sliAssets;
         }
 
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

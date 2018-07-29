@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Financial.Business.Models;
 
 namespace Financial.Business.ServiceInterfaces
 {
-    public interface IAssetService : IDisposable
+    public interface IAssetService
     {
         List<SelectListItem> GetSelectListOfAssets(string selectedId);
     }

@@ -6,19 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Financial.Core.Models;
-using Financial.Tests.Data.Repositories;
-using Financial.Tests.Data;
-using Financial.Tests.Data.Fakes;
+using Financial.WebApplication.Tests.Fakes.Repositories;
 using System.Web.Mvc;
 using Financial.WebApplication.Models.ViewModels.Asset;
 
-namespace Financial.Tests.WebApplication.Controllers
+namespace Financial.WebApplication.Tests.WebApplication.Controllers
 {
     public class AssetControllerTestsBase : ControllerTestsBase
     {
         public AssetControllerTestsBase()
         {
-            _controller = new AssetController(_unitOfWork);
+            _controller = new AssetController(_unitOfWork, _businessService);
         }
 
         protected AssetController _controller;
@@ -54,7 +52,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypes = new List<AssetType>() {
                 new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }}; 
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             int expectedCount = 1;
             int expectedAssetId = 10;
             var expectedAssetName = "Asset";
@@ -130,7 +128,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 new AssetType() { Id = 20, Name = "Asset Type 1", IsActive = true }, // count
                 new AssetType() { Id = 21, Name = "Asset Type 2", IsActive = false }}; // NOT active
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             int expectedCount = 1;
             var expectedValue = "20";
             var expectedText = "Asset Type 1";
@@ -156,7 +154,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypes = new List<AssetType>() {
                 new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             var vmExpected = new CreateViewModel()
             {
                 SelectedAssetTypeId = "20",
@@ -184,7 +182,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypes = new List<AssetType>() {
                 new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             var vmExpected = new CreateViewModel()
             {
                 SelectedAssetTypeId = "20",
@@ -235,7 +233,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypes = new List<AssetType>() {
                 new AssetType() { Id = 20, Name = "AssetType", IsActive = true }}; 
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             int id = 10;
             var expectedName = "Asset";
             var expectedAssetTypeId = "20";
@@ -263,7 +261,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 new AssetType() { Id = 21, Name = "AssetType 2", IsActive = false }, // NOT active
                 new AssetType() { Id = 22, Name = "AssetType 3", IsActive = true }}; // count
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             int id = 10;
             int count = 2;
             var expectedAssetTypeId = "20";
@@ -289,7 +287,7 @@ namespace Financial.Tests.WebApplication.Controllers
                 new AssetType() { Id = 20, Name = "AssetType 1", IsActive = true }, 
                 new AssetType() { Id = 21, Name = "AssetType 2", IsActive = true }}; 
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             var vmExpected = new EditViewModel()
             {
                 Id = 10,
@@ -364,7 +362,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypes = new List<AssetType>() {
                 new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             int id = 10;
             var expectedAssetName = "Asset";
             var expectedAssetTypeName = "Asset Type";
@@ -409,7 +407,7 @@ namespace Financial.Tests.WebApplication.Controllers
             var _dataAssetTypes = new List<AssetType>() {
                 new AssetType() { Id = 20, Name = "Asset Type", IsActive = true }};
             _unitOfWork.AssetTypes = new InMemoryAssetTypeRepository(_dataAssetTypes);
-            var controller = new AssetController(_unitOfWork);
+            var controller = new AssetController(_unitOfWork, _businessService);
             int id = 10;
             var expectedAssetName = "Asset";
             var expectedAssetTypeName = "Asset Type";

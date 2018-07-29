@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace Financial.Business
 {
-    public interface IBusinessService : IDisposable
+    public interface IBusinessService
     {
         IAssetService AssetService { get; }
         IAssetSettingService AssetSettingService { get; }
         IAssetTypeService AssetTypeService { get; }
-        ISelectListService SelectListService { get; }
+        IAssetTypeSettingTypeService AssetTypeSettingTypeService { get; }
+        ISettingTypeService SettingTypeService { get; }
     }
 }

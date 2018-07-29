@@ -5,20 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Financial.Tests.Data.Fakes;
-using Financial.Tests.Data.Repositories;
+using Financial.WebApplication.Tests.Fakes.Repositories;
 using Financial.Core.Models;
-using Financial.Tests.Data;
 using System.Web.Mvc;
 using Financial.WebApplication.Models.ViewModels.ParentChildRelationshipType;
 
-namespace Financial.Tests.WebApplication.Controllers
+namespace Financial.WebApplication.Tests.WebApplication.Controllers
 {
     public class ParentChildRelationshipTypeControllerTestsBase : ControllerTestsBase
     {
         public ParentChildRelationshipTypeControllerTestsBase()
         {
-            _controller = new ParentChildRelationshipTypeController(_unitOfWork);
+            _controller = new ParentChildRelationshipTypeController(_unitOfWork, _businessService);
         }
 
         protected ParentChildRelationshipTypeController _controller;

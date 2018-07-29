@@ -32,10 +32,15 @@
         <th onclick="sortTable(5)" style="text-align: right;">
             @Html.DisplayNameFor(model => model.Total)
         </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Note)
+        </th>
         <th></th>
     </tr>
 
 @foreach (var item in Model) {
+    decTotal = decTotal + item.Amount;
+    item.Total = decTotal;
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.DueDate)
@@ -47,13 +52,13 @@
             @Html.DisplayFor(modelItem => item.AssetName)
         </td>
         <td style="text-align: right;">
-            @if (item.TransactionType == "Income")
+            @if (item.Amount >= 0)
             {
                 @Html.DisplayFor(modelItem => item.Amount)
             }
         </td>
         <td style="text-align: right;">
-            @if (item.TransactionType == "Expense")
+            @if (item.Amount < 0)
             {
                 @Html.DisplayFor(modelItem => item.Amount)
             }
@@ -62,8 +67,11 @@
             @Html.DisplayFor(modelItem => item.Total)
         </td>
         <td>
+            @Html.DisplayFor(modelItem => item.Note)
+        </td>
+        <td>
             @Html.ActionLink("Edit", "Edit", "AssetTransaction", new { id = item.Id }, null) |
-            @Html.ActionLink("Details", "Details", "Asset", new { id = item.AssetId }, null) |
+            @Html.ActionLink("Account", "Details", "Asset", new { id = item.AssetId }, null) |
             @Html.ActionLink("Delete", "Delete", "AssetTransaction", new { id = item.Id }, null)
         </td>
     </tr>

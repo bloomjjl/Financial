@@ -1,4 +1,6 @@
-﻿using Financial.Business.Utilities;
+﻿using Financial.Business;
+using Financial.Business.ServiceInterfaces;
+using Financial.Business.Utilities;
 using Financial.Core;
 using Financial.Core.Models;
 using Financial.Data;
@@ -14,14 +16,14 @@ namespace Financial.WebApplication.Controllers
 {
     public class AssetTransactionController : BaseController
     {
-        public AssetTransactionController()
+        private IUnitOfWork _unitOfWork;
+        private IAssetTransactionService _assetTransactionService;
+
+        public AssetTransactionController(IUnitOfWork unitOfWork, IAssetTransactionService AssetTransactionService)
             : base()
         {
-        }
-
-        public AssetTransactionController(IUnitOfWork unitOfWork)
-            : base(unitOfWork)
-        {
+            _unitOfWork = unitOfWork;
+            _assetTransactionService = AssetTransactionService;
         }
 
         [HttpGet]
@@ -29,40 +31,23 @@ namespace Financial.WebApplication.Controllers
         {
             try
             {
-                // create vm
-                var vmIndex = new List<IndexViewModel>();
-
-                // get active transactions
-                List<AssetTransaction> dbAssetTransactions = UOW.AssetTransactions.GetAllActiveByDueDate().ToList();
-
-                // set initial value for total
-                var total = 0.00M;
-
-                // transfer dto to vm
-                var index = 0;
-                foreach (var dtoAssetTransaction in dbAssetTransactions)
+                if (TempData["ErrorMessage"] != null)
                 {
-                    var dtoAsset = UOW.Assets.GetActive(dtoAssetTransaction.AssetId);
-                    var dtoTransactionType = UOW.TransactionTypes.Get(dtoAssetTransaction.TransactionTypeId);
-                    if (dtoAsset != null && dtoTransactionType != null)
-                    {
-                        // determine amount displayed
-                        total = TransactionUtility.CalculateTransaction(total, dtoAssetTransaction.Amount, dtoTransactionType.Name);
-
-                        // add additional identifying info to asset title
-                        var assetNameAdditionalInformation = BS.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
-
-                        // format clear date
-                        string clearDate = DataTypeUtility.GetDateValidatedToString(dtoAssetTransaction.ClearDate);
-
-                        // transfer to vm
-                        vmIndex.Add(new IndexViewModel(index, dtoAssetTransaction, clearDate, dtoAsset, assetNameAdditionalInformation, dtoTransactionType.Name, total));
-                        // increment index for sorting in view
-                        index++;
-                    }
+                    ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+                }
+                else if (TempData["SuccessMessage"] != null)
+                {
+                    ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                 }
 
-                // display view
+                // transfer bm to vm
+                var bmAssetTransactionList = _assetTransactionService.GetListOfActiveTransactions();
+
+                var vmIndex = bmAssetTransactionList
+                    .Select(r => new IndexViewModel(r))
+                    .ToList();
+
+
                 return View("Index", vmIndex.OrderByDescending(r => r.Index).ToList());
             }
             catch (Exception)
@@ -73,27 +58,210 @@ namespace Financial.WebApplication.Controllers
         }
 
         [HttpGet]
+        public ActionResult Create(int? assetId)
+        {
+            try
+            {
+                // get bm
+                var bmAssetTransaction = _assetTransactionService.GetTransactionOptions(assetId);
+                if (bmAssetTransaction == null)
+                {
+                    TempData["ErrorMessage"] = "Unable to create record. Try again.";
+                    return RedirectToAction("Index", "AssetTransaction");
+                }
+
+                // transfer bm to vm
+                var vmCreate = new CreateViewModel(bmAssetTransaction);
+
+                return View("Create", vmCreate);
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "AssetTransaction");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(CreateViewModel vmCreate)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    TempData["ErrorMessage"] = "Problem creating record. Try again.";
+                    return RedirectToAction("Index", "AssetTransaction");
+                }
+
+                // transfer vm to bm
+                var bmAssetTransaction = new Business.Models.AssetTransaction()
+                {
+                    AssetId = DataTypeUtility.GetIntegerFromString(vmCreate.SelectedAssetId),
+                    TransactionTypeId = DataTypeUtility.GetIntegerFromString(vmCreate.SelectedTransactionTypeId),
+                    TransactionCategoryId = DataTypeUtility.GetIntegerFromString(vmCreate.SelectedTransactionCategoryId),
+                    CheckNumber = vmCreate.CheckNumber,
+                    DueDate = Convert.ToDateTime(vmCreate.DueDate),
+                    ClearDate = Convert.ToDateTime(vmCreate.ClearDate),
+                    Amount = vmCreate.Amount,
+                    Note = vmCreate.Note,
+                };
+
+                // update db
+                if (!_assetTransactionService.AddTransaction(bmAssetTransaction))
+                {
+                    ViewData["ErrorMessage"] = "Problem creating record";
+                    return View("Create", vmCreate);
+                }
+
+                TempData["SuccessMessage"] = "Record created";
+                return RedirectToAction("Details", "Asset", new { Id = vmCreate.AssetId });
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered problem";
+                return RedirectToAction("Index", "AssetTransaction");
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            try
+            {
+                // get bm
+                var bmAssetTransaction = _assetTransactionService.GetTransactionToEdit(id);
+                if (bmAssetTransaction == null)
+                {
+                    TempData["ErrorMessage"] = "Unable to edit record. Try again.";
+                    return RedirectToAction("Index", "AssetTransaction");
+                }
+
+                return View("Edit", new EditViewModel(bmAssetTransaction));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered Problem";
+                return RedirectToAction("Index", "AssetTransaction");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(EditViewModel vmEdit)
+        {
+            try
+            {
+                if(!ModelState.IsValid)
+                {
+                    TempData["ErrorMessage"] = "Problem editing record. Try again.";
+                    return RedirectToAction("Index", "AssetTransaction");
+                }
+
+                // transfer vm to bm
+                var bmAssetTransaction = new Business.Models.AssetTransaction()
+                {
+                    AssetTransactionId = vmEdit.Id,
+                    AssetId = vmEdit.AssetId,
+                    TransactionTypeId = DataTypeUtility.GetIntegerFromString(vmEdit.SelectedTransactionTypeId),
+                    TransactionCategoryId = DataTypeUtility.GetIntegerFromString(vmEdit.SelectedTransactionCategoryId),
+                    CheckNumber = vmEdit.CheckNumber,
+                    DueDate = Convert.ToDateTime(vmEdit.DueDate),
+                    ClearDate = Convert.ToDateTime(vmEdit.ClearDate),
+                    Amount = vmEdit.Amount,
+                    Note = vmEdit.Note,
+                };
+
+                // update db
+                if (!_assetTransactionService.UpdateTransaction(bmAssetTransaction))
+                {
+                    ViewData["ErrorMessage"] = "Problem updating record";
+                    return View("Edit", vmEdit);
+                }
+
+                TempData["SuccessMessage"] = "Record updated";
+                return RedirectToAction("Details", "Asset", new { id = vmEdit.AssetId });
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered Problem";
+                return RedirectToAction("Index", "AssetTransaction");
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                // get bm
+                var bmAssetTransaction = _assetTransactionService.GetTransactionToDelete(id);
+
+                // tranfer bm to vm
+                return View("Delete", new DeleteViewModel(bmAssetTransaction));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered Problem";
+                return RedirectToAction("Index", "AssetTransaction");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(DeleteViewModel vmDelete)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    TempData["ErrorMessage"] = "Problem deleting record. Try again.";
+                    return RedirectToAction("Index", "AssetTransaction");
+                }
+
+                // update db
+                if (!_assetTransactionService.DeleteTransaction(vmDelete.Id))
+                {
+                    ViewData["ErrorMessage"] = "Problem deleting record";
+                    return View("Delete", vmDelete);
+                }
+
+                TempData["SuccessMessage"] = "Record deleted";
+                return RedirectToAction("Index", "AssetTransaction");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Encountered Problem";
+                return RedirectToAction("Index", "AssetTransaction");
+            }
+        }
+
+
+
+
+        [HttpGet]
         public ActionResult DisplayForAsset(int assetId)
         {
             try
             {
                 // transfer assetId from db
-                var dbAssetTransactions = UOW.AssetTransactions.GetAllActiveByDescendingDueDate(assetId);
+                var dbAssetTransactions = _unitOfWork.AssetTransactions.GetAllActiveByDescendingDueDate(assetId);
 
                 // transfer dto to vm
                 var vmDisplayForAsset = new List<DisplayForAssetViewModel>();
                 foreach(var dtoAssetTransaction in dbAssetTransactions)
                 {
-                    var dtoTransactionCategory = UOW.TransactionCategories.Get(dtoAssetTransaction.TransactionCategoryId);
+                    var dtoTransactionCategory = _unitOfWork.TransactionCategories.Get(dtoAssetTransaction.TransactionCategoryId);
 
-                    // update amount for expense to "-0.00"
+                    // is Expense?
                     if(dtoAssetTransaction.TransactionTypeId == 1)
                     {
+                        // update to "-0.00"
                         dtoAssetTransaction.Amount = dtoAssetTransaction.Amount * -1;
                     }
 
-                    // format clear date
-                    string clearDate = DataTypeUtility.GetDateValidatedToString(dtoAssetTransaction.ClearDate);
+                    // format date
+                    string clearDate = DataTypeUtility.GetDateValidatedToShortDateString(dtoAssetTransaction.ClearDate);
 
                     // transfer to vm
                     vmDisplayForAsset.Add(new DisplayForAssetViewModel(dtoAssetTransaction, clearDate, dtoTransactionCategory));
@@ -109,80 +277,15 @@ namespace Financial.WebApplication.Controllers
             }
         }
 
-        [HttpGet]
-        public ActionResult Create(int? assetId)
-        {
-            try
-            {
-                // transfer id to dto 
-                var dtoAsset = UOW.Assets.Get(DataTypeUtility.GetIntegerFromString(assetId.ToString()));
-                if (dtoAsset != null)
-                {
-                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
-                    if (dtoAssetType != null)
-                    {
-                        // add additional identifying info to asset title
-                        var assetNameAdditionalInformaiton = BS.AssetSettingService.GetAccountIdentificationInformation(dtoAsset);
-
-                        // transfer dto to sli
-                        var sliTransactionTypes = BS.SelectListService.TransactionTypes(null);
-                        var sliTransactionCategories = BS.SelectListService.TransactionCategories(null);
-
-                        // display view
-                        return View("Create", new CreateViewModel(dtoAsset, assetNameAdditionalInformaiton, dtoAssetType, DateTime.Now, sliTransactionTypes, sliTransactionCategories));
-                    }
-                }
-                TempData["ErrorMessage"] = "Unable to create record. Try again.";
-                return RedirectToAction("SelectAssetToCreate", "AssetTransaction");
-            }
-            catch (Exception)
-            {
-                TempData["ErrorMessage"] = "Encountered problem";
-                return RedirectToAction("Index", "AssetTransaction");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(CreateViewModel vmCreate)
-        {
-            try
-            {
-                // transfer vm to dto
-                UOW.AssetTransactions.Add(new AssetTransaction()
-                {
-                    AssetId = vmCreate.AssetId,
-                    TransactionTypeId = DataTypeUtility.GetIntegerFromString(vmCreate.SelectedTransactionTypeId),
-                    TransactionCategoryId = DataTypeUtility.GetIntegerFromString(vmCreate.SelectedTransactionCategoryId),
-                    CheckNumber = vmCreate.CheckNumber,
-                    DueDate = Convert.ToDateTime(vmCreate.DueDate),
-                    ClearDate = Convert.ToDateTime(vmCreate.ClearDate),
-                    Amount = vmCreate.Amount,
-                    Note = vmCreate.Note,
-                    IsActive = true
-                });
-
-                // update db
-                UOW.CommitTrans();
-
-                // display view with message
-                TempData["SuccessMessage"] = "Record created";
-                return RedirectToAction("Details", "Asset", new { Id = vmCreate.AssetId });
-            }
-            catch (Exception)
-            {
-                TempData["ErrorMessage"] = "Encountered problem";
-                return RedirectToAction("Index", "AssetTransaction");
-            }
-        }
-
+        /*
+         * TODO: implement service
         [HttpGet]
         public ActionResult SelectAssetToCreate()
         {
             try
             {
                 // transfer dto to sli
-                var sliAssets = BS.AssetService.GetSelectListOfAssets(null);
+                var sliAssets = _businessService.AssetService.GetSelectListOfAssets(null);
 
                 // display view
                 return View("SelectAssetToCreate", new SelectAssetToCreateViewModel(sliAssets));
@@ -193,6 +296,7 @@ namespace Financial.WebApplication.Controllers
                 return RedirectToAction("Index", "AssetTransaction");
             }
         }
+        */
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -217,86 +321,21 @@ namespace Financial.WebApplication.Controllers
             }
         }
 
-        [HttpGet]
-        public ActionResult Edit(int id)
-        {
-            try
-            { 
-                // transfer id to dto 
-                var dtoAssetTransaction = UOW.AssetTransactions.Get(id);
-                if (dtoAssetTransaction != null)
-                {
-                    var dtoAsset = UOW.Assets.Get(dtoAssetTransaction.AssetId);
-                    if (dtoAsset != null)
-                    {
-                        var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
-                        if (dtoAssetType != null)
-                        {
-
-                            // transfer dto to sli
-                            var sliTransactionTypes = BS.SelectListService.TransactionTypes(dtoAssetTransaction.TransactionTypeId.ToString());
-                            var sliTransactionCategories = BS.SelectListService.TransactionCategories(dtoAssetTransaction.TransactionCategoryId.ToString());
-
-                            // display view
-                            return View("Edit", new EditViewModel(dtoAssetTransaction, dtoAsset, dtoAssetType, sliTransactionTypes, sliTransactionCategories));
-                        }
-                        TempData["ErrorMessage"] = "Unable to edit record. Try again.";
-                        return RedirectToAction("Details", "Asset", new { id = id });
-                    }
-                }
-                TempData["ErrorMessage"] = "Unable to edit record. Try again.";
-                return RedirectToAction("Index", "AssetTransaction");
-            }
-            catch (Exception)
-            {
-                TempData["ErrorMessage"] = "Encountered Problem";
-                return RedirectToAction("Index", "AssetTransaction");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(EditViewModel vmEdit)
-        {
-            try
-            { 
-                // transfer vm to dto
-                var dtoAssetTransaction = UOW.AssetTransactions.Get(vmEdit.Id);
-                dtoAssetTransaction.TransactionTypeId = DataTypeUtility.GetIntegerFromString(vmEdit.SelectedTransactionTypeId);
-                dtoAssetTransaction.TransactionCategoryId = DataTypeUtility.GetIntegerFromString(vmEdit.SelectedTransactionCategoryId);
-                dtoAssetTransaction.CheckNumber = vmEdit.CheckNumber;
-                dtoAssetTransaction.DueDate = Convert.ToDateTime(vmEdit.DueDate);
-                dtoAssetTransaction.ClearDate = Convert.ToDateTime(vmEdit.ClearDate);
-                dtoAssetTransaction.Amount = vmEdit.Amount;
-                dtoAssetTransaction.Note = vmEdit.Note;
-
-                // update db
-                UOW.CommitTrans();
-
-                // display view with message
-                TempData["SuccessMessage"] = "Record updated";
-                return RedirectToAction("Details", "Asset", new { id = vmEdit.AssetId });
-            }
-            catch (Exception)
-            {
-                TempData["ErrorMessage"] = "Encountered Problem";
-                return RedirectToAction("Index", "AssetTransaction");
-            }
-        }
-
+        /*
+         * TODO: implement service
         [HttpGet]
         public ActionResult EditAsset(int id, int assetId)
         {
             try
             {
                 // transfer id to dto
-                var dtoAssetTransaction = UOW.AssetTransactions.Get(id);
-                var dtoAsset = UOW.Assets.Get(assetId);
+                var dtoAssetTransaction = _unitOfWork.AssetTransactions.Get(id);
+                var dtoAsset = _unitOfWork.Assets.Get(assetId);
                 if (dtoAssetTransaction != null && dtoAsset != null)
                 {
-                    var dtoAssetType = UOW.AssetTypes.Get(dtoAsset.AssetTypeId);
-                    var dtoTransactionType = UOW.TransactionTypes.Get(dtoAssetTransaction.TransactionTypeId);
-                    var dtoTransactionCategory = UOW.TransactionCategories.Get(dtoAssetTransaction.TransactionCategoryId);
+                    var dtoAssetType = _unitOfWork.AssetTypes.Get(dtoAsset.AssetTypeId);
+                    var dtoTransactionType = _unitOfWork.TransactionTypes.Get(dtoAssetTransaction.TransactionTypeId);
+                    var dtoTransactionCategory = _unitOfWork.TransactionCategories.Get(dtoAssetTransaction.TransactionCategoryId);
                     if (dtoAssetType != null && dtoTransactionType != null && dtoTransactionCategory != null)
                     {
                         // validate values to display
@@ -304,7 +343,7 @@ namespace Financial.WebApplication.Controllers
                         dtoAssetTransaction.Note = TransactionUtility.FormatTransactionNote(dtoAssetTransaction.Note);
 
                         // transfer dto to sli
-                        var sliAssets = BS.AssetService.GetSelectListOfAssets(dtoAsset.Id.ToString());
+                        var sliAssets = _businessService.AssetService.GetSelectListOfAssets(dtoAsset.Id.ToString());
 
                         // transfer to vm and display view
                         return View("EditAsset", new EditAssetViewModel(dtoAssetTransaction, sliAssets, dtoAsset.Id.ToString(), dtoAssetType, dtoTransactionType.Name, dtoTransactionCategory.Name));
@@ -321,6 +360,7 @@ namespace Financial.WebApplication.Controllers
                 return RedirectToAction("Index", "AssetTransaction");
             }
         }
+        */
 
         [HttpPost]
         public ActionResult EditAsset(EditAssetViewModel vmEditAsset)
@@ -330,13 +370,13 @@ namespace Financial.WebApplication.Controllers
                 if (ModelState.IsValid)
                 {
                     // transfer vm to dto
-                    var dtoAssetTransaction = UOW.AssetTransactions.Get(vmEditAsset.Id);
+                    var dtoAssetTransaction = _unitOfWork.AssetTransactions.Get(vmEditAsset.Id);
                     if (dtoAssetTransaction != null)
                     {
                         dtoAssetTransaction.AssetId = DataTypeUtility.GetIntegerFromString(vmEditAsset.SelectedAssetId);
 
                         // update db
-                        UOW.CommitTrans();
+                        _unitOfWork.CommitTrans();
 
                         // display view
                         TempData["SuccessMessage"] = "Asset Name updated";
