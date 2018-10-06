@@ -23,7 +23,82 @@ textarea {
     max-width: 280px;
 }
 
+
+.logo-title {
+    width: 300px;
+    height: 50px;
+}
+
+.list_links {
+    white-space: nowrap;
+}
 #table_trasactions th:hover {
     color: red;
     cursor: pointer;
+}
+
+
+
+@media (min-width: 768px) {
+
+    .header {
+        display: inherit;
+    }
+
+    .navbar-logo-img {
+        display: none;
+    }
+
+    .navbar-logo-title {
+        display: none;
+    }
+
+    .navbar-header {
+        display: none;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .header {
+        display: none;
+    }
+
+    .navbar-logo-img {
+        display: inherit;
+    }
+
+    .logo-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .navbar-logo-title {
+        display: inherit;
+    }
+
+    .navbar-header {
+        display: inherit;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .header {
+        display: none;
+    }
+
+    .navbar-logo-img {
+        display: inherit;
+    }
+
+    .navbar-logo-title {
+        display: inherit;
+    }
+
+    .navbar-header {
+        display: inherit;
+    }
+
 }

@@ -11,28 +11,28 @@ namespace Financial.Business
 {
     public class BusinessService : IBusinessService
     {
-        private IUnitOfWork _unitOfWork;
-
         public BusinessService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
-            SetServices();
+            SetServices(unitOfWork);
         }
 
-        private void SetServices()
+        private void SetServices(IUnitOfWork unitOfWork)
         {
-            AssetService = new AssetService(_unitOfWork);
-            AssetSettingService = new AssetSettingService(_unitOfWork);
-            AssetTypeService = new AssetTypeService(_unitOfWork);
-            AssetTypeSettingTypeService = new AssetTypeSettingTypeService(_unitOfWork);
-            SettingTypeService = new SettingTypeService(_unitOfWork);
+            AccountSettingService = new AccountSettingService(unitOfWork);
+
+            AccountService = new AccountService(unitOfWork, AccountSettingService);
+            AccountTransactionService = new AccountTransactionService(unitOfWork);
+            AccountTypeService = new AccountTypeService(unitOfWork);
+            AccountTypeSettingTypeService = new AccountTypeSettingTypeService(unitOfWork);
+            SettingTypeService = new SettingTypeService(unitOfWork);
         }
 
 
-        public IAssetService AssetService { get; private set; }
-        public IAssetSettingService AssetSettingService { get; private set; }
-        public IAssetTypeService AssetTypeService { get; private set; }
-        public IAssetTypeSettingTypeService AssetTypeSettingTypeService { get; private set; }
+        public IAccountService AccountService { get; private set; }
+        public IAccountSettingService AccountSettingService { get; private set; }
+        public IAccountTransactionService AccountTransactionService { get; private set; }
+        public IAccountTypeService AccountTypeService { get; private set; }
+        public IAccountTypeSettingTypeService AccountTypeSettingTypeService { get; private set; }
         public ISettingTypeService SettingTypeService { get; private set; }
 
     }

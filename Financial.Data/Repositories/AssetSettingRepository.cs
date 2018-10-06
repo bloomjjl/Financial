@@ -2,6 +2,7 @@
 using Financial.Core.Models;
 using Financial.Data.RepositoryInterfaces;
 using System;
+using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,10 +23,12 @@ namespace Financial.Data.Repositories
         }
 
 
-
         public AssetSetting GetActive(int assetId, int settingTypeId)
         {
             return FinancialDbContext.AssetSettings
+                .Include(r => r.Asset)
+                .Include(r => r.Asset.AssetType)
+                .Include(r => r.SettingType)
                 .Where(r => r.IsActive)
                 .Where(r => r.AssetId == assetId)
                 .FirstOrDefault(r => r.SettingTypeId == settingTypeId);
@@ -34,6 +37,8 @@ namespace Financial.Data.Repositories
         public IEnumerable<AssetSetting> GetAllActiveForAsset(int assetId)
         {
             return FinancialDbContext.AssetSettings
+                .Include(r => r.Asset)
+                .Include(r => r.SettingType)
                 .Where(r => r.IsActive)
                 .Where(r => r.AssetId == assetId)
                 .ToList();
@@ -42,6 +47,8 @@ namespace Financial.Data.Repositories
         public IEnumerable<AssetSetting> GetAllActiveForSettingType(int settingTypeId)
         {
             return FinancialDbContext.AssetSettings
+                .Include(r => r.Asset)
+                .Include(r => r.SettingType)
                 .Where(r => r.IsActive)
                 .Where(r => r.SettingTypeId == settingTypeId)
                 .ToList();

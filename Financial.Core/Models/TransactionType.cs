@@ -13,5 +13,15 @@ namespace Financial.Core.Models
     {
         [Required]
         public string Name { get; set; }
+
+
+
+
+        public ICollection<AssetTransaction> AssetTransactions { get; set; }
+
+
+
+        public static readonly int IdForExpense = 1;
+        public static readonly int IdForIncome = 2;
     }
 }

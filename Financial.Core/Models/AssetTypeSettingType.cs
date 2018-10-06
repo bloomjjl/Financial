@@ -8,15 +8,13 @@ using System.Threading.Tasks;
 
 namespace Financial.Core.Models
 {
-    [Table("AccountTypesAttributeTypes")]
+    [Table("AccountTypeAttributeTypes")]
     public class AssetTypeSettingType : BaseEntity
     {
         [Required]
-        [Display(Name = "AssetType ID")]
         [Column("AccountTypeId")]
         public int AssetTypeId { get; set; }
         [Required]
-        [Display(Name = "SettingType ID")]
         [Column("AttributeTypeId")]
         public int SettingTypeId { get; set; }
     }

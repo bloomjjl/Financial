@@ -23,7 +23,12 @@ namespace Financial.Data.Repositories
 
 
 
-
+        public new AssetType Get(int id)
+        {
+            return FinancialDbContext.AssetTypes
+                .Include("Asset")
+                .FirstOrDefault(r => r.Id == id);
+        }
 
         public IEnumerable<AssetType> GetAllActiveOrderedByName()
         {

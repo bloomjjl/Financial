@@ -16,9 +16,9 @@ namespace Financial.WebApplication.Controllers
     public class AssetTypeSettingTypeController : BaseController
     {
         private IUnitOfWork _unitOfWork;
-        private IAssetTypeSettingTypeService _assetTypeSettingTypeService;
+        private IAccountTypeSettingTypeService _assetTypeSettingTypeService;
         
-        public AssetTypeSettingTypeController(IUnitOfWork unitOfWork, IAssetTypeSettingTypeService assetTypeSettingTypeService)
+        public AssetTypeSettingTypeController(IUnitOfWork unitOfWork, IAccountTypeSettingTypeService assetTypeSettingTypeService)
             : base()
         {
             _unitOfWork = unitOfWork;
@@ -163,7 +163,7 @@ namespace Financial.WebApplication.Controllers
             try
             { 
                 // transfer dto to vm
-                var dtoSettingType = _unitOfWork.SettingTypes.Get(DataTypeUtility.GetIntegerFromString(settingTypeId.ToString()));
+                var dtoSettingType = _unitOfWork.AssetTypes.Get(DataTypeUtility.GetIntegerFromString(settingTypeId.ToString()));
                 if (dtoSettingType != null)
                 {
                     /*

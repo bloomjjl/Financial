@@ -15,10 +15,10 @@ namespace Financial.WebApplication.Controllers
     public class AssetTypeController : BaseController
     {
         private IUnitOfWork _unitOfWork;
-        private IAssetTypeService _assetTypeService;
+        private IAccountTypeService _assetTypeService;
 
         
-        public AssetTypeController(IUnitOfWork unitOfWork, IAssetTypeService assetTypeService)
+        public AssetTypeController(IUnitOfWork unitOfWork, IAccountTypeService assetTypeService)
             : base()
         {
             _unitOfWork = unitOfWork;
@@ -80,7 +80,7 @@ namespace Financial.WebApplication.Controllers
                 }
 
                 // transfer vm to bm
-                var bmAssetType = new Business.Models.AssetType()
+                var bmAssetType = new Business.Models.AccountType()
                 {
                     AssetTypeName = vmCreate.Name,
                 };
@@ -139,7 +139,7 @@ namespace Financial.WebApplication.Controllers
                 }
 
                 // transfer vm to bm
-                var bmAssetType = new Business.Models.AssetType()
+                var bmAssetType = new Business.Models.AccountType()
                 {
                     AssetTypeId = vmEdit.Id,
                     AssetTypeName = vmEdit.Name,

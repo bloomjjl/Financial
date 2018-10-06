@@ -3,6 +3,7 @@ using Financial.Core.Models;
 using Financial.Data.RepositoryInterfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,9 @@ namespace Financial.Data.Repositories
         public IEnumerable<AssetTransaction> GetAllActiveByDueDate()
         {
             return FinancialDbContext.AssetTransactions
+                .Include(r => r.Asset)
+                .Include(r => r.Asset.AssetType)
+                .Include(r => r.TransactionType)
                 .Where(r => r.IsActive)
                 .OrderBy(r => r.DueDate)
                 .ToList();

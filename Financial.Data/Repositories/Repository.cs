@@ -13,7 +13,7 @@ namespace Financial.Data.Repositories
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
         protected readonly DbContext _context;
-        private IDbSet<TEntity> _entities;
+        private DbSet<TEntity> _entities;
 
         public Repository(DbContext context)
         {
@@ -53,7 +53,7 @@ namespace Financial.Data.Repositories
 
         public bool Exists(int id)
         {
-            return _entities.FirstOrDefault(r => r.Id == id) == null ? false : true;
+            return _entities.FirstOrDefault(r => r.Id == id) != null;
         }
 
         public void Add(TEntity entity)
@@ -64,11 +64,6 @@ namespace Financial.Data.Repositories
         public void AddRange(IEnumerable<TEntity> entities)
         {
             _context.Set<TEntity>().AddRange(entities);
-        }
-
-        public void Update(TEntity entity)
-        {
-            _context.Entry(entity).State = EntityState.Modified;
         }
 
         public void Remove(TEntity entity)

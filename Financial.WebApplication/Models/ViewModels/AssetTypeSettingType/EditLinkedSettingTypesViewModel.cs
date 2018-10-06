@@ -14,7 +14,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         {
         }
 
-        public EditLinkedSettingTypesViewModel(Business.Models.AssetType bmAssetType)
+        public EditLinkedSettingTypesViewModel(Business.Models.AccountType bmAssetType)
         {
             AssetTypeId = bmAssetType.AssetTypeId;
             AssetTypeName = bmAssetType.AssetTypeName;
@@ -29,6 +29,6 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
-        public List<Business.Models.SettingType> SettingTypes { get; set; }
+        public List<Business.Models.AttributeType> SettingTypes { get; set; }
     }
 }

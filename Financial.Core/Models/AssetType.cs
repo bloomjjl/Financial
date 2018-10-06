@@ -13,5 +13,12 @@ namespace Financial.Core.Models
     {
         [Required]
         public string Name { get; set; }
+
+
+
+        //public ICollection<Asset> Assets { get; set; }
+
+
+        public static readonly int IdForCreditCard = 3;
     }
 }

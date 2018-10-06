@@ -13,7 +13,7 @@ namespace Financial.WebApplication.Models.ViewModels.SettingType
         {
         }
 
-        public IndexViewModel(Business.Models.SettingType bmSettingType)
+        public IndexViewModel(Business.Models.AttributeType bmSettingType)
         {
             Id = bmSettingType.SettingTypeId;
             Name = bmSettingType.SettingTypeName;

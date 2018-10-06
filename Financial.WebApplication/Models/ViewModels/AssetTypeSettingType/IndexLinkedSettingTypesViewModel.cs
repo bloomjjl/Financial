@@ -14,7 +14,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         {
 
         }
-        public IndexLinkedSettingTypesViewModel(Business.Models.SettingType bmSettingType)
+        public IndexLinkedSettingTypesViewModel(Business.Models.AttributeType bmSettingType)
         {
             Id = bmSettingType.AssetTypeSettingTypeId;
             //AssetTypeId = dtoAssetTypeSettingType.AssetTypeId;
@@ -23,7 +23,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
             SettingTypeName = bmSettingType.SettingTypeName;
             //SettingTypeIsActive = dtoSettingType.IsActive;
         }
-        public IndexLinkedSettingTypesViewModel(Business.Models.AssetType bmAssetType)
+        public IndexLinkedSettingTypesViewModel(Business.Models.AccountType bmAssetType)
         {
             Id = bmAssetType.AssetTypeSettingTypeId;
             //AssetTypeId = dtoAssetTypeSettingType.AssetTypeId;

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TransactionCategory = Financial.Core.Models.TransactionCategory;
 
 namespace Financial.Data.Repositories
 {
@@ -19,6 +20,15 @@ namespace Financial.Data.Repositories
         private FinancialDbContext FinancialDbContext
         {
             get { return _context as FinancialDbContext; }
+        }
+
+
+
+        public IEnumerable<TransactionCategory> GetAllActiveOrderedByName()
+        {
+            return FinancialDbContext.TransactionCategories
+                .Where(r => r.IsActive)
+                .OrderBy(r => r.Name);
         }
     }
 }

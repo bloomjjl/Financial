@@ -14,8 +14,8 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         {
 
         }
-        public CreateLinkedSettingTypesViewModel(Business.Models.AssetType bmAssetType,
-            List<Business.Models.SettingType> bmSettingTypes)
+        public CreateLinkedSettingTypesViewModel(Business.Models.AccountType bmAssetType,
+            List<Business.Models.AttributeType> bmSettingTypes)
         {
             AssetTypeId = bmAssetType.AssetTypeId;
             AssetTypeName = bmAssetType.AssetTypeName;
@@ -27,7 +27,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         [Display(Name = "Asset Type")]
         public string AssetTypeName { get; set; }
 
-        public List<Business.Models.AssetTypeSettingType> LinkedAssetTypeSettingTypes { get; set; }
-        public List<Business.Models.SettingType> SettingTypes { get; set; }
+        public List<Business.Models.AccountTypeSettingType> LinkedAssetTypeSettingTypes { get; set; }
+        public List<Business.Models.AttributeType> SettingTypes { get; set; }
     }
 }

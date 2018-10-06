@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Financial.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,10 @@ namespace Financial.Business.Utilities
 {
     public class TransactionUtility
     {
-        public static int TransactionTypeIdForExpense = 1;
-        public static int TransactionTypeIdForIncome = 2;
-
-
         public static decimal FormatAmount(int TransactionTypeId, decimal amount)
         {
-            if(TransactionTypeId == TransactionTypeIdForExpense)
-            {
+            if(TransactionTypeId == TransactionType.IdForExpense)
                 return amount * -1;
-            }
 
             return amount;
         }

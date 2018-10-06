@@ -19,21 +19,21 @@ namespace Financial.Business.Services
         }
 
 
-        public SettingType GetSettingType(int settingTypeId)
+        public AttributeType GetSettingType(int settingTypeId)
         {
             var dtoSettingType = _unitOfWork.SettingTypes.Get(settingTypeId);
             if (dtoSettingType == null)
             {
                 return null;
             }
-            return new SettingType(dtoSettingType);
+            return new AttributeType(dtoSettingType);
         }
 
-        public List<SettingType> GetListOfSettingTypes()
+        public List<AttributeType> GetListOfSettingTypes()
         {
             // get all active setting types from db
             return _unitOfWork.SettingTypes.GetAllActive()
-                .Select(r => new SettingType(r))
+                .Select(r => new AttributeType(r))
                 .ToList();
         }
 
@@ -45,7 +45,7 @@ namespace Financial.Business.Services
         /// positive integer = record added.
         /// zero integer = name already exists.
         /// </returns>
-        public int AddSettingType(SettingType bmSettingType)
+        public int AddSettingType(AttributeType bmSettingType)
         {
             // check for existing name
             var exists = _unitOfWork.SettingTypes.GetAllActive()
@@ -70,7 +70,7 @@ namespace Financial.Business.Services
             return dtoSettingType.Id;
         }
 
-        public bool EditSettingType(SettingType bmSettingType)
+        public bool EditSettingType(AttributeType bmSettingType)
         {
             // get dto
             var dtoSettingType = _unitOfWork.SettingTypes.Get(bmSettingType.SettingTypeId);

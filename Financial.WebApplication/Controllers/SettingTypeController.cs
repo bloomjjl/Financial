@@ -81,7 +81,7 @@ namespace Financial.WebApplication.Controllers
                 }
 
                 // transfer vm to bm
-                var bmSettingType = new Business.Models.SettingType()
+                var bmSettingType = new Business.Models.AttributeType()
                 {
                     SettingTypeName = vmCreate.Name,
                 };
@@ -140,7 +140,7 @@ namespace Financial.WebApplication.Controllers
                 }
 
                 // transfer vm to bm
-                var bmSettingType = new Business.Models.SettingType()
+                var bmSettingType = new Business.Models.AttributeType()
                 {
                     SettingTypeId = vmEdit.Id,
                     SettingTypeName = vmEdit.Name,

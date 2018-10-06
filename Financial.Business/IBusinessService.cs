@@ -9,10 +9,11 @@ namespace Financial.Business
 {
     public interface IBusinessService
     {
-        IAssetService AssetService { get; }
-        IAssetSettingService AssetSettingService { get; }
-        IAssetTypeService AssetTypeService { get; }
-        IAssetTypeSettingTypeService AssetTypeSettingTypeService { get; }
+        IAccountService AccountService { get; }
+        IAccountSettingService AccountSettingService { get; }
+        IAccountTransactionService AccountTransactionService { get; }
+        IAccountTypeService AccountTypeService { get; }
+        IAccountTypeSettingTypeService AccountTypeSettingTypeService { get; }
         ISettingTypeService SettingTypeService { get; }
     }
 }

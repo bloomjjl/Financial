@@ -3,61 +3,129 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="~/Content/images/logo_financial2.png">
     <title>Financial Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-    @Scripts.Render("~/bundles/jquery")
-\</head>
+   @* @Scripts.Render("~/bundles/jquery")
+    *@
+</head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Financial", "Index", "AssetTransaction", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Asset Types", "Index", "AssetType")</li>
-                    <li>@Html.ActionLink("Setting Types", "Index", "SettingType")</li>
-                    <li>@Html.ActionLink("Transaction Categories", "Index", "TransactionCategory")</li>
-                    <li>@Html.ActionLink("Assets", "Index", "Asset")</li>
-                </ul>
-                @Html.Partial("_LoginPartial")
-            </div>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("Account Types", "Index", "AssetType")</li>
+                <li>@Html.ActionLink("Setting Types", "Index", "SettingType")</li>
+                <li>@Html.ActionLink("Transaction Categories", "Index", "TransactionCategory")</li>
+                <li>@Html.ActionLink("Accounts", "Index", "Account")</li>
+            </ul>
+            @Html.Partial("_LoginPartial")
         </div>
     </div>
-    <div class="container body-content">
+</div>
 
-        @if (ViewData["ErrorMessage"] != null)
-        {
-            <div class="alert alert-warning">
-                <span class="glyphicon glyphicon-remove"></span>
-                @ViewData["ErrorMessage"].ToString()
-            </div>
-        }
-        else if (ViewData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success">
-                <span class="glyphicon glyphicon-ok"></span>
-                @ViewData["SuccessMessage"].ToString()
-            </div>
-        }
-
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Financial Application</p>
-        </footer>
+@*
+<div class="header">
+        <div class="container">
+            <img class="logo-title" src="~/Content/images/logo_financial3.png" alt="Financial Logo" />
+        </div>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryui")
-    @Scripts.Render("~/bundles/jquerydt")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" id="navbar-title" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                
+            <img class="logo-img" src="~/Content/images/logo_financial2.png" alt="Financial Logo" />
+            
+                @Html.ActionLink("Bloom Final Project", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+               
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>@Html.ActionLink("Asset Types", "Index", "AssetType")</li>
+                <li>@Html.ActionLink("Setting Types", "Index", "SettingType")</li>
+                <li>@Html.ActionLink("Transaction Categories", "Index", "TransactionCategory")</li>
+                <li>@Html.ActionLink("Assets", "Index", "Account")</li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Manage Users", "Index", "ManageUsers", new { area = "Admin" }, null)</li>
+                            <li>@Html.ActionLink("Manage Sessions", "Index", "ManageSessions", new { area = "Admin" }, null)</li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                @if (Request.IsAuthenticated)
+                {
+                    <li>@Html.ActionLink("Logout", "Logout", "Account", new { area = "" }, null)</li>
+                    <li>@Html.Action("UserNavPartial", "Account", new { area = "" })</li>
+                }
+                else
+                {
+                    <li>@Html.ActionLink("Login", "Login", "Account", new { area = "" }, null)</li>
+                }
+            </ul>
+
+        </div>
+    </div>
+</div>
+*@
+@*
+    @Html.Partial("_NavBar")
+*@
+
+
+<div class="container body-content">
+
+    @if (ViewData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-warning">
+            <span class="glyphicon glyphicon-remove"></span>
+            @ViewData["ErrorMessage"].ToString()
+        </div>
+    }
+    else if (ViewData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span>
+            @ViewData["SuccessMessage"].ToString()
+        </div>
+    }
+
+    @RenderBody()
+
+    <hr/>
+
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Financial Application</p>
+    </footer>
+</div>
+
+@Scripts.Render("~/bundles/lib")
+@*
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryui")
+@Scripts.Render("~/bundles/jquerydt")
+@Scripts.Render("~/bundles/bootstrap")
+    *@
+@RenderSection("scripts", required: false)
 </body>
 </html>

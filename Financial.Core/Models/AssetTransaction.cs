@@ -36,5 +36,21 @@ namespace Financial.Core.Models
         [Required]
         public decimal Amount { get; set; }
         public string Note { get; set; }
+
+
+
+
+
+        [ForeignKey("AssetId")]
+        public Asset Asset { get; set; }
+
+        [ForeignKey("TransactionTypeId")]
+        public TransactionType TransactionType { get; set; }
+
+        [ForeignKey("TransactionCategoryId")]
+        public TransactionCategory TransactionCategory { get; set; }
+
+        [ForeignKey("TransactionDescriptionId")]
+        public TransactionDescription TransactionDescription { get; set; }
     }
 }

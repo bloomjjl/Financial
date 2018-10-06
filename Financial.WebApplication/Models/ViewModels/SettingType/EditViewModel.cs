@@ -13,7 +13,7 @@ namespace Financial.WebApplication.Models.ViewModels.SettingType
         {
         }
 
-        public EditViewModel(Business.Models.SettingType bmSettingType)
+        public EditViewModel(Business.Models.AttributeType bmSettingType)
         {
             Id = bmSettingType.SettingTypeId;
             Name = bmSettingType.SettingTypeName;

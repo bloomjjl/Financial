@@ -42,22 +42,23 @@
   <ItemGroup>
     <Compile Include="BusinessService.cs" />
     <Compile Include="IBusinessService.cs" />
-    <Compile Include="Models\AssetTransaction.cs" />
-    <Compile Include="Models\AssetType.cs" />
-    <Compile Include="Models\AssetTypeSettingType.cs" />
-    <Compile Include="Models\SettingType.cs" />
-    <Compile Include="ServiceInterfaces\IAssetService.cs" />
-    <Compile Include="ServiceInterfaces\IAssetSettingService.cs" />
-    <Compile Include="ServiceInterfaces\IAssetTransactionService.cs" />
-    <Compile Include="ServiceInterfaces\IAssetTypeService.cs" />
-    <Compile Include="ServiceInterfaces\IAssetTypeSettingTypeService.cs" />
+    <Compile Include="Models\Account.cs" />
+    <Compile Include="Models\AccountTransaction.cs" />
+    <Compile Include="Models\AccountType.cs" />
+    <Compile Include="Models\AccountTypeSettingType.cs" />
+    <Compile Include="Models\AttributeType.cs" />
+    <Compile Include="ServiceInterfaces\IAccountService.cs" />
+    <Compile Include="ServiceInterfaces\IAccountSettingService.cs" />
+    <Compile Include="ServiceInterfaces\IAccountTransactionService.cs" />
+    <Compile Include="ServiceInterfaces\IAccountTypeService.cs" />
+    <Compile Include="ServiceInterfaces\IAccountTypeSettingTypeService.cs" />
     <Compile Include="ServiceInterfaces\ISelectListService.cs" />
     <Compile Include="ServiceInterfaces\ISettingTypeService.cs" />
-    <Compile Include="Services\AssetService.cs" />
-    <Compile Include="Services\AssetSettingService.cs" />
-    <Compile Include="Services\AssetTransactionService.cs" />
-    <Compile Include="Services\AssetTypeService.cs" />
-    <Compile Include="Services\AssetTypeSettingTypeService.cs" />
+    <Compile Include="Services\AccountService.cs" />
+    <Compile Include="Services\AccountSettingService.cs" />
+    <Compile Include="Services\AccountTransactionService.cs" />
+    <Compile Include="Services\AccountTypeService.cs" />
+    <Compile Include="Services\AccountTypeSettingTypeService.cs" />
     <Compile Include="Services\SelectListService.cs" />
     <Compile Include="Services\SettingTypeService.cs" />
     <Compile Include="Utilities\AccountUtility.cs" />
@@ -65,12 +66,27 @@
     <Compile Include="Utilities\TransactionUtility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.Helpers.dll</HintPath>
       <Private>True</Private>

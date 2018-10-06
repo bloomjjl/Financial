@@ -37,6 +37,7 @@ namespace Financial.Business.Tests.Fakes.Repositories
                 .ToList();
         }
 
+
         public IEnumerable<AssetSetting> GetAllActiveForSettingType(int settingTypeId)
         {
             return _entities

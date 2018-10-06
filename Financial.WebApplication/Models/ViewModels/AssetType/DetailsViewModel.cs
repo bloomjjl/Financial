@@ -12,7 +12,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetType
         public DetailsViewModel()
         {
         }
-        public DetailsViewModel(Business.Models.AssetType bmAssetType)
+        public DetailsViewModel(Business.Models.AccountType bmAssetType)
         {
             Id = bmAssetType.AssetTypeId;
             Name = bmAssetType.AssetTypeName;

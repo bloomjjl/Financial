@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Financial.Core.Models
 {
-    [Table("AccountTypesRelationshipTypes")]
+    [Table("AccountTypeRelationshipTypes")]
     public class AssetTypeRelationshipType : BaseEntity
     {
         [Required]

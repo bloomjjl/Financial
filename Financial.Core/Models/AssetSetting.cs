@@ -12,13 +12,22 @@ namespace Financial.Core.Models
     public class AssetSetting : BaseEntity
     {
         [Required]
-        [Display(Name = "Asset ID")]
         [Column("AccountId")]
         public int AssetId { get; set; }
         [Required]
-        [Display(Name = "SettingType ID")]
         [Column("AttributeTypeId")]
         public int SettingTypeId { get; set; }
         public string Value { get; set; }
+
+
+
+
+
+        [ForeignKey("AssetId")]
+        public Asset Asset { get; set; }
+
+        [ForeignKey("SettingTypeId")]
+        public SettingType SettingType { get; set; }
+
     }
 }

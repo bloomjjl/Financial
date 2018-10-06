@@ -14,7 +14,7 @@ namespace Financial.WebApplication.Models.ViewModels.SettingType
 
         }
 
-        public DetailsViewModel(Business.Models.SettingType bmSettingType)
+        public DetailsViewModel(Business.Models.AttributeType bmSettingType)
         {
             Id = bmSettingType.SettingTypeId;
             Name = bmSettingType.SettingTypeName;

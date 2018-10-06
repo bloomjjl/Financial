@@ -16,7 +16,7 @@ namespace Financial.Business.Tests.Services
         {
             // Fake Data
             _dataAssets = FakeAssets.InitialFakeAssets().ToList();
-            _dataAssetSettings = FakeAssetSettings.InitialFakeAssetSettings().ToList();
+            _dataAssetAttributes = FakeAssetSettings.InitialFakeAssetSettings().ToList();
             _dataAssetTransactions = FakeAssetTransactions.InitialFakeAssetTransactions().ToList();
             _dataAssetTypes = FakeAssetTypes.InitialFakeAssetTypes().ToList();
             //_dataAssetTypesRelationsihpTypes = FakeAssetTypesRelationshipTypes.InitialFakeAssetTypesRelationshipTypes().ToList();
@@ -30,7 +30,7 @@ namespace Financial.Business.Tests.Services
 
             // Fake Repositories
             _repositoryAsset = new InMemoryAssetRepository(_dataAssets);
-            _repositoryAssetSetting = new InMemoryAssetSettingRepository(_dataAssetSettings);
+            _repositoryAssetSetting = new InMemoryAssetSettingRepository(_dataAssetAttributes);
             _repositoryAssetTransaction = new InMemoryAssetTransactionRepository(_dataAssetTransactions);
             _repositoryAssetType = new InMemoryAssetTypeRepository(_dataAssetTypes);
             //_repositoryAssetTypeRelationshipType = new InMemoryAssetTypeRelationshipTypeRepository(_dataAssetTypesRelationsihpTypes);
@@ -43,33 +43,20 @@ namespace Financial.Business.Tests.Services
             _repositoryTransactionType = new InMemoryTransactionTypeRepository(_dataTransactionTypes);
 
             // Fake Unit of Work
-            _unitOfWork = new InMemoryUnitOfWork()
-            {
-                Assets = _repositoryAsset,
-                AssetSettings = _repositoryAssetSetting,
-                AssetTransactions = _repositoryAssetTransaction,
-                AssetTypes = _repositoryAssetType,
-                //AssetTypesRelationshipTypes = _repositoryAssetTypeRelationshipType,
-                //AssetTypesSettingTypes = _repositoryAssetTypeSettingType,
-                //ParentChildRelationshipTypes = _repositoryParentChildRelationshipType,
-                //RelationshipTypes = _repositoryRelationshipType,
-                //SettingTypes = _repositorySettingType,
-                TransactionCategories = _repositoryTransactionCategory,
-                //TransactionDescriptions = _repositoryTransactionDescription,
-                TransactionTypes = _repositoryTransactionType
-            };
+            ResetUnitOfWork();
         }
+
 
         // Fake Data
         protected IList<Asset> _dataAssets;
-        protected IList<AssetSetting> _dataAssetSettings;
+        protected IList<AssetSetting> _dataAssetAttributes;
         protected IList<AssetTransaction> _dataAssetTransactions;
         protected IList<AssetType> _dataAssetTypes;
-        protected IList<AssetTypeRelationshipType> _dataAssetTypesRelationsihpTypes;
-        protected IList<AssetTypeSettingType> _dataAssetTypesSettingTypes;
+        protected IList<AssetTypeRelationshipType> _dataAssetTypesRelationshipTypes;
+        protected IList<AssetTypeSettingType> _dataAssetTypesAttributeTypes;
         protected IList<ParentChildRelationshipType> _dataParentChildRelationshipTypes;
         protected IList<RelationshipType> _dataRelationshipTypes;
-        protected IList<SettingType> _dataSettingTypes;
+        protected IList<SettingType> _dataAttributeTypes;
         protected IList<TransactionCategory> _dataTransactionCategories;
         //protected IList<TransactionDescription> _dataTransactionDescriptions;
         protected IList<TransactionType> _dataTransactionTypes;
@@ -90,6 +77,25 @@ namespace Financial.Business.Tests.Services
         
         // Fake UOW
         protected InMemoryUnitOfWork _unitOfWork;
+
+        public void ResetUnitOfWork()
+        {
+            _unitOfWork = new InMemoryUnitOfWork()
+            {
+                Assets = _repositoryAsset,
+                AssetSettings = _repositoryAssetSetting,
+                AssetTransactions = _repositoryAssetTransaction,
+                AssetTypes = _repositoryAssetType,
+                //AssetTypesRelationshipTypes = _repositoryAssetTypeRelationshipType,
+                //AssetTypesSettingTypes = _repositoryAssetTypeSettingType,
+                //ParentChildRelationshipTypes = _repositoryParentChildRelationshipType,
+                //RelationshipTypes = _repositoryRelationshipType,
+                //SettingTypes = _repositorySettingType,
+                TransactionCategories = _repositoryTransactionCategory,
+                //TransactionDescriptions = _repositoryTransactionDescription,
+                TransactionTypes = _repositoryTransactionType
+            };
+        }
 
     }
 }

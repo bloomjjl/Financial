@@ -13,5 +13,10 @@ namespace Financial.Core.Models
     {
         [Required]
         public string Name { get; set; }
+
+
+
+        public ICollection<AssetTransaction> AssetTransactions { get; set; }
+
     }
 }

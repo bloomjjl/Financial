@@ -16,7 +16,7 @@ namespace Financial.WebApplication
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "AssetTransaction", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "AccountTransaction", action = "Index", id = UrlParameter.Optional }
             );
         }
     }

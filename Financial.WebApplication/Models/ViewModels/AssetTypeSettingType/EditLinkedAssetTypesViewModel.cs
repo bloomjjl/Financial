@@ -28,6 +28,6 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
         [Display(Name = "Setting Type")]
         public string SettingTypeName { get; set; }
 
-        public List<Business.Models.AssetTypeSettingType> LinkedAssetTypeSettingTypes { get; set; }
+        public List<Business.Models.AccountTypeSettingType> LinkedAssetTypeSettingTypes { get; set; }
     }
 }

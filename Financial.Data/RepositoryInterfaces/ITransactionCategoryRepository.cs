@@ -9,5 +9,6 @@ namespace Financial.Data.RepositoryInterfaces
 {
     public interface ITransactionCategoryRepository : IRepository<TransactionCategory>
     {
+        IEnumerable<TransactionCategory> GetAllActiveOrderedByName();
     }
 }

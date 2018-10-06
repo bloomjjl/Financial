@@ -9,7 +9,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
     public class IndexSettingTypesForAssetTypeViewModel
     {
         public IndexSettingTypesForAssetTypeViewModel() { }
-        public IndexSettingTypesForAssetTypeViewModel(Business.Models.SettingType bmSettingType, Business.Models.AssetTypeSettingType bmAssetTypeSettingType)
+        public IndexSettingTypesForAssetTypeViewModel(Business.Models.AttributeType bmSettingType, Business.Models.AccountTypeSettingType bmAssetTypeSettingType)
         {
             AssetTypeSettingTypeId = bmAssetTypeSettingType.AssetTypeSettingTypeId;
             AssetTypeId = bmAssetTypeSettingType.AssetTypeId;
@@ -17,7 +17,7 @@ namespace Financial.WebApplication.Models.ViewModels.AssetTypeSettingType
             SettingTypeName = bmSettingType.SettingTypeName;
             IsLinked = bmAssetTypeSettingType.AssetTypeId > 0;
         }
-        public IndexSettingTypesForAssetTypeViewModel(int assetTypeId, Business.Models.SettingType bmSettingTypeLinked)
+        public IndexSettingTypesForAssetTypeViewModel(int assetTypeId, Business.Models.AttributeType bmSettingTypeLinked)
         {
             AssetTypeSettingTypeId = bmSettingTypeLinked.AssetTypeSettingTypeId;
             AssetTypeId = assetTypeId;

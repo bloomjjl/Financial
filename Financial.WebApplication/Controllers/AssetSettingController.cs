@@ -79,10 +79,10 @@ namespace Financial.WebApplication.Controllers
 
                     // transfer dto to vm
                     var vmCreate = new List<CreateViewModel>();
-                    var dbATST = _unitOfWork.AssetTypeSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
-                    foreach(var dtoATST in dbATST)
+                    var dbAssetTypeSettingTypes = _unitOfWork.AssetTypeSettingTypes.GetAllActiveForAssetType(dtoAsset.AssetTypeId);
+                    foreach(var dtoAssetTypeSettingType in dbAssetTypeSettingTypes)
                     {
-                        var dtoSettingType = _unitOfWork.SettingTypes.GetActive(dtoATST.SettingTypeId);
+                        var dtoSettingType = _unitOfWork.SettingTypes.GetActive(dtoAssetTypeSettingType.SettingTypeId);
                         if (dtoSettingType != null)
                         {
                             vmCreate.Add(new CreateViewModel(dtoAsset, dtoSettingType));

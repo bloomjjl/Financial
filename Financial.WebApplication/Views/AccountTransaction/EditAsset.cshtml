@@ -1,0 +1,107 @@
+﻿@model Financial.WebApplication.Models.ViewModels.AccountTransaction.EditAssetViewModel
+
+@{
+    ViewBag.Title = "EditAsset";
+}
+
+<h2>Asset</h2>
+
+
+@using (Html.BeginForm("EditAsset", "AssetTransaction", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Edit Transaction</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SelectedAssetId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SelectedAssetId, Model.Assets, "-- Select a Type --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.SelectedAssetId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AssetTypeName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label(Model.AssetTypeName, new { @class = "control-label text-muted" })
+                @Html.ValidationMessageFor(model => model.AssetTypeName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Edit", "AssetTransaction", new { id = Model.Id }, new { @class="btn btn-default" })
+            </div>
+        </div>
+
+        <hr />
+        <h4>Transaction</h4>
+        <hr />
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CheckNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label(Model.CheckNumber, new { @class = "control-label text-muted" })
+                @Html.ValidationMessageFor(model => model.CheckNumber, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DueDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label(Model.DueDate, new { @class = "control-label text-muted" })
+                @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ClearDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label(Model.ClearDate, new { @class = "control-label text-muted" })
+                @Html.ValidationMessageFor(model => model.ClearDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <label class="control-label text-muted">@Model.Amount</label>
+                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Note, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label(Model.Note, new { @class = "control-label text-muted" })
+                @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TransactionType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label(Model.TransactionType, new { @class = "control-label text-muted" })
+                @Html.ValidationMessageFor(model => model.TransactionType, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TransactionCategory, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label(Model.TransactionCategory, new { @class = "control-label text-muted" })
+                @Html.ValidationMessageFor(model => model.TransactionCategory, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

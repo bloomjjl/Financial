@@ -21,9 +21,9 @@ namespace Financial.WebApplication
             container.RegisterType<IUnitOfWork, UnitOfWork>();
             container.RegisterType<IBusinessService, BusinessService>();
 
-            container.RegisterType<IAssetTypeService, AssetTypeService>();
-            container.RegisterType<IAssetTypeSettingTypeService, AssetTypeSettingTypeService>();
-            container.RegisterType<IAssetTransactionService, AssetTransactionService>();
+            container.RegisterType<IAccountTypeService, AccountTypeService>();
+            container.RegisterType<IAccountTypeSettingTypeService, AccountTypeSettingTypeService>();
+            container.RegisterType<IAccountTransactionService, AccountTransactionService>();
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }
